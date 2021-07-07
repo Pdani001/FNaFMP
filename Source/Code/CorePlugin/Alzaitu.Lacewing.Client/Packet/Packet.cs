@@ -131,7 +131,7 @@ namespace Alzaitu.Lacewing.Client.Packet
             if (!stream.DataAvailable)
                 return null;
 
-            byte[] ReadBuffer = new byte[1024];
+            byte[] ReadBuffer = new byte[256];
             int pos = 0;
             stream.Read(ReadBuffer, 0, ReadBuffer.Length);
             byte type = ReadBuffer[pos++];
@@ -141,7 +141,7 @@ namespace Alzaitu.Lacewing.Client.Packet
 
             long size = ReadBuffer[pos++];
             if (size == 254)
-                size = ReadInversedShort(new byte[2] { ReadBuffer[pos++], ReadBuffer[pos++] });
+                size = BitConverter.ToUInt16(new byte[2] { ReadBuffer[pos++], ReadBuffer[pos++] },0);
             else if (size == 255)
             {
                 byte[] number = new byte[4];

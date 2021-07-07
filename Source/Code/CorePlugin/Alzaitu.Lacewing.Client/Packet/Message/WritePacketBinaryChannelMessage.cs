@@ -16,7 +16,7 @@ namespace Alzaitu.Lacewing.Client.Packet.Message
         protected override void WriteImpl(BinaryWriter wrt)
         {
             wrt.Write(SubChannel);
-            wrt.Write(Channel);
+            wrt.Write(BitConverter.GetBytes(Channel));
             wrt.Write(Message);
         }
 

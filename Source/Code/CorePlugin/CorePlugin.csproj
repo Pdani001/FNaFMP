@@ -83,7 +83,6 @@
     <Compile Include="Alzaitu.Lacewing.Client\Packet\Message\ReadPacketPing.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\Message\ReadPacketUdpWelcome.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\Message\WritePacketBinaryChannelMessage.cs" />
-    <Compile Include="Alzaitu.Lacewing.Client\Packet\Message\WritePacketBinaryServerChannelMessage.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\Message\WritePacketPong.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\Message\WritePacketUdpHello.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\Packet.cs" />

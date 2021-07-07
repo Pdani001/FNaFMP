@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 
 namespace Alzaitu.Lacewing.Client.Packet.Message
 {
@@ -13,6 +14,14 @@ namespace Alzaitu.Lacewing.Client.Packet.Message
         {
             wrt.Write(SubChannel);
             wrt.Write(Message);
+        }
+
+        protected override void WriteImpl(int pos, out byte[] bytes)
+        {
+            List<byte> list = new List<byte>();
+            list.Add(SubChannel);
+            list.AddRange(Message);
+            bytes = list.ToArray();
         }
 
         protected override void ReadImpl(byte[] bytes, long size, int pos, LacewingClient client = null, bool blasted = false)

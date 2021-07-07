@@ -30,7 +30,7 @@ namespace Alzaitu.Lacewing.Client.Packet.Response
                     }
                     string name = Encoding.UTF8.GetString(data);
                     size -= channelnamelength;
-                    int ChannelID = ReadInversedShort(new byte[2] { bytes[pos++], bytes[pos++] });
+                    int ChannelID = BitConverter.ToUInt16(new byte[2] { bytes[pos++], bytes[pos++] },0);
                     size -= 2;
                     Channel = ClientChannel.GetChannel(client, name);
                     List<ClientPeer> peers = new List<ClientPeer>();

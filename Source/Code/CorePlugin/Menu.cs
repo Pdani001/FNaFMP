@@ -405,8 +405,9 @@ namespace FNaFMP.Menu
                 {
 					inforetry = -1;
 					attempt = 0;
+					Utilities.Logger.Write(Logger.LogLevel.WARN,"Authentication failed, leaving channel");
 					Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
-                } else
+				} else
                 {
 					inforetry += 5;
 					SendVersion();
@@ -482,7 +483,7 @@ namespace FNaFMP.Menu
 		{
 			if (!join)
 				return;
-			Utilities.Logger.Write("Joined channel '{0}'", args.Channel);
+			Utilities.Logger.Write("Joined channel '{0}', starting authentication", args.Channel);
 			SendVersion();
 			inforetry = (int)Time.MainTimer.TotalSeconds + 5;
 			attempt = 1;
@@ -506,6 +507,7 @@ namespace FNaFMP.Menu
             {
 				if(e.PeerID == Core.Client.joinedChannels[0].ChannelMaster.Id)
                 {
+					Utilities.Logger.Write("Received lobby info from channel master ({0})",e.PeerID);
 					inforetry = -1;
 					attempt = 0;
 					BinaryReader reader = new BinaryReader(e.Message);
@@ -514,10 +516,12 @@ namespace FNaFMP.Menu
                     {
 						DenyReason = reader.ReadText();
 						Event = "LobbyJoin";
+						Utilities.Logger.Write(Logger.LogLevel.WARN,"'{0}': {1}", Event, DenyReason);
 						Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
 						join = false;
 					} else
                     {
+						Utilities.Logger.Write("Join successful, switching to next scene");
 						int count = reader.ReadByte();
 						bool password = reader.ReadByte() == 1;	// NOT IMPLEMENTED YET (2021-06-30) ~Pdani
 						// TODO: Create the password Scene! (But make the lobby chat first lol)
@@ -880,6 +884,7 @@ namespace FNaFMP.Menu
 					Core.Client.Event.TextMessage -= Event_TextMessage;
 				}
 				Core.Client.Event.ResponseJoinChannel -= Event_JoinChannel;
+                Core.Client.Event.ResponseLeaveChannel -= Event_LeaveChannel;
 			}
 		}
 		private int checkin = -1;

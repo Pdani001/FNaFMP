@@ -68,6 +68,7 @@ namespace FNaFMP.Select
                 {
 					return;
                 }
+				Utility.Utilities.Logger.Write("Character select screen is ready!");
 				Players.Add(Core.Client.ID);
                 Core.Client.Event.ResponseLeaveChannel += Event_LeaveChannel;
                 Core.Client.Event.Peer += Event_Peer;
@@ -89,6 +90,7 @@ namespace FNaFMP.Select
             {
 				if (Core.Client.IsMaster)
 				{
+					Utility.Utilities.Logger.Write("Status request from {0}",e.PeerID);
 					foreach (Core.Character cr in Checkmarks.Keys)
 					{
 						Checkmark check = Checkmarks[cr];
@@ -153,6 +155,7 @@ namespace FNaFMP.Select
 				case 12:
                     if (Core.Client.IsMaster)
                     {
+						Utility.Utilities.Logger.Write("Lobby join request from {0}",e.PeerID);
 						ClientChannel channel = Core.Client.joinedChannels[0];
 						int count = channel.Count;
 						string version = reader.ReadText();
@@ -450,6 +453,8 @@ namespace FNaFMP.Select
 			Vector2 size = canvas.MeasureText(display);
 			canvas.DrawText(display, location.X - (size.X / 2), location.Y - (size.Y / 2));
 
+			this.canvas.End();
+
 			Vector2 mouse = DualityApp.Mouse.Pos;
 			if (DualityApp.Mouse.ButtonHit(MouseButton.Left) && !leave)
 			{
@@ -460,7 +465,6 @@ namespace FNaFMP.Select
 				}
 			}
 
-			this.canvas.End();
 		}
 	}
 
