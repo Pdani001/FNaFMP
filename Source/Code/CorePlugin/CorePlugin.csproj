@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{AFE883F3-72B4-4C7C-A1D1-44EDC09C8F6E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FNaFMP</RootNamespace>
+    <AssemblyName>GamePlugin.core</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>GamePlugin.core.xml</DocumentationFile>
+    <NoWarn>1591,1592,1573,1571,1570,1572</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>GamePlugin.core.xml</DocumentationFile>
+    <NoWarn>1591,1592,1573,1571,1570,1572</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DiscordRPC, Version=1.0.175.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DiscordRichPresence.1.0.175\lib\net35\DiscordRPC.dll</HintPath>
+    </Reference>
+    <Reference Include="Duality">
+      <HintPath>..\..\..\Duality.dll</HintPath>
+    </Reference>
+    <Reference Include="DualityPrimitives">
+      <HintPath>..\..\..\DualityPrimitives.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Net.Sockets, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Net.Sockets.4.3.0\lib\net46\System.Net.Sockets.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Alzaitu.Lacewing.Client\ClientChannel.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\ClientEvent.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\ClientPeer.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\LacewingClient.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\BinaryReader.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventBinaryMessage.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventNumberMessage.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventPeer.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventPing.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventResponseChannelList.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventResponseConnect.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventResponseJoinChannel.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventResponseLeaveChannel.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventResponseSetName.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventTextMessage.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\MessageEventType.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Message\PacketBinaryPeerMessage.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Message\PacketBinaryServerMessage.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Message\ReadPacketBinaryChannelMessage.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Message\ReadPacketPeer.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Message\ReadPacketPing.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Message\ReadPacketUdpWelcome.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Message\WritePacketBinaryChannelMessage.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Message\WritePacketBinaryServerChannelMessage.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Message\WritePacketPong.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Message\WritePacketUdpHello.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Packet.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\PacketHandler.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\PacketTypeAttribute.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Request\PacketRequest.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Request\PacketRequestChannelList.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Request\PacketRequestConnect.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Request\PacketRequestJoinChannel.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Request\PacketRequestLeaveChannel.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Request\PacketRequestSetName.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Response\PacketResponse.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Response\PacketResponseChannelList.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Response\PacketResponseConnect.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Response\PacketResponseJoinChannel.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Response\PacketResponseLeaveChannel.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\Response\PacketResponseSetName.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\StateMachine\BaseThread.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\StateMachine\ClientThread.cs" />
+    <Compile Include="Menu.cs" />
+    <Compile Include="Select.cs" />
+    <Compile Include="Splash.cs" />
+    <Compile Include="Utility.cs" />
+    <Compile Include="CorePlugin.cs" />
+    <Compile Include="Office.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- Copy all plugin binaries to the plugin folder -->
+  <Import Project="$(SolutionDir)AggregateUserPlugins.targets" />
+</Project>

@@ -1,0 +1,9 @@
+D:\VSCode\Alzaitu.Lacewing\Alzaitu.Lacewing.Client\obj\Debug\netcoreapp2.0\Alzaitu.Lacewing.Client.AssemblyInfoInputs.cache
+D:\VSCode\Alzaitu.Lacewing\Alzaitu.Lacewing.Client\obj\Debug\netcoreapp2.0\Alzaitu.Lacewing.Client.AssemblyInfo.cs
+D:\VSCode\Alzaitu.Lacewing\Alzaitu.Lacewing.Client\obj\Debug\netcoreapp2.0\Alzaitu.Lacewing.Client.csproj.CoreCompileInputs.cache
+D:\VSCode\Alzaitu.Lacewing\Alzaitu.Lacewing.Client\obj\Debug\netcoreapp2.0\Alzaitu.Lacewing.Client.csprojAssemblyReference.cache
+D:\VSCode\Alzaitu.Lacewing\Alzaitu.Lacewing.Client\bin\Debug\netcoreapp2.0\Alzaitu.Lacewing.Client.deps.json
+D:\VSCode\Alzaitu.Lacewing\Alzaitu.Lacewing.Client\bin\Debug\netcoreapp2.0\Alzaitu.Lacewing.Client.dll
+D:\VSCode\Alzaitu.Lacewing\Alzaitu.Lacewing.Client\bin\Debug\netcoreapp2.0\Alzaitu.Lacewing.Client.pdb
+D:\VSCode\Alzaitu.Lacewing\Alzaitu.Lacewing.Client\obj\Debug\netcoreapp2.0\Alzaitu.Lacewing.Client.dll
+D:\VSCode\Alzaitu.Lacewing\Alzaitu.Lacewing.Client\obj\Debug\netcoreapp2.0\Alzaitu.Lacewing.Client.pdb

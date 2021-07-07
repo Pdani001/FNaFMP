@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v2.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v2.0": {
+      "Alzaitu.Lacewing.Client/1.0.0": {
+        "runtime": {
+          "Alzaitu.Lacewing.Client.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Alzaitu.Lacewing.Client/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\VSCode\\Alzaitu.Lacewing\\Alzaitu.Lacewing.Client\\Alzaitu.Lacewing.Client.csproj": {}
+  },
+  "projects": {
+    "D:\\VSCode\\Alzaitu.Lacewing\\Alzaitu.Lacewing.Client\\Alzaitu.Lacewing.Client.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\VSCode\\Alzaitu.Lacewing\\Alzaitu.Lacewing.Client\\Alzaitu.Lacewing.Client.csproj",
+        "projectName": "Alzaitu.Lacewing.Client",
+        "projectPath": "D:\\VSCode\\Alzaitu.Lacewing\\Alzaitu.Lacewing.Client\\Alzaitu.Lacewing.Client.csproj",
+        "packagesPath": "C:\\Users\\Pdani\\.nuget\\packages\\",
+        "outputPath": "D:\\VSCode\\Alzaitu.Lacewing\\Alzaitu.Lacewing.Client\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "D:\\Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Pdani\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp2.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {},
+          "https://packages.stride3d.net/nuget": {}
+        },
+        "frameworks": {
+          "netcoreapp2.0": {
+            "targetAlias": "netcoreapp2.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp2.0": {
+          "targetAlias": "netcoreapp2.0",
+          "dependencies": {
+            "Microsoft.NETCore.App": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.0.0, )",
+              "autoReferenced": true
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "0vcxtcQt4v0arQZiy93v5Iof4Wr8wu3neRIeWJY0fpkmEOJKOeIanqDOdI5UB9zp03oEedOfw4SMJ7U4BJSnaw==",
+  "success": true,
+  "projectFilePath": "D:\\VSCode\\Alzaitu.Lacewing\\Alzaitu.Lacewing.Client\\Alzaitu.Lacewing.Client.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Pdani\\.nuget\\packages\\microsoft.netcore.app\\2.0.0\\microsoft.netcore.app.2.0.0.nupkg.sha512",
+    "C:\\Users\\Pdani\\.nuget\\packages\\microsoft.netcore.dotnetapphost\\2.0.0\\microsoft.netcore.dotnetapphost.2.0.0.nupkg.sha512",
+    "C:\\Users\\Pdani\\.nuget\\packages\\microsoft.netcore.dotnethostpolicy\\2.0.0\\microsoft.netcore.dotnethostpolicy.2.0.0.nupkg.sha512",
+    "C:\\Users\\Pdani\\.nuget\\packages\\microsoft.netcore.dotnethostresolver\\2.0.0\\microsoft.netcore.dotnethostresolver.2.0.0.nupkg.sha512",
+    "C:\\Users\\Pdani\\.nuget\\packages\\microsoft.netcore.platforms\\2.0.0\\microsoft.netcore.platforms.2.0.0.nupkg.sha512",
+    "C:\\Users\\Pdani\\.nuget\\packages\\netstandard.library\\2.0.0\\netstandard.library.2.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
