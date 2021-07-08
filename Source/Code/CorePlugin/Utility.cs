@@ -262,6 +262,32 @@ namespace FNaFMP.Utility
 							right.X -= subX;
 							canvas.DrawText("State: " + DoorController.RightDoor.GetState(), right.X, right.Y + 50);
 						}
+
+						float half = DualityApp.WindowSize.X / 2;
+
+						float limit = (half / 4);
+
+						float cancelStart = half - limit;
+						float cancelEnd = half + limit;
+
+						if (!CameraAnimator.IsOpening)
+						{
+							canvas.DrawLine(cancelStart, 0, cancelStart, DualityApp.WindowSize.Y);
+							canvas.DrawLine(cancelEnd, 0, cancelEnd, DualityApp.WindowSize.Y);
+
+							int i = 1;
+							while (cancelStart - (limit * i) > 0)
+							{
+								canvas.DrawLine(cancelStart - (limit * i), 0, cancelStart - (limit * i), DualityApp.WindowSize.Y);
+								i++;
+							}
+							i = 1;
+							while (cancelEnd + (limit * i) < DualityApp.WindowSize.X)
+							{
+								canvas.DrawLine(cancelEnd + (limit * i), 0, cancelEnd + (limit * i), DualityApp.WindowSize.Y);
+								i++;
+							}
+						}
 					}
 					else
                     {

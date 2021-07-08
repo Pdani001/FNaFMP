@@ -7,6 +7,12 @@ namespace Alzaitu.Lacewing.Client
     {
         internal ClientEvent() { }
 
+        public event EventHandler<EventDisconnect> Disconnect;
+        internal virtual void OnDisconnect(EventDisconnect e)
+        {
+            Disconnect?.Invoke(this, e);
+        }
+
         public event EventHandler<EventResponseConnect> ResponseConnect;
         internal virtual void OnResponseConnect(EventResponseConnect e)
         {

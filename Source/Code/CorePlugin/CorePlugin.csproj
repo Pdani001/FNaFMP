@@ -70,6 +70,7 @@
     <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventPeer.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventPing.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventResponseChannelList.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventDisconnect.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventResponseConnect.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventResponseJoinChannel.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventResponseLeaveChannel.cs" />

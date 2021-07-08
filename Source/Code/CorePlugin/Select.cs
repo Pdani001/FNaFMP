@@ -74,6 +74,7 @@ namespace FNaFMP.Select
                 Core.Client.Event.Peer += Event_Peer;
                 Core.Client.Event.BinaryMessage += Event_BinaryMessage;
                 Core.Client.Event.NumberMessage += Event_NumberMessage;
+                Core.Client.Event.Disconnect += Event_Disconnect;
                 if (!Core.Client.IsMaster)
                 {
 					Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 21, new Random().Next());
@@ -82,6 +83,11 @@ namespace FNaFMP.Select
                     }
                 }
             }
+        }
+
+        private void Event_Disconnect(object sender, EventDisconnect e)
+        {
+			Scene.SwitchTo(LobbyScene);
         }
 
         private void Event_NumberMessage(object sender, EventNumberMessage e)
@@ -257,6 +263,7 @@ namespace FNaFMP.Select
 				Core.Client.Event.Peer -= Event_Peer;
                 Core.Client.Event.BinaryMessage -= Event_BinaryMessage;
 				Core.Client.Event.NumberMessage -= Event_NumberMessage;
+                Core.Client.Event.Disconnect -= Event_Disconnect;
 			}
 		}
 		private int countdown = -1;

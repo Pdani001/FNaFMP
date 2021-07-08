@@ -47,7 +47,8 @@ namespace Alzaitu.Lacewing.Client.Packet
 
             if (stream.GetType() == typeof(NetworkStream))
             {
-                var wrt = new BinaryWriter((NetworkStream)stream);
+                NetworkStream network = (NetworkStream)stream;
+                var wrt = new BinaryWriter(network);
 
                 if (NeedsFirstZero())
                 {
@@ -73,6 +74,8 @@ namespace Alzaitu.Lacewing.Client.Packet
                     wrt.Write(SubType.Value);
 
                 WriteImpl(wrt);
+
+                wrt.Flush();
             }
             else if(stream.GetType() == typeof(LacewingClient))
             {
@@ -137,7 +140,7 @@ namespace Alzaitu.Lacewing.Client.Packet
             byte type = ReadBuffer[pos++];
 
             if(!TypeReadMap.TryGetValue((byte) ((type >> 4) & 0xF), out var packetTypeBlock))
-                throw new InvalidDataException($"The packet read from the stream ({(type >> 4) & 0xF}.{type & 0xF}) does not have an associated type.");
+                throw new InvalidDataException($"[TCP] The packet read from the stream ({(type >> 4) & 0xF}.{type & 0xF}) does not have an associated type.");
 
             long size = ReadBuffer[pos++];
             if (size == 254)
@@ -159,7 +162,7 @@ namespace Alzaitu.Lacewing.Client.Packet
             {
                 var subType = ReadBuffer[pos++];
                 if(!packetTypeBlock.TryGetValue(subType, out packetType))
-                    throw new InvalidDataException($"The packet read from the stream ({(type >> 4) & 0xF}.{type & 0xF}.{subType}) does not have an associated type.");
+                    throw new InvalidDataException($"[TCP] The packet read from the stream ({(type >> 4) & 0xF}.{type & 0xF}.{subType}) does not have an associated type.");
                 size -= sizeof(byte);
             }
 
@@ -186,7 +189,7 @@ namespace Alzaitu.Lacewing.Client.Packet
             var type = bytes[pos++];
 
             if (!TypeReadMap.TryGetValue((byte)((type >> 4) & 0xF), out var packetTypeBlock))
-                throw new InvalidDataException($"The packet read from the stream ({(type >> 4) & 0xF}.{type & 0xF}) does not have an associated type.");
+                throw new InvalidDataException($"[UDP] The packet read from the stream ({(type >> 4) & 0xF}.{type & 0xF}) does not have an associated type.");
             
 
             Type packetType;
@@ -196,7 +199,7 @@ namespace Alzaitu.Lacewing.Client.Packet
             {
                 var subType = bytes[pos++];
                 if (!packetTypeBlock.TryGetValue(subType, out packetType))
-                    throw new InvalidDataException($"The packet read from the stream ({(type >> 4) & 0xF}.{type & 0xF}.{subType}) does not have an associated type.");
+                    throw new InvalidDataException($"[UDP] The packet read from the stream ({(type >> 4) & 0xF}.{type & 0xF}.{subType}) does not have an associated type.");
             }
 
             List<byte> msg = new List<byte>();

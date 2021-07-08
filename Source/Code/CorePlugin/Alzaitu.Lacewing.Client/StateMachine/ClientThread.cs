@@ -4,6 +4,7 @@ using System.Text;
 using Alzaitu.Lacewing.Client.Packet;
 using System.Threading;
 using System.IO;
+using Alzaitu.Lacewing.Client.Packet.EventData;
 
 namespace Alzaitu.Lacewing.Client.StateMachine
 {
@@ -33,7 +34,14 @@ namespace Alzaitu.Lacewing.Client.StateMachine
                     {
                         Console.WriteLine("Exception: "+e.Message);
                         if (e.GetType() == typeof(IOException))
+                        {
+                            client.Event.OnDisconnect(new EventDisconnect
+                            {
+                                Client = client,
+                                Reason = e.Message
+                            });
                             break;
+                        }
                         else
                             continue;
                     }

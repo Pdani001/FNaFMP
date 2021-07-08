@@ -13,7 +13,7 @@ using System.Threading;
 
 namespace Alzaitu.Lacewing.Client
 {
-    public sealed class LacewingClient : IDisposable
+    public sealed class LacewingClient
     {
         public string UserName { get; internal set; }
         internal string ServerAddress;
@@ -27,6 +27,8 @@ namespace Alzaitu.Lacewing.Client
         public readonly SortedDictionary<int, ClientChannel> globalChannelsByID = new SortedDictionary<int, ClientChannel>();
         public readonly SortedDictionary<int, ClientPeer> clientsByID = new SortedDictionary<int, ClientPeer>();
         public readonly List<ClientChannel> joinedChannels = new List<ClientChannel>();
+
+        private ClientThread thread;
 
         private NetworkStream stream;
         private readonly TcpClient _client;
@@ -67,10 +69,11 @@ namespace Alzaitu.Lacewing.Client
         private void OnConnect(IAsyncResult result)
         {
             _client.EndConnect(result);
+            _client.NoDelay = true;
             stream = _client.GetStream();
             UdpEndpoint = (IPEndPoint)_client.Client.RemoteEndPoint;
-            ClientThread ct = new ClientThread(this);
-            ct.Start();
+            thread = new ClientThread(this);
+            thread.Start();
             WritePacket(new PacketRequestConnect{ 
                 Version = PacketRequestConnect.CURRENT_VERSION
             });
@@ -213,9 +216,43 @@ namespace Alzaitu.Lacewing.Client
         internal void WritePacket(Packet.Packet packet, bool blasted = false)
         {
             if (!blasted)
-                packet.Write(stream);
+            {
+                try
+                {
+                    packet.Write(stream);
+                }
+                catch (Exception e)
+                {
+                    if (IsConnected)
+                    {
+                        Event.OnDisconnect(new EventDisconnect
+                        {
+                            Client = this,
+                            Reason = e.Message
+                        });
+                        Dispose();
+                    }
+                }
+            }
             else
-                packet.Write(this);
+            {
+                try
+                {
+                    packet.Write(this);
+                }
+                catch (Exception e)
+                {
+                    if (IsConnected)
+                    {
+                        Event.OnDisconnect(new EventDisconnect
+                        {
+                            Client = this,
+                            Reason = e.Message
+                        });
+                        Dispose();
+                    }
+                }
+            }
         }
 
         public void Dispose()
@@ -223,7 +260,11 @@ namespace Alzaitu.Lacewing.Client
             IsConnected = false;
             Disposed = true;
             _client.Close();
-            _udp.Close();
+            try
+            {
+                _udp.Close();
+            }
+            catch (Exception) { }
         }
     }
 }

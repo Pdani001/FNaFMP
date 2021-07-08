@@ -603,6 +603,11 @@ namespace FNaFMP.Office
 			set { if (value != null) prevent = value; }
         }
     }
+	public class MoveTime
+    {
+		public int Min { get; set; }
+		public int Max { get; set; }
+    }
     public class MovementControl : Component, ICmpInitializable
     {
 		private Dictionary<Core.Character, List<Movement>> movements = new Dictionary<Core.Character, List<Movement>>();
@@ -611,7 +616,14 @@ namespace FNaFMP.Office
 			get { return movements; }
 			set { if (value != null) movements = value; }
 		}
+		private Dictionary<Core.Character, MoveTime> mt = new Dictionary<Core.Character, MoveTime>();
+		public Dictionary<Core.Character, MoveTime> MoveTimes
+		{
+			get { return mt; }
+			set { if (value != null) mt = value; }
+		}
 		private static Dictionary<Core.Character, List<Movement>> check = null;
+		private static Dictionary<Core.Character, MoveTime> times = null;
 		public static bool IsValid(int from, int to)
         {
 			if (Core.SelfCharacter == Core.Character.Guard)
@@ -637,9 +649,21 @@ namespace FNaFMP.Office
 			}
 			return false;
         }
+		private static Random random = null;
+		public static int GetRandomMoveTime(Core.Character character)
+        {
+			if (character == Core.Character.Guard || !times.ContainsKey(character))
+				return 0;
+			MoveTime time = times[character];
+			if (time.Min > time.Max)
+				return 1;
+			return random.Next(time.Min, time.Max);
+        }
         public void OnActivate()
         {
+			random = new Random();
 			check = movements;
+			times = mt;
             if(Core.Client != null)
             {
                 Core.Client.Event.BinaryMessage += Event_BinaryMessage;
@@ -662,7 +686,9 @@ namespace FNaFMP.Office
 
         public void OnDeactivate()
         {
+			random = null;
 			check = null;
+			times = null;
 			if (Core.Client != null)
 			{
 				Core.Client.Event.BinaryMessage -= Event_BinaryMessage;
@@ -1120,7 +1146,11 @@ namespace FNaFMP.Office
 	public class DisplayController : Component, ICmpUpdatable, ICmpInitializable
 	{
 		private bool started = false;
-		private float direction = 0;
+		private static float direction = 0;
+		public static float OfficeDirection
+        {
+			get { return direction; }
+        }
 		private static float defaultX = float.NaN;
 		public static float DefaultCamX
         {
@@ -1146,7 +1176,7 @@ namespace FNaFMP.Office
 
 			float half = DualityApp.WindowSize.X / 2;
 
-			float limit = (half / 8);
+			float limit = (half / 4);
 
 			float cancelStart = half - limit;
 			float cancelEnd = half + limit;
@@ -1174,10 +1204,15 @@ namespace FNaFMP.Office
 					int i = 1;
 					while (cursorPos.X < cancelStart - (limit * i) && xPos > 0)
 					{
-						xPos--;
+						xPos -= i*2;
 						i++;
 					}
 					direction = xPos;
+					if (direction < 0)
+					{
+						direction = 0;
+						xPos = 0;
+					}
 				}
 				else if (cursorPos.X > cancelEnd && xPos < 320)
 				{
@@ -1185,10 +1220,15 @@ namespace FNaFMP.Office
 					int i = 1;
 					while (cursorPos.X > cancelEnd + (limit * i) && xPos < 320)
 					{
-						xPos++;
+						xPos += i*2;
 						i++;
 					}
 					direction = xPos;
+					if(direction > 320)
+                    {
+						direction = 320;
+						xPos = 320;
+                    }
 				}
 			}
 			Transform transform = this.GameObj.Transform;
@@ -1210,6 +1250,7 @@ namespace FNaFMP.Office
 					Core.SelfCharacter = Core.Character.Guard;
                 }
             }
+			direction = 0;
 			defaultX = float.NaN;
 			DoorController.LightDirection = DoorDirection.None;
 			DoorController.LightFlicker = false;
@@ -1235,6 +1276,11 @@ namespace FNaFMP.Office
 
         public void OnDeactivate()
         {
+			if(Core.Client != null && Core.Client.IsConnected)
+            {
+				if(!GameController.IsFinished)
+					Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name,26,(byte)Core.SelfCharacter);
+            }
 			Core.SelfCharacter = Core.Character.None;
         }
     }
@@ -1471,5 +1517,14 @@ namespace FNaFMP.Office
 			}
 			return false;
 		}
+    }
+
+	internal class GameController
+    {
+		private static bool finished = false;
+		public static bool IsFinished
+        {
+			get { return finished; }
+        }
     }
 }

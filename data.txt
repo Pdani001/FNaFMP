@@ -1,0 +1,38 @@
+== IMAGES ==
+Map: 400x400
+Blip, Camera: 1280x720
+Door: Left 223x720; Right 248x720
+Panel: 92x247
+Its Me: 1280x720
+Button: 60x40
+(Note: this is not all of the images, only the ones I documented /Pdani)
+============
+
+== CAMERAS ==
+0: 1A
+1: 1B
+2: 1C
+3: 2A
+4: 2B
+5: 3
+6: 4A
+7: 4B
+8: 5
+9: 6
+10: 7
+=============
+
+== CHANNELS ==
+"TEMPLATE: *CHANNEL ID* -> ..message.."
+
+-- SELECT --
+Status change:
+ - To master: *1* -> .character. .status (0-2).         ## Obselete
+ - To player: *2* -> .character. .peer. .status (0-2).  [Also sent to joining players]
+Lobby info (from player to master): *12* -> .version, null terminated.
+Lobby info (from master to player): *12* -> .success (0/1). [On success: .player count. .password (0/1). .party length. .party.] [On fail: .fail reason, null terminated.]
+Lobby chat: *15* -> .character. .message length. .message.
+Status request (after join, number): *21* -> .random number.
+Game info: *3* (text) -> .game code.
+Movement: *25* -> .character. .position. .magic value, can be left out.
+Disconnect: *26* (number) -> .character.
