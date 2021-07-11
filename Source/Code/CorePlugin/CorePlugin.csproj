@@ -64,6 +64,7 @@
     <Compile Include="Alzaitu.Lacewing.Client\ClientEvent.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\ClientPeer.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\LacewingClient.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Logger.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\BinaryReader.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventBinaryMessage.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventNumberMessage.cs" />

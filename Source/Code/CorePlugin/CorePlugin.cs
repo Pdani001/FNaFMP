@@ -63,7 +63,7 @@ namespace FNaFMP
             client.Dispose();
             client = new LacewingClient();
             party = Guid.NewGuid();
-            discord.SetPresence(BuildPresence("In Menu","",party.ToString(),1,1));
+            discord.SetPresence(BuildPresence("In Menu", "", party.ToString(), 1, 1));
         }
         public static RichPresence BuildPresence(string Details, string State, string PartyID, int PartyMax, int PartySize)
         {
@@ -92,8 +92,32 @@ namespace FNaFMP
                 }
             };
         }
+        private static bool debug = false;
+
+        /**
+         * <summary>
+         * If true, more information will be available to the user
+         * </summary>
+         */
+        public static bool DEBUG
+        {
+            get { return debug; }
+        }
+        
         protected override void OnGameStarting()
         {
+            string[] args = Environment.GetCommandLineArgs();
+            string t = "";
+            foreach(string a in args)
+            {
+                if (t.Length == 0)
+                    t += $"'{a}'";
+                else
+                    t += ", " + $"'{a}'";
+            }
+            Console.WriteLine("args = [{0}]",t);
+            debug = args.Contains("--debug");
+
             character = Character.None;
 
             client = new LacewingClient();

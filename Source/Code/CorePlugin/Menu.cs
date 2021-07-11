@@ -48,6 +48,7 @@ namespace FNaFMP.Menu
 		{
 			return Opacity;
 		}
+		private ContentRef<Material> def = null;
 		private ContentRef<Material> fnaf57bg = null;
 		private ContentRef<Sound> ambience = null;
 		private ContentRef<Sound> themetune = null;
@@ -90,6 +91,10 @@ namespace FNaFMP.Menu
 				render = GameObj.GetComponent<SpriteRenderer>();
 				return;
 			}
+			if(def == null)
+            {
+				def = render.SharedMaterial;
+            }
 			if(source == null && !nosound)
             {
                 switch (music)
@@ -152,6 +157,7 @@ namespace FNaFMP.Menu
 			}
 			if (music != 1)
 			{
+				render.SharedMaterial = def;
 				if (lastSprite + 300 < seconds)
 				{
 					int bg = rnd.Next(100);
@@ -159,14 +165,14 @@ namespace FNaFMP.Menu
 					lastSprite = seconds;
 				}
 				color.A = (byte)(255 - Opacity);
-				render.ColorTint = color;
 			} else
             {
 				if(fnaf57bg != null)
 					render.SharedMaterial = fnaf57bg;
+				render.SpriteIndex = 0;
 				color.A = 255;
-				render.ColorTint = color;
 			}
+			render.ColorTint = color;
 		}
 
         public void OnActivate()
@@ -405,10 +411,11 @@ namespace FNaFMP.Menu
                 {
 					inforetry = -1;
 					attempt = 0;
-					Utilities.Logger.Write(Logger.LogLevel.WARN,"Authentication failed, leaving channel");
+					Utilities.Logger.Write(DualityLogger.LogLevel.WARN,"Authentication failed, leaving channel");
 					Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
 				} else
                 {
+					Utilities.Logger.Write(DualityLogger.LogLevel.WARN, "Authentication failed, retrying...");
 					inforetry += 5;
 					SendVersion();
                 }
@@ -493,6 +500,7 @@ namespace FNaFMP.Menu
 
 		private void SendVersion()
         {
+			Utilities.Logger.Write("Sending client version...");
 			List<byte> msg = new List<byte>();
 			msg.AddRange(Encoding.UTF8.GetBytes(Core.VERSION));
 			msg.Add(0);
@@ -516,7 +524,7 @@ namespace FNaFMP.Menu
                     {
 						DenyReason = reader.ReadText();
 						Event = "LobbyJoin";
-						Utilities.Logger.Write(Logger.LogLevel.WARN,"'{0}': {1}", Event, DenyReason);
+						Utilities.Logger.Write(DualityLogger.LogLevel.WARN,"'{0}': {1}", Event, DenyReason);
 						Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
 						join = false;
 					} else

@@ -66,6 +66,8 @@ namespace FNaFMP.Select
             {
                 if (!Core.Client.IsConnected)
                 {
+					Utility.Utilities.Logger.Write(Utility.DualityLogger.LogLevel.ERROR, "Connection the the server was interrupted, returning to lobby...");
+					Scene.SwitchTo(LobbyScene);
 					return;
                 }
 				Utility.Utilities.Logger.Write("Character select screen is ready!");
@@ -87,6 +89,7 @@ namespace FNaFMP.Select
 
         private void Event_Disconnect(object sender, EventDisconnect e)
         {
+			Utility.Utilities.Logger.Write(Utility.DualityLogger.LogLevel.ERROR, "Disconnected from server: {0}", e.Reason);
 			Scene.SwitchTo(LobbyScene);
         }
 
@@ -123,7 +126,7 @@ namespace FNaFMP.Select
         {
 			if (e.Message == null)
 			{
-				Utility.Utilities.Logger.Write(Utility.Logger.LogLevel.ERROR, "Binary message was null!!");
+				Utility.Utilities.Logger.Write(Utility.DualityLogger.LogLevel.ERROR, "Binary message was null!!");
 				return;
 			}
 			BinaryReader reader = new BinaryReader(e.Message);
@@ -246,11 +249,12 @@ namespace FNaFMP.Select
 			Core.SelfCharacter = Core.Character.None;
 			if(LobbyScene != null)
             {
+				Utility.Utilities.Logger.Write("Channel left, returning to lobby list...");
 				Scene.SwitchTo(LobbyScene);
             }
 			else
             {
-				Utility.Utilities.Logger.Write(Utility.Logger.LogLevel.ERROR, "Couldn't find the lobby screen!");
+				Utility.Utilities.Logger.Write(Utility.DualityLogger.LogLevel.ERROR, "Couldn't find the lobby screen!");
 				Scene.SwitchTo(DualityApp.AppData.StartScene);
 			}
         }
@@ -268,20 +272,25 @@ namespace FNaFMP.Select
 		}
 		private int countdown = -1;
 		private int nextcount = -1;
+		private bool leaveing = false;
         public void OnUpdate()
         {
             if(Core.Client != null)
             {
 				if (!Core.Client.IsConnected)
 				{
-					Core.SelfCharacter = Core.Character.None;
-					if (LobbyScene != null)
+					if (!leaveing)
 					{
-						Scene.SwitchTo(LobbyScene);
-					}
-					else
-					{
-						Scene.SwitchTo(DualityApp.AppData.StartScene);
+						Core.SelfCharacter = Core.Character.None;
+						leaveing = true;
+						if (LobbyScene != null)
+						{
+							Scene.SwitchTo(LobbyScene);
+						}
+						else
+						{
+							Scene.SwitchTo(DualityApp.AppData.StartScene);
+						}
 					}
 					return;
 				}
@@ -299,7 +308,7 @@ namespace FNaFMP.Select
 						}
 						else
 						{
-							Utility.Utilities.Logger.Write(Utility.Logger.LogLevel.ERROR, "Couldn't find the loading screen!");
+							Utility.Utilities.Logger.Write(Utility.DualityLogger.LogLevel.ERROR, "Couldn't find the loading screen!");
 							Scene.SwitchTo(DualityApp.AppData.StartScene);
 						}
 					}
@@ -320,8 +329,8 @@ namespace FNaFMP.Select
                 }
 			} else
             {
-				Utility.Utilities.Logger.Write(Utility.Logger.LogLevel.ERROR, "There was no Lacewing client on the character select menu!");
-				Utility.Utilities.Logger.Write(Utility.Logger.LogLevel.ERROR, "If you see this, it means something went horribly wrong.");
+				Utility.Utilities.Logger.Write(Utility.DualityLogger.LogLevel.ERROR, "There was no Lacewing client on the character select menu!");
+				Utility.Utilities.Logger.Write(Utility.DualityLogger.LogLevel.ERROR, "If you see this, it means something went horribly wrong.");
 				Scene.SwitchTo(DualityApp.AppData.StartScene);
 			}
         }
@@ -469,6 +478,7 @@ namespace FNaFMP.Select
 				{
 					leave = true;
 					Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
+					Utility.Utilities.Logger.Write("Leaving the lobby...");
 				}
 			}
 

@@ -38,5 +38,10 @@
             Defines a Duality core plugin.
             </summary>
         </member>
+        <member name="P:FNaFMP.Core.DEBUG">
+            <summary>
+            If true, more information will be available to the user
+            </summary>
+        </member>
     </members>
 </doc>

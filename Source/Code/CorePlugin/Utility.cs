@@ -26,15 +26,15 @@ namespace FNaFMP.Utility
 	}
 	public class Utilities
     {
-		private static readonly Logger logger = new Logger("FNaF MP");
-		public static Logger Logger
+		private static readonly DualityLogger logger = new DualityLogger("FNaF MP");
+		public static DualityLogger Logger
 		{
 			get { return logger; }
 		}
 	}
-	public class Logger
+	public class DualityLogger
     {
-		public Logger(string prefix)
+		public DualityLogger(string prefix)
         {
 			this.prefix = "[" + prefix + "/{0}]";
 		}
@@ -187,7 +187,7 @@ namespace FNaFMP.Utility
 		}
     }
 
-	public class HudRenderer : Component, ICmpRenderer
+	public class HudRenderer : Component, ICmpRenderer, ICmpInitializable
 	{
 		private ContentRef<Font> font = null;
 		[DontSerialize] private readonly Canvas canvas = new Canvas();
@@ -298,7 +298,17 @@ namespace FNaFMP.Utility
 				this.canvas.End();
 			}
 		}
-	}
+
+        public void OnActivate()
+        {
+			isDebug = Core.DEBUG;
+        }
+
+        public void OnDeactivate()
+        {
+            
+        }
+    }
 	public class GlobalStatic : Component, ICmpUpdatable
 	{
 		private static int opacity = 0;

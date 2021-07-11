@@ -32,7 +32,7 @@ namespace Alzaitu.Lacewing.Client.StateMachine
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Exception: "+e.Message);
+                        client.logger.Write("Exception: "+e.Message);
                         if (e.GetType() == typeof(IOException))
                         {
                             client.Event.OnDisconnect(new EventDisconnect

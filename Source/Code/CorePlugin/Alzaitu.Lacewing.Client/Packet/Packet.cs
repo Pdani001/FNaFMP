@@ -28,7 +28,7 @@ namespace Alzaitu.Lacewing.Client.Packet
         public bool CanWrite => GetType().GetCustomAttribute<PacketTypeAttribute>().CanWrite;
         public bool CanRead => GetType().GetCustomAttribute<PacketTypeAttribute>().CanRead;
 
-        public void Write(object stream)
+        public void Write(LacewingClient client, bool blasted)
         {
             var siz = GetSize();
 
@@ -45,59 +45,86 @@ namespace Alzaitu.Lacewing.Client.Packet
             if (siz > uint.MaxValue)
                 throw new InvalidOperationException($"Cannot send a message that's more than {uint.MaxValue} bytes long.");
 
-            if (stream.GetType() == typeof(NetworkStream))
+            if (!blasted)
             {
-                NetworkStream network = (NetworkStream)stream;
-                var wrt = new BinaryWriter(network);
+                var wrt = new BinaryWriter(client.GetStream());
 
                 if (NeedsFirstZero())
                 {
+                    if (client.debug)
+                    {
+                        client.logger.Write("[TCP] Initial zero set");
+                    }
                     wrt.Write((byte)0);
                 }
 
+                if (client.debug)
+                {
+                    client.logger.Write("[TCP] Write Type = {0} ({1})",Type, type);
+                }
                 wrt.Write(type);
 
+                if (client.debug)
+                {
+                    client.logger.Write("[TCP] Write Size = {0}", siz);
+                }
                 if (siz < 254)
-                    wrt.Write((byte)(siz & 0xff));
+                    wrt.Write((byte)siz);
                 else if (siz < 65535)
                 {
                     wrt.Write((byte)254);
-                    wrt.Write((ushort)(siz & 0xffff));
+                    wrt.Write(BitConverter.GetBytes((ushort)siz));
                 }
                 else
                 {
                     wrt.Write((byte)255);
-                    wrt.Write((uint)siz);
+                    wrt.Write(BitConverter.GetBytes((uint)siz));
                 }
 
                 if (SubType != null)
+                {
+                    if (client.debug)
+                    {
+                        client.logger.Write("[TCP] Write Subtype = {0}", SubType.Value);
+                    }
                     wrt.Write(SubType.Value);
+                }
 
                 WriteImpl(wrt);
 
                 wrt.Flush();
             }
-            else if(stream.GetType() == typeof(LacewingClient))
+            else
             {
-                LacewingClient client = (LacewingClient)stream;
                 List<byte> byteList = new List<byte>();
 
+                if (client.debug)
+                {
+                    client.logger.Write("[UDP] Write Type = {0} ({1})", Type, type);
+                }
                 byteList.Add(type);
+
+                if (client.debug)
+                {
+                    client.logger.Write("[UDP] Write Client = {0}", client.ID);
+                }
                 byteList.AddRange(BitConverter.GetBytes(client.ID));
 
 
                 if (SubType != null)
+                {
+                    if (client.debug)
+                    {
+                        client.logger.Write("[TCP] Write Subtype = {0}", SubType.Value);
+                    }
                     byteList.Add(SubType.Value);
+                }
 
                 WriteImpl(byteList.Count, out byte[] bytes);
 
                 byteList.AddRange(bytes);
 
                 client._udp.Send(byteList.ToArray(), byteList.Count);
-            }
-            else
-            {
-                throw new InvalidOperationException("Type of 'stream' ("+ stream.GetType() + ") is neither NetworkStream or LacewingClient");
             }
         }
 
@@ -139,6 +166,11 @@ namespace Alzaitu.Lacewing.Client.Packet
             stream.Read(ReadBuffer, 0, ReadBuffer.Length);
             byte type = ReadBuffer[pos++];
 
+            if(client != null && client.debug)
+            {
+                client.logger.Write("[TCP] Read Type = {0} ({1}.{2})",type, (type >> 4) & 0xF, type & 0xF);
+            }
+
             if(!TypeReadMap.TryGetValue((byte) ((type >> 4) & 0xF), out var packetTypeBlock))
                 throw new InvalidDataException($"[TCP] The packet read from the stream ({(type >> 4) & 0xF}.{type & 0xF}) does not have an associated type.");
 
@@ -155,13 +187,22 @@ namespace Alzaitu.Lacewing.Client.Packet
                 size = BitConverter.ToInt32(number, 0);
             }
 
+            if (client != null && client.debug)
+            {
+                client.logger.Write("[TCP] Read Size = {0}", size);
+            }
+
             Type packetType;
             if (packetTypeBlock.ContainsKey(-1))
                 packetType = packetTypeBlock[-1];
             else
             {
                 var subType = ReadBuffer[pos++];
-                if(!packetTypeBlock.TryGetValue(subType, out packetType))
+                if (client != null && client.debug)
+                {
+                    client.logger.Write("[TCP] Read Subtype = {0}", subType);
+                }
+                if (!packetTypeBlock.TryGetValue(subType, out packetType))
                     throw new InvalidDataException($"[TCP] The packet read from the stream ({(type >> 4) & 0xF}.{type & 0xF}.{subType}) does not have an associated type.");
                 size -= sizeof(byte);
             }
@@ -188,6 +229,11 @@ namespace Alzaitu.Lacewing.Client.Packet
             var pos = 0;
             var type = bytes[pos++];
 
+            if (client != null && client.debug)
+            {
+                client.logger.Write("[UDP] Read Type = {0} ({1}.{2})", type, (type >> 4) & 0xF, type & 0xF);
+            }
+
             if (!TypeReadMap.TryGetValue((byte)((type >> 4) & 0xF), out var packetTypeBlock))
                 throw new InvalidDataException($"[UDP] The packet read from the stream ({(type >> 4) & 0xF}.{type & 0xF}) does not have an associated type.");
             
@@ -198,6 +244,10 @@ namespace Alzaitu.Lacewing.Client.Packet
             else
             {
                 var subType = bytes[pos++];
+                if (client != null && client.debug)
+                {
+                    client.logger.Write("[UDP] Read Subtype = {0}", subType);
+                }
                 if (!packetTypeBlock.TryGetValue(subType, out packetType))
                     throw new InvalidDataException($"[UDP] The packet read from the stream ({(type >> 4) & 0xF}.{type & 0xF}.{subType}) does not have an associated type.");
             }

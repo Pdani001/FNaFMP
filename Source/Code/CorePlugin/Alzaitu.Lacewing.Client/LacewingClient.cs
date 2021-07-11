@@ -15,6 +15,8 @@ namespace Alzaitu.Lacewing.Client
 {
     public sealed class LacewingClient
     {
+        internal readonly Logger logger = Logger.GetLogger("Lacewing");
+        public readonly bool debug = false;
         public string UserName { get; internal set; }
         internal string ServerAddress;
         internal int ServerPort;
@@ -44,6 +46,7 @@ namespace Alzaitu.Lacewing.Client
             _udp = new UdpClient();
             UserName = username;
             IsConnected = false;
+            debug = Environment.GetCommandLineArgs().Contains("--debug");
         }
 
         public void Connect(string address, int port = 6121)
@@ -102,7 +105,7 @@ namespace Alzaitu.Lacewing.Client
             }
             catch (SocketException)
             {
-                Console.WriteLine("[Lacewing/ERR] UDP failed to connect!");
+                logger.Write("Error - UDP failed to connect!");
             }
         }
 
@@ -215,42 +218,20 @@ namespace Alzaitu.Lacewing.Client
 
         internal void WritePacket(Packet.Packet packet, bool blasted = false)
         {
-            if (!blasted)
+            try
             {
-                try
-                {
-                    packet.Write(stream);
-                }
-                catch (Exception e)
-                {
-                    if (IsConnected)
-                    {
-                        Event.OnDisconnect(new EventDisconnect
-                        {
-                            Client = this,
-                            Reason = e.Message
-                        });
-                        Dispose();
-                    }
-                }
+                packet.Write(this, blasted);
             }
-            else
+            catch (Exception e)
             {
-                try
+                if (IsConnected)
                 {
-                    packet.Write(this);
-                }
-                catch (Exception e)
-                {
-                    if (IsConnected)
+                    Event.OnDisconnect(new EventDisconnect
                     {
-                        Event.OnDisconnect(new EventDisconnect
-                        {
-                            Client = this,
-                            Reason = e.Message
-                        });
-                        Dispose();
-                    }
+                        Client = this,
+                        Reason = e.Message
+                    });
+                    Dispose();
                 }
             }
         }
