@@ -9,7 +9,7 @@
       <active dataType="Bool">true</active>
       <children />
       <compList dataType="Struct" type="System.Collections.Generic.List`1[[Duality.Component]]" id="460535071">
-        <_items dataType="Array" type="Duality.Component[]" id="1678736238" length="8">
+        <_items dataType="Array" type="Duality.Component[]" id="1678736238">
           <item dataType="Struct" type="Duality.Components.Transform" id="1313395535">
             <active dataType="Bool">true</active>
             <angle dataType="Float">0</angle>
@@ -74,7 +74,6 @@
           </item>
           <item dataType="Struct" type="FNaFMP.Office.DisplayController" id="459163443">
             <active dataType="Bool">true</active>
-            <direction dataType="Float">0</direction>
             <gameobj dataType="ObjectRef">1256118317</gameobj>
             <started dataType="Bool">true</started>
           </item>
@@ -83,8 +82,18 @@
             <font dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Font]]" />
             <gameobj dataType="ObjectRef">1256118317</gameobj>
           </item>
+          <item dataType="Struct" type="FNaFMP.Office.ScreenText" id="261733984">
+            <active dataType="Bool">true</active>
+            <gameobj dataType="ObjectRef">1256118317</gameobj>
+            <rfont dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Font]]">
+              <contentPath dataType="String">Data\Fonts\Consolas16.Font.res</contentPath>
+            </rfont>
+            <tfont dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Font]]">
+              <contentPath dataType="String">Data\Fonts\Volter24.Font.res</contentPath>
+            </tfont>
+          </item>
         </_items>
-        <_size dataType="Int">7</_size>
+        <_size dataType="Int">8</_size>
       </compList>
       <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="2827722272" surrogate="true">
         <header />
@@ -97,6 +106,7 @@
             <item dataType="Type" id="1232654006" value="FNaFMP.Office.CameraViewer" />
             <item dataType="Type" id="3404768858" value="FNaFMP.Office.DisplayController" />
             <item dataType="Type" id="1108852182" value="FNaFMP.Utility.HudRenderer" />
+            <item dataType="Type" id="2960480314" value="FNaFMP.Office.ScreenText" />
           </keys>
           <values dataType="Array" type="System.Object[]" id="2244243144">
             <item dataType="ObjectRef">1313395535</item>
@@ -106,6 +116,7 @@
             <item dataType="ObjectRef">1065128514</item>
             <item dataType="ObjectRef">459163443</item>
             <item dataType="ObjectRef">737527849</item>
+            <item dataType="ObjectRef">261733984</item>
           </values>
         </body>
       </compMap>
@@ -185,7 +196,7 @@
             <list dataType="Struct" type="System.Collections.Generic.List`1[[System.Collections.Generic.List`1[[FNaFMP.Office.CameraView]]]]" id="86207104">
               <_items dataType="Array" type="System.Collections.Generic.List`1[[FNaFMP.Office.CameraView]][]" id="2129012124" length="16">
                 <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.CameraView]]" id="1927433668">
-                  <_items dataType="Array" type="FNaFMP.Office.CameraView[]" id="106254660" length="4">
+                  <_items dataType="Array" type="FNaFMP.Office.CameraView[]" id="106254660" length="8">
                     <item dataType="Struct" type="FNaFMP.Office.CameraView" id="4055159364">
                       <duration dataType="Float">0</duration>
                       <extra dataType="Int">-1</extra>
@@ -213,11 +224,58 @@
                         <_size dataType="Int">3</_size>
                       </robots>
                     </item>
+                    <item dataType="Struct" type="FNaFMP.Office.CameraView" id="491194368">
+                      <duration dataType="Float">0</duration>
+                      <extra dataType="Int">-1</extra>
+                      <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
+                        <contentPath dataType="String">Data\Camera\View\1A\1A-bo+fr.Material.res</contentPath>
+                      </mat>
+                      <mode dataType="Enum" type="Duality.Components.Renderers.SpriteAnimator+LoopMode" name="Once" value="0" />
+                      <move dataType="Bool">true</move>
+                      <robots dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Core+Character]]" id="1699603528">
+                        <_items dataType="Array" type="FNaFMP.Core+Character[]" id="110023788" length="4">
+                          <item dataType="Enum" type="FNaFMP.Core+Character" name="Bonnie" value="2" />
+                          <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                        </_items>
+                        <_size dataType="Int">2</_size>
+                      </robots>
+                    </item>
+                    <item dataType="Struct" type="FNaFMP.Office.CameraView" id="219626018">
+                      <duration dataType="Float">0</duration>
+                      <extra dataType="Int">-1</extra>
+                      <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
+                        <contentPath dataType="String">Data\Camera\View\1A\1A-ch+fr.Material.res</contentPath>
+                      </mat>
+                      <mode dataType="Enum" type="Duality.Components.Renderers.SpriteAnimator+LoopMode" name="Once" value="0" />
+                      <move dataType="Bool">true</move>
+                      <robots dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Core+Character]]" id="3216499730">
+                        <_items dataType="Array" type="FNaFMP.Core+Character[]" id="113956432" length="4">
+                          <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
+                          <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                        </_items>
+                        <_size dataType="Int">2</_size>
+                      </robots>
+                    </item>
+                    <item dataType="Struct" type="FNaFMP.Office.CameraView" id="2790830940">
+                      <duration dataType="Float">0</duration>
+                      <extra dataType="Int">-1</extra>
+                      <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
+                        <contentPath dataType="String">Data\Camera\View\1A\1A-fr.Material.res</contentPath>
+                      </mat>
+                      <mode dataType="Enum" type="Duality.Components.Renderers.SpriteAnimator+LoopMode" name="Once" value="0" />
+                      <move dataType="Bool">true</move>
+                      <robots dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Core+Character]]" id="4255085068">
+                        <_items dataType="Array" type="FNaFMP.Core+Character[]" id="1133655204" length="4">
+                          <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                        </_items>
+                        <_size dataType="Int">1</_size>
+                      </robots>
+                    </item>
                   </_items>
-                  <_size dataType="Int">2</_size>
+                  <_size dataType="Int">5</_size>
                 </item>
                 <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.CameraView]]" id="521480598">
-                  <_items dataType="Array" type="FNaFMP.Office.CameraView[]" id="1136008782" length="4">
+                  <_items dataType="Array" type="FNaFMP.Office.CameraView[]" id="1136008782">
                     <item dataType="Struct" type="FNaFMP.Office.CameraView" id="1576083152">
                       <duration dataType="Float">0</duration>
                       <extra dataType="Int">-1</extra>
@@ -226,10 +284,123 @@
                       </mat>
                       <mode dataType="Enum" type="Duality.Components.Renderers.SpriteAnimator+LoopMode" name="Once" value="0" />
                       <move dataType="Bool">true</move>
-                      <robots />
+                      <robots dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Core+Character]]" id="3528427196">
+                        <_items dataType="Array" type="FNaFMP.Core+Character[]" id="524091972" length="0" />
+                        <_size dataType="Int">0</_size>
+                      </robots>
+                    </item>
+                    <item dataType="Struct" type="FNaFMP.Office.CameraView" id="2067525230">
+                      <duration dataType="Float">0</duration>
+                      <extra dataType="Int">-1</extra>
+                      <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
+                        <contentPath dataType="String">Data\Camera\View\1B\1B-all.Material.res</contentPath>
+                      </mat>
+                      <mode dataType="Enum" type="Duality.Components.Renderers.SpriteAnimator+LoopMode" name="Once" value="0" />
+                      <move dataType="Bool">true</move>
+                      <robots dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Core+Character]]" id="1948945826">
+                        <_items dataType="Array" type="FNaFMP.Core+Character[]" id="3487578384" length="4">
+                          <item dataType="Enum" type="FNaFMP.Core+Character" name="Bonnie" value="2" />
+                          <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                          <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
+                        </_items>
+                        <_size dataType="Int">3</_size>
+                      </robots>
+                    </item>
+                    <item dataType="Struct" type="FNaFMP.Office.CameraView" id="2074191020">
+                      <duration dataType="Float">0</duration>
+                      <extra dataType="Int">-1</extra>
+                      <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
+                        <contentPath dataType="String">Data\Camera\View\1B\1B-bo.Material.res</contentPath>
+                      </mat>
+                      <mode dataType="Enum" type="Duality.Components.Renderers.SpriteAnimator+LoopMode" name="Once" value="0" />
+                      <move dataType="Bool">true</move>
+                      <robots dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Core+Character]]" id="3082044280">
+                        <_items dataType="Array" type="FNaFMP.Core+Character[]" id="2452987756" length="4">
+                          <item dataType="Enum" type="FNaFMP.Core+Character" name="Bonnie" value="2" />
+                        </_items>
+                        <_size dataType="Int">1</_size>
+                      </robots>
+                    </item>
+                    <item dataType="Struct" type="FNaFMP.Office.CameraView" id="378262546">
+                      <duration dataType="Float">0</duration>
+                      <extra dataType="Int">-1</extra>
+                      <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
+                        <contentPath dataType="String">Data\Camera\View\1B\1B-bo+ch.Material.res</contentPath>
+                      </mat>
+                      <mode dataType="Enum" type="Duality.Components.Renderers.SpriteAnimator+LoopMode" name="Once" value="0" />
+                      <move dataType="Bool">true</move>
+                      <robots dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Core+Character]]" id="320346550">
+                        <_items dataType="Array" type="FNaFMP.Core+Character[]" id="3197940064" length="4">
+                          <item dataType="Enum" type="FNaFMP.Core+Character" name="Bonnie" value="2" />
+                          <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
+                        </_items>
+                        <_size dataType="Int">2</_size>
+                      </robots>
+                    </item>
+                    <item dataType="Struct" type="FNaFMP.Office.CameraView" id="1223197832">
+                      <duration dataType="Float">0</duration>
+                      <extra dataType="Int">-1</extra>
+                      <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
+                        <contentPath dataType="String">Data\Camera\View\1B\1B-bo+fr.Material.res</contentPath>
+                      </mat>
+                      <mode dataType="Enum" type="Duality.Components.Renderers.SpriteAnimator+LoopMode" name="Once" value="0" />
+                      <move dataType="Bool">true</move>
+                      <robots dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Core+Character]]" id="1937095764">
+                        <_items dataType="Array" type="FNaFMP.Core+Character[]" id="793717988" length="4">
+                          <item dataType="Enum" type="FNaFMP.Core+Character" name="Bonnie" value="2" />
+                          <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                        </_items>
+                        <_size dataType="Int">2</_size>
+                      </robots>
+                    </item>
+                    <item dataType="Struct" type="FNaFMP.Office.CameraView" id="1388591974">
+                      <duration dataType="Float">0</duration>
+                      <extra dataType="Int">-1</extra>
+                      <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
+                        <contentPath dataType="String">Data\Camera\View\1B\1B-ch.Material.res</contentPath>
+                      </mat>
+                      <mode dataType="Enum" type="Duality.Components.Renderers.SpriteAnimator+LoopMode" name="Once" value="0" />
+                      <move dataType="Bool">true</move>
+                      <robots dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Core+Character]]" id="1449062106">
+                        <_items dataType="Array" type="FNaFMP.Core+Character[]" id="2956788992" length="4">
+                          <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
+                        </_items>
+                        <_size dataType="Int">1</_size>
+                      </robots>
+                    </item>
+                    <item dataType="Struct" type="FNaFMP.Office.CameraView" id="914352196">
+                      <duration dataType="Float">0</duration>
+                      <extra dataType="Int">-1</extra>
+                      <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
+                        <contentPath dataType="String">Data\Camera\View\1B\1B-ch+fr.Material.res</contentPath>
+                      </mat>
+                      <mode dataType="Enum" type="Duality.Components.Renderers.SpriteAnimator+LoopMode" name="Once" value="0" />
+                      <move dataType="Bool">true</move>
+                      <robots dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Core+Character]]" id="4242094096">
+                        <_items dataType="Array" type="FNaFMP.Core+Character[]" id="3298262844" length="4">
+                          <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
+                          <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                        </_items>
+                        <_size dataType="Int">2</_size>
+                      </robots>
+                    </item>
+                    <item dataType="Struct" type="FNaFMP.Office.CameraView" id="1133665290">
+                      <duration dataType="Float">0</duration>
+                      <extra dataType="Int">-1</extra>
+                      <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
+                        <contentPath dataType="String">Data\Camera\View\1B\1B-fr.Material.res</contentPath>
+                      </mat>
+                      <mode dataType="Enum" type="Duality.Components.Renderers.SpriteAnimator+LoopMode" name="Once" value="0" />
+                      <move dataType="Bool">true</move>
+                      <robots dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Core+Character]]" id="3671421198">
+                        <_items dataType="Array" type="FNaFMP.Core+Character[]" id="2591282640" length="4">
+                          <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                        </_items>
+                        <_size dataType="Int">1</_size>
+                      </robots>
                     </item>
                   </_items>
-                  <_size dataType="Int">1</_size>
+                  <_size dataType="Int">8</_size>
                 </item>
                 <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.CameraView]]" id="4217535616">
                   <_items dataType="Array" type="FNaFMP.Office.CameraView[]" id="671329864">
@@ -329,7 +500,7 @@
                       <robots />
                     </item>
                     <item dataType="Struct" type="FNaFMP.Office.CameraView" id="763908882">
-                      <duration dataType="Float">0</duration>
+                      <duration dataType="Float">1</duration>
                       <extra dataType="Int">0</extra>
                       <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
                         <contentPath dataType="String">Data\Camera\View\2A\2A-foxy.Material.res</contentPath>
@@ -614,14 +785,17 @@
               <body>
                 <keys dataType="Array" type="System.Object[]" id="91442732">
                   <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                  <item dataType="Enum" type="FNaFMP.Core+Character" name="Foxy" value="4" />
+                  <item dataType="Enum" type="FNaFMP.Core+Character" name="Bonnie" value="2" />
+                  <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
                 </keys>
                 <values dataType="Array" type="System.Object[]" id="721531830">
                   <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.Movement]]" id="2061202022">
                     <_items dataType="Array" type="FNaFMP.Office.Movement[]" id="1818176384">
                       <item dataType="Struct" type="FNaFMP.Office.Movement" id="1022652828">
-                        <_x003C_From_x003E_k__BackingField dataType="UInt">0</_x003C_From_x003E_k__BackingField>
-                        <_x003C_To_x003E_k__BackingField dataType="UInt">1</_x003C_To_x003E_k__BackingField>
-                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[FNaFMP.Office.MovePrevent]]" id="4116932036" surrogate="true">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">0</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">1</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="4116932036" surrogate="true">
                           <header />
                           <body>
                             <keys dataType="Array" type="System.Object[]" id="3263803716">
@@ -629,22 +803,32 @@
                               <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
                             </keys>
                             <values dataType="Array" type="System.Object[]" id="872739478">
-                              <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="2496514254">
-                                <_x003C_Position_x003E_k__BackingField dataType="Int">0</_x003C_Position_x003E_k__BackingField>
-                                <equal dataType="Bool">true</equal>
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="2496514254">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="3997417424" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="3007777468">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">0</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
                               </item>
-                              <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="855838538">
-                                <_x003C_Position_x003E_k__BackingField dataType="Int">0</_x003C_Position_x003E_k__BackingField>
-                                <equal dataType="Bool">true</equal>
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="855838538">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="3654614412" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="3823558564">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">0</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
                               </item>
                             </values>
                           </body>
                         </prevent>
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.Movement" id="2518532118">
-                        <_x003C_From_x003E_k__BackingField dataType="UInt">0</_x003C_From_x003E_k__BackingField>
-                        <_x003C_To_x003E_k__BackingField dataType="UInt">10</_x003C_To_x003E_k__BackingField>
-                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[FNaFMP.Office.MovePrevent]]" id="2064391990" surrogate="true">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">0</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">10</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="2064391990" surrogate="true">
                           <header />
                           <body>
                             <keys dataType="Array" type="System.Object[]" id="1201888096">
@@ -652,33 +836,59 @@
                               <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
                             </keys>
                             <values dataType="Array" type="System.Object[]" id="1851328654">
-                              <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="612522930">
-                                <_x003C_Position_x003E_k__BackingField dataType="Int">0</_x003C_Position_x003E_k__BackingField>
-                                <equal dataType="Bool">true</equal>
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="612522930">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="1825056464" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="1163273916">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">0</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
                               </item>
-                              <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="3112555082">
-                                <_x003C_Position_x003E_k__BackingField dataType="Int">0</_x003C_Position_x003E_k__BackingField>
-                                <equal dataType="Bool">true</equal>
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="3112555082">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="4197280424" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="2402449068">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">0</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="4139946422">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">10</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">2</_size>
                               </item>
                             </values>
                           </body>
                         </prevent>
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.Movement" id="3962720264">
-                        <_x003C_From_x003E_k__BackingField dataType="UInt">1</_x003C_From_x003E_k__BackingField>
-                        <_x003C_To_x003E_k__BackingField dataType="UInt">10</_x003C_To_x003E_k__BackingField>
-                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[FNaFMP.Office.MovePrevent]]" id="3445339800" surrogate="true">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">1</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">10</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="3445339800" surrogate="true">
                           <header />
                           <body>
-                            <keys dataType="Array" type="System.Object[]" id="2683590188" length="0" />
-                            <values dataType="Array" type="System.Object[]" id="1492120502" length="0" />
+                            <keys dataType="Array" type="System.Object[]" id="2683590188">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="1492120502">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="3670108774">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="2467621760" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="1895199132">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">10</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
                           </body>
                         </prevent>
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.Movement" id="1746699186">
-                        <_x003C_From_x003E_k__BackingField dataType="UInt">1</_x003C_From_x003E_k__BackingField>
-                        <_x003C_To_x003E_k__BackingField dataType="UInt">9</_x003C_To_x003E_k__BackingField>
-                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[FNaFMP.Office.MovePrevent]]" id="2450894474" surrogate="true">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">1</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">9</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="2450894474" surrogate="true">
                           <header />
                           <body>
                             <keys dataType="Array" type="System.Object[]" id="3328334816" length="0" />
@@ -687,9 +897,9 @@
                         </prevent>
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.Movement" id="607008820">
-                        <_x003C_From_x003E_k__BackingField dataType="UInt">10</_x003C_From_x003E_k__BackingField>
-                        <_x003C_To_x003E_k__BackingField dataType="UInt">1</_x003C_To_x003E_k__BackingField>
-                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[FNaFMP.Office.MovePrevent]]" id="1770385884" surrogate="true">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">10</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">1</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="1770385884" surrogate="true">
                           <header />
                           <body>
                             <keys dataType="Array" type="System.Object[]" id="794040004" length="0" />
@@ -698,9 +908,9 @@
                         </prevent>
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.Movement" id="1641844110">
-                        <_x003C_From_x003E_k__BackingField dataType="UInt">10</_x003C_From_x003E_k__BackingField>
-                        <_x003C_To_x003E_k__BackingField dataType="UInt">9</_x003C_To_x003E_k__BackingField>
-                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[FNaFMP.Office.MovePrevent]]" id="3312948750" surrogate="true">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">10</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">9</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="3312948750" surrogate="true">
                           <header />
                           <body>
                             <keys dataType="Array" type="System.Object[]" id="1100300240" length="0" />
@@ -709,20 +919,32 @@
                         </prevent>
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.Movement" id="2926641088">
-                        <_x003C_From_x003E_k__BackingField dataType="UInt">9</_x003C_From_x003E_k__BackingField>
-                        <_x003C_To_x003E_k__BackingField dataType="UInt">10</_x003C_To_x003E_k__BackingField>
-                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[FNaFMP.Office.MovePrevent]]" id="3964154640" surrogate="true">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">9</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">10</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="3964154640" surrogate="true">
                           <header />
                           <body>
-                            <keys dataType="Array" type="System.Object[]" id="1632997180" length="0" />
-                            <values dataType="Array" type="System.Object[]" id="2281462678" length="0" />
+                            <keys dataType="Array" type="System.Object[]" id="1632997180">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="2281462678">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="756542742">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="2703374624" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="3914692572">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">10</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
                           </body>
                         </prevent>
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.Movement" id="2898020106">
-                        <_x003C_From_x003E_k__BackingField dataType="UInt">9</_x003C_From_x003E_k__BackingField>
-                        <_x003C_To_x003E_k__BackingField dataType="UInt">1</_x003C_To_x003E_k__BackingField>
-                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[FNaFMP.Office.MovePrevent]]" id="1466148098" surrogate="true">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">9</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">1</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="1466148098" surrogate="true">
                           <header />
                           <body>
                             <keys dataType="Array" type="System.Object[]" id="3531778448" length="0" />
@@ -731,20 +953,32 @@
                         </prevent>
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.Movement" id="1608129932">
-                        <_x003C_From_x003E_k__BackingField dataType="UInt">9</_x003C_From_x003E_k__BackingField>
-                        <_x003C_To_x003E_k__BackingField dataType="UInt">6</_x003C_To_x003E_k__BackingField>
-                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[FNaFMP.Office.MovePrevent]]" id="2462367188" surrogate="true">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">9</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">6</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="2462367188" surrogate="true">
                           <header />
                           <body>
-                            <keys dataType="Array" type="System.Object[]" id="437724388" length="0" />
-                            <values dataType="Array" type="System.Object[]" id="4160552470" length="0" />
+                            <keys dataType="Array" type="System.Object[]" id="437724388">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="4160552470">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="2094944942">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="3059436880" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="49279932">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">6</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
                           </body>
                         </prevent>
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.Movement" id="3070251750">
-                        <_x003C_From_x003E_k__BackingField dataType="UInt">6</_x003C_From_x003E_k__BackingField>
-                        <_x003C_To_x003E_k__BackingField dataType="UInt">9</_x003C_To_x003E_k__BackingField>
-                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[FNaFMP.Office.MovePrevent]]" id="3297070822" surrogate="true">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">6</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">9</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="3297070822" surrogate="true">
                           <header />
                           <body>
                             <keys dataType="Array" type="System.Object[]" id="2712810880" length="0" />
@@ -753,31 +987,55 @@
                         </prevent>
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.Movement" id="275296504">
-                        <_x003C_From_x003E_k__BackingField dataType="UInt">6</_x003C_From_x003E_k__BackingField>
-                        <_x003C_To_x003E_k__BackingField dataType="UInt">7</_x003C_To_x003E_k__BackingField>
-                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[FNaFMP.Office.MovePrevent]]" id="3311756712" surrogate="true">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">6</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">7</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="3311756712" surrogate="true">
                           <header />
                           <body>
-                            <keys dataType="Array" type="System.Object[]" id="3370804908" length="0" />
-                            <values dataType="Array" type="System.Object[]" id="1278824886" length="0" />
+                            <keys dataType="Array" type="System.Object[]" id="3370804908">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="1278824886">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="2200465126">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="4256036224" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="1840735644">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">7</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
                           </body>
                         </prevent>
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.Movement" id="712917250">
-                        <_x003C_From_x003E_k__BackingField dataType="UInt">7</_x003C_From_x003E_k__BackingField>
-                        <_x003C_To_x003E_k__BackingField dataType="UInt">6</_x003C_To_x003E_k__BackingField>
-                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[FNaFMP.Office.MovePrevent]]" id="80281530" surrogate="true">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">7</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">6</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="80281530" surrogate="true">
                           <header />
                           <body>
-                            <keys dataType="Array" type="System.Object[]" id="2736769024" length="0" />
-                            <values dataType="Array" type="System.Object[]" id="3887639502" length="0" />
+                            <keys dataType="Array" type="System.Object[]" id="2736769024">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="3887639502">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="2414650066">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="3848189776" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="522247100">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">6</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
                           </body>
                         </prevent>
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.Movement" id="2806206500">
-                        <_x003C_From_x003E_k__BackingField dataType="UInt">7</_x003C_From_x003E_k__BackingField>
-                        <_x003C_To_x003E_k__BackingField dataType="UInt">21</_x003C_To_x003E_k__BackingField>
-                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[FNaFMP.Office.MovePrevent]]" id="2775607788" surrogate="true">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">7</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">21</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="2775607788" surrogate="true">
                           <header />
                           <body>
                             <keys dataType="Array" type="System.Object[]" id="4279278180">
@@ -786,26 +1044,41 @@
                               <item dataType="Enum" type="FNaFMP.Core+Character" name="Foxy" value="4" />
                             </keys>
                             <values dataType="Array" type="System.Object[]" id="2076166166">
-                              <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="1830731054">
-                                <_x003C_Position_x003E_k__BackingField dataType="Int">22</_x003C_Position_x003E_k__BackingField>
-                                <equal dataType="Bool">true</equal>
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="1830731054">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="4242945872" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="1733221308">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">22</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
                               </item>
-                              <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="2372915402">
-                                <_x003C_Position_x003E_k__BackingField dataType="Int">22</_x003C_Position_x003E_k__BackingField>
-                                <equal dataType="Bool">true</equal>
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="2372915402">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="2185480108" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="4256150756">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">22</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
                               </item>
-                              <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="794359966">
-                                <_x003C_Position_x003E_k__BackingField dataType="Int">5</_x003C_Position_x003E_k__BackingField>
-                                <equal dataType="Bool">false</equal>
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="794359966">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="3561710112" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="220697564">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">2</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Higher" value="4" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
                               </item>
                             </values>
                           </body>
                         </prevent>
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.Movement" id="1757002846">
-                        <_x003C_From_x003E_k__BackingField dataType="UInt">1</_x003C_From_x003E_k__BackingField>
-                        <_x003C_To_x003E_k__BackingField dataType="UInt">0</_x003C_To_x003E_k__BackingField>
-                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[FNaFMP.Office.MovePrevent]]" id="2631296190" surrogate="true">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">1</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">0</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="2631296190" surrogate="true">
                           <header />
                           <body>
                             <keys dataType="Array" type="System.Object[]" id="3951672336" length="0" />
@@ -814,20 +1087,32 @@
                         </prevent>
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.Movement" id="2783058608">
-                        <_x003C_From_x003E_k__BackingField dataType="UInt">1</_x003C_From_x003E_k__BackingField>
-                        <_x003C_To_x003E_k__BackingField dataType="UInt">6</_x003C_To_x003E_k__BackingField>
-                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[FNaFMP.Office.MovePrevent]]" id="1242605472" surrogate="true">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">1</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">6</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="1242605472" surrogate="true">
                           <header />
                           <body>
-                            <keys dataType="Array" type="System.Object[]" id="702438108" length="0" />
-                            <values dataType="Array" type="System.Object[]" id="938315030" length="0" />
+                            <keys dataType="Array" type="System.Object[]" id="702438108">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="938315030">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="2332617718">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="1578489568" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="2420938716">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">6</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
                           </body>
                         </prevent>
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.Movement" id="2376110170">
-                        <_x003C_From_x003E_k__BackingField dataType="UInt">6</_x003C_From_x003E_k__BackingField>
-                        <_x003C_To_x003E_k__BackingField dataType="UInt">1</_x003C_To_x003E_k__BackingField>
-                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[FNaFMP.Office.MovePrevent]]" id="84199730" surrogate="true">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">6</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">1</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="84199730" surrogate="true">
                           <header />
                           <body>
                             <keys dataType="Array" type="System.Object[]" id="1876544464" length="0" />
@@ -838,9 +1123,638 @@
                     </_items>
                     <_size dataType="Int">16</_size>
                   </item>
+                  <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.Movement]]" id="3767941946">
+                    <_items dataType="Array" type="FNaFMP.Office.Movement[]" id="2031835604" length="4">
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="3577031908">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">2</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">2</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="1919764420" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="2082762052">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Foxy" value="4" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="500855446">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="3356671182">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="2419765200" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="513231548">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">2</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="HigherOrEqual" value="5" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="2568089110">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">2</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">3</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="2259765934" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="1512529232">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Foxy" value="4" />
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Bonnie" value="2" />
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="3930591086">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="1332262946">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="1084371216" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="91372348">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">2</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="NotEqual" value="1" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="1799395594">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="3289429432" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="833188972">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">3</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="1499395126">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">21</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="HigherOrEqual" value="5" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">2</_size>
+                              </item>
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="4248406994">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="1567112992" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="2874576860">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">22</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="1373230554">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="1206252648" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="1275208748">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">21</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
+                          </body>
+                        </prevent>
+                      </item>
+                    </_items>
+                    <_size dataType="Int">2</_size>
+                  </item>
+                  <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.Movement]]" id="1059118822">
+                    <_items dataType="Array" type="FNaFMP.Office.Movement[]" id="1335846656" length="16">
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="1273451164">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">0</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">1</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="3422911428" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="1756310852" length="0" />
+                            <values dataType="Array" type="System.Object[]" id="1815048854" length="0" />
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="4229599766">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">0</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">8</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="3053350966" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="1629002080" length="0" />
+                            <values dataType="Array" type="System.Object[]" id="2736690318" length="0" />
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="1384064264">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">1</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">0</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="1461173912" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="3078190636">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="3446780854">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="744671846">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="402156416" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="2215735708">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">0</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="NotEqual" value="1" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="2702945202">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">1</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">8</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="4182956938" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="3871887328" length="0" />
+                            <values dataType="Array" type="System.Object[]" id="2130011022" length="0" />
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="1445525812">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">1</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">3</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="3721092572" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="3200605892">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Foxy" value="4" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="2377171862">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="2269168974">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="3686972112" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="3942723260">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">2</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Higher" value="4" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="177940878">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">3</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">1</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="3339819790" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="2210037200" length="0" />
+                            <values dataType="Array" type="System.Object[]" id="1614816878" length="0" />
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="2430334144">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">3</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">5</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="2847921424" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="3431713596" length="0" />
+                            <values dataType="Array" type="System.Object[]" id="526224278" length="0" />
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="3871681802">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">3</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">4</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="1836522498" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="3740284304" length="0" />
+                            <values dataType="Array" type="System.Object[]" id="997616366" length="0" />
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="1652363404">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">4</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">3</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="732102100" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="2600117476">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Foxy" value="4" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="356580886">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="2112344750">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="1897155920" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="2575168444">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">2</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Higher" value="4" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="1341166310">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">4</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">21</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="612347366" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="962875776" length="0" />
+                            <values dataType="Array" type="System.Object[]" id="2240975054" length="0" />
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="2652639224">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">21</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">22</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="1029148584" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="1703604908">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="1626792374">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="3528090342">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="1626725760" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="2045318556">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">21</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="2047373626">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="3181789524" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="3142870756">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">22</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="3208115970">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">8</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">1</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="2380524218" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="2893877760" length="0" />
+                            <values dataType="Array" type="System.Object[]" id="2075590606" length="0" />
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="4178307876">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">5</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">3</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="2559686636" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="3377372772">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Foxy" value="4" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="1092411414">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="886567214">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="2100741968" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="967015356">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">2</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Higher" value="4" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
+                          </body>
+                        </prevent>
+                      </item>
+                    </_items>
+                    <_size dataType="Int">13</_size>
+                  </item>
+                  <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.Movement]]" id="1466183866">
+                    <_items dataType="Array" type="FNaFMP.Office.Movement[]" id="534422612">
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="994290916">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">0</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">1</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="2676967364" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="812412228" length="0" />
+                            <values dataType="Array" type="System.Object[]" id="2129293974" length="0" />
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="4261146134">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">0</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">10</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="776850094" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="937057616" length="0" />
+                            <values dataType="Array" type="System.Object[]" id="39587694" length="0" />
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="1028424416">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">1</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">0</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="3790731528" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="3416720236">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="1654709302">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="3017690534">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="2540788736" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="455762076">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">0</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="NotEqual" value="1" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="2067565154">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">1</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">10</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="68642930" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="243827920">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="2499392110">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="73324450">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="3007026448" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="1825852220">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">10</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="4141476028">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">1</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">9</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="3186142540" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="2996208036" length="0" />
+                            <values dataType="Array" type="System.Object[]" id="834357014" length="0" />
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="662859966">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">1</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">6</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="1666092422" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="1213581184">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="2320581838">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="1888248146">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="1907428688" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="2447569852">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">6</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="4269024664">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">6</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">1</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="2324524144" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="3304847676" length="0" />
+                            <values dataType="Array" type="System.Object[]" id="3830694806" length="0" />
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="3205827178">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">6</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">7</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="712064682" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="170610208">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="867185550">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="1457214194">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="670436816" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="2245713596">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">7</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="796226900">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">7</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">6</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="1923435316" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="3627735204">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="4148005654">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="517588718">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="708497488" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="621914556">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">6</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="3993318854">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">7</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">21</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="3423694174" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="1730309904" length="0" />
+                            <values dataType="Array" type="System.Object[]" id="2470665454" length="0" />
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="1297695312">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">21</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">22</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="3252603000" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="938603884">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Bonnie" value="2" />
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Foxy" value="4" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="2336655414">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="1524881318">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="4058539008" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="829120668">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">21</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="637526458">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="958512660" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="1491450468">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">22</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="2174749606">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="2595268608" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="2908727452">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">2</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Higher" value="4" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="2549624082">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">9</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">1</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="4184149794" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="2560338704" length="0" />
+                            <values dataType="Array" type="System.Object[]" id="772777198" length="0" />
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="492198956">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">9</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">10</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="2420839356" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="416222788">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="2275523222">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="1157609422">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="3371512272" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="3539396284">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">10</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="1190760302">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">9</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">6</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="3267049270" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="1834101600">
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                            </keys>
+                            <values dataType="Array" type="System.Object[]" id="1746331790">
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="1703324594">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="338765520" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="3306694332">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">6</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                            </values>
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="1935124488">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">6</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">9</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="3790073568" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="2488801244" length="0" />
+                            <values dataType="Array" type="System.Object[]" id="1652345110" length="0" />
+                          </body>
+                        </prevent>
+                      </item>
+                      <item dataType="Struct" type="FNaFMP.Office.Movement" id="1423592474">
+                        <_x003C_From_x003E_k__BackingField dataType="Int">10</_x003C_From_x003E_k__BackingField>
+                        <_x003C_To_x003E_k__BackingField dataType="Int">9</_x003C_To_x003E_k__BackingField>
+                        <prevent dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]]]" id="2372290650" surrogate="true">
+                          <header />
+                          <body>
+                            <keys dataType="Array" type="System.Object[]" id="2526798848" length="0" />
+                            <values dataType="Array" type="System.Object[]" id="1643873230" length="0" />
+                          </body>
+                        </prevent>
+                      </item>
+                    </_items>
+                    <_size dataType="Int">16</_size>
+                  </item>
                 </values>
               </body>
             </movements>
+            <mt dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[FNaFMP.Office.MoveTime]]" id="2883545374" surrogate="true">
+              <header />
+              <body>
+                <keys dataType="Array" type="System.Object[]" id="2776121770">
+                  <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                  <item dataType="Enum" type="FNaFMP.Core+Character" name="Bonnie" value="2" />
+                  <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
+                  <item dataType="Enum" type="FNaFMP.Core+Character" name="Foxy" value="4" />
+                </keys>
+                <values dataType="Array" type="System.Object[]" id="1169731290">
+                  <item dataType="Struct" type="FNaFMP.Office.MoveTime" id="3196779408">
+                    <_x003C_Max_x003E_k__BackingField dataType="Int">25</_x003C_Max_x003E_k__BackingField>
+                    <_x003C_Min_x003E_k__BackingField dataType="Int">10</_x003C_Min_x003E_k__BackingField>
+                  </item>
+                  <item dataType="Struct" type="FNaFMP.Office.MoveTime" id="3635714798">
+                    <_x003C_Max_x003E_k__BackingField dataType="Int">15</_x003C_Max_x003E_k__BackingField>
+                    <_x003C_Min_x003E_k__BackingField dataType="Int">10</_x003C_Min_x003E_k__BackingField>
+                  </item>
+                  <item dataType="Struct" type="FNaFMP.Office.MoveTime" id="3854025324">
+                    <_x003C_Max_x003E_k__BackingField dataType="Int">20</_x003C_Max_x003E_k__BackingField>
+                    <_x003C_Min_x003E_k__BackingField dataType="Int">10</_x003C_Min_x003E_k__BackingField>
+                  </item>
+                  <item dataType="Struct" type="FNaFMP.Office.MoveTime" id="4089485074">
+                    <_x003C_Max_x003E_k__BackingField dataType="Int">35</_x003C_Max_x003E_k__BackingField>
+                    <_x003C_Min_x003E_k__BackingField dataType="Int">15</_x003C_Min_x003E_k__BackingField>
+                  </item>
+                </values>
+              </body>
+            </mt>
           </item>
           <item dataType="Struct" type="FNaFMP.Office.OfficeLightRenderer" id="2953169281">
             <active dataType="Bool">true</active>
@@ -861,8 +1775,23 @@
                   <move dataType="Bool">true</move>
                   <robots />
                 </item>
+                <item dataType="Struct" type="FNaFMP.Office.CameraView" id="3579599054">
+                  <duration dataType="Float">0</duration>
+                  <extra dataType="Int">-1</extra>
+                  <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
+                    <contentPath dataType="String">Data\Office\office-Lbonnie.Material.res</contentPath>
+                  </mat>
+                  <mode dataType="Enum" type="Duality.Components.Renderers.SpriteAnimator+LoopMode" name="Once" value="0" />
+                  <move dataType="Bool">true</move>
+                  <robots dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Core+Character]]" id="1902792530">
+                    <_items dataType="Array" type="FNaFMP.Core+Character[]" id="2075269456" length="4">
+                      <item dataType="Enum" type="FNaFMP.Core+Character" name="Bonnie" value="2" />
+                    </_items>
+                    <_size dataType="Int">1</_size>
+                  </robots>
+                </item>
               </_items>
-              <_size dataType="Int">1</_size>
+              <_size dataType="Int">2</_size>
             </left>
             <renderer />
             <right dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.CameraView]]" id="2133841656">
@@ -877,8 +1806,23 @@
                   <move dataType="Bool">true</move>
                   <robots />
                 </item>
+                <item dataType="Struct" type="FNaFMP.Office.CameraView" id="1307714634">
+                  <duration dataType="Float">0</duration>
+                  <extra dataType="Int">-1</extra>
+                  <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
+                    <contentPath dataType="String">Data\Office\office-Rchica.Material.res</contentPath>
+                  </mat>
+                  <mode dataType="Enum" type="Duality.Components.Renderers.SpriteAnimator+LoopMode" name="Once" value="0" />
+                  <move dataType="Bool">true</move>
+                  <robots dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Core+Character]]" id="603508044">
+                    <_items dataType="Array" type="FNaFMP.Core+Character[]" id="741966244" length="4">
+                      <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
+                    </_items>
+                    <_size dataType="Int">1</_size>
+                  </robots>
+                </item>
               </_items>
-              <_size dataType="Int">1</_size>
+              <_size dataType="Int">2</_size>
             </right>
             <startup dataType="Bool">false</startup>
             <transform />
@@ -1041,6 +1985,10 @@
             <scale dataType="Float">1</scale>
             <scaleAbs dataType="Float">1</scaleAbs>
           </item>
+          <item dataType="Struct" type="Duality.Components.VelocityTracker" id="4213648085">
+            <active dataType="Bool">true</active>
+            <gameobj dataType="ObjectRef">2142513618</gameobj>
+          </item>
           <item dataType="Struct" type="Duality.Components.Renderers.SpriteRenderer" id="3611132898">
             <active dataType="Bool">true</active>
             <colorTint dataType="Struct" type="Duality.Drawing.ColorRgba">
@@ -1066,10 +2014,6 @@
             </sharedMat>
             <spriteIndex dataType="Int">0</spriteIndex>
             <visibilityGroup dataType="Enum" type="Duality.Drawing.VisibilityFlag" name="Group0" value="1" />
-          </item>
-          <item dataType="Struct" type="Duality.Components.VelocityTracker" id="4213648085">
-            <active dataType="Bool">true</active>
-            <gameobj dataType="ObjectRef">2142513618</gameobj>
           </item>
           <item dataType="Struct" type="Duality.Components.Renderers.SpriteAnimator" id="1882710158">
             <active dataType="Bool">true</active>
@@ -1427,10 +2371,11 @@
                               <spriteIndex dataType="Int">-1</spriteIndex>
                               <visibilityGroup dataType="Enum" type="Duality.Drawing.VisibilityFlag" name="Group1" value="2" />
                             </item>
-                            <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="2181992841">
+                            <item dataType="Struct" type="FNaFMP.Office.CameraButtonText" id="2246729795">
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">2586317313</gameobj>
-                              <render />
+                              <number dataType="Int">0</number>
+                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -1441,12 +2386,12 @@
                             <keys dataType="Array" type="System.Object[]" id="658668791">
                               <item dataType="ObjectRef">3757206646</item>
                               <item dataType="ObjectRef">1240285980</item>
-                              <item dataType="ObjectRef">1180528928</item>
+                              <item dataType="Type" id="2951253646" value="FNaFMP.Office.CameraButtonText" />
                             </keys>
                             <values dataType="Array" type="System.Object[]" id="2341431872">
                               <item dataType="ObjectRef">2643594531</item>
                               <item dataType="ObjectRef">4054936593</item>
-                              <item dataType="ObjectRef">2181992841</item>
+                              <item dataType="ObjectRef">2246729795</item>
                             </values>
                           </body>
                         </compMap>
@@ -1531,13 +2476,8 @@
                         <renderer />
                         <transform />
                       </item>
-                      <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="3671378656">
-                        <active dataType="Bool">true</active>
-                        <gameobj dataType="ObjectRef">4075703128</gameobj>
-                        <render />
-                      </item>
                     </_items>
-                    <_size dataType="Int">5</_size>
+                    <_size dataType="Int">4</_size>
                   </compList>
                   <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="3191916352" surrogate="true">
                     <header />
@@ -1546,14 +2486,12 @@
                         <item dataType="ObjectRef">3757206646</item>
                         <item dataType="ObjectRef">1240285980</item>
                         <item dataType="ObjectRef">1128967702</item>
-                        <item dataType="ObjectRef">1180528928</item>
                         <item dataType="Type" id="2905165420" value="FNaFMP.Office.CameraButton" />
                       </keys>
                       <values dataType="Array" type="System.Object[]" id="4045162206">
                         <item dataType="ObjectRef">4132980346</item>
                         <item dataType="ObjectRef">1249355112</item>
                         <item dataType="ObjectRef">3815899668</item>
-                        <item dataType="ObjectRef">3671378656</item>
                         <item dataType="ObjectRef">2585921855</item>
                       </values>
                     </body>
@@ -1624,10 +2562,11 @@
                               <spriteIndex dataType="Int">-1</spriteIndex>
                               <visibilityGroup dataType="Enum" type="Duality.Drawing.VisibilityFlag" name="Group1" value="2" />
                             </item>
-                            <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="121293772">
+                            <item dataType="Struct" type="FNaFMP.Office.CameraButtonText" id="186030726">
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">525618244</gameobj>
-                              <render />
+                              <number dataType="Int">1</number>
+                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -1638,12 +2577,12 @@
                             <keys dataType="Array" type="System.Object[]" id="3958078310">
                               <item dataType="ObjectRef">3757206646</item>
                               <item dataType="ObjectRef">1240285980</item>
-                              <item dataType="ObjectRef">1180528928</item>
+                              <item dataType="ObjectRef">2951253646</item>
                             </keys>
                             <values dataType="Array" type="System.Object[]" id="4058658618">
                               <item dataType="ObjectRef">582895462</item>
                               <item dataType="ObjectRef">1994237524</item>
-                              <item dataType="ObjectRef">121293772</item>
+                              <item dataType="ObjectRef">186030726</item>
                             </values>
                           </body>
                         </compMap>
@@ -1728,13 +2667,8 @@
                         <renderer />
                         <transform />
                       </item>
-                      <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="2224250022">
-                        <active dataType="Bool">true</active>
-                        <gameobj dataType="ObjectRef">2628574494</gameobj>
-                        <render />
-                      </item>
                     </_items>
-                    <_size dataType="Int">5</_size>
+                    <_size dataType="Int">4</_size>
                   </compList>
                   <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="3299236290" surrogate="true">
                     <header />
@@ -1743,14 +2677,12 @@
                         <item dataType="ObjectRef">3757206646</item>
                         <item dataType="ObjectRef">1240285980</item>
                         <item dataType="ObjectRef">1128967702</item>
-                        <item dataType="ObjectRef">1180528928</item>
                         <item dataType="ObjectRef">2905165420</item>
                       </keys>
                       <values dataType="Array" type="System.Object[]" id="2684395406">
                         <item dataType="ObjectRef">2685851712</item>
                         <item dataType="ObjectRef">4097193774</item>
                         <item dataType="ObjectRef">2368771034</item>
-                        <item dataType="ObjectRef">2224250022</item>
                         <item dataType="ObjectRef">1138793221</item>
                       </values>
                     </body>
@@ -1821,10 +2753,11 @@
                               <spriteIndex dataType="Int">-1</spriteIndex>
                               <visibilityGroup dataType="Enum" type="Duality.Drawing.VisibilityFlag" name="Group1" value="2" />
                             </item>
-                            <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="1302627375">
+                            <item dataType="Struct" type="FNaFMP.Office.CameraButtonText" id="1367364329">
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">1706951847</gameobj>
-                              <render />
+                              <number dataType="Int">9</number>
+                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -1835,12 +2768,12 @@
                             <keys dataType="Array" type="System.Object[]" id="2160339305">
                               <item dataType="ObjectRef">3757206646</item>
                               <item dataType="ObjectRef">1240285980</item>
-                              <item dataType="ObjectRef">1180528928</item>
+                              <item dataType="ObjectRef">2951253646</item>
                             </keys>
                             <values dataType="Array" type="System.Object[]" id="1690671808">
                               <item dataType="ObjectRef">1764229065</item>
                               <item dataType="ObjectRef">3175571127</item>
-                              <item dataType="ObjectRef">1302627375</item>
+                              <item dataType="ObjectRef">1367364329</item>
                             </values>
                           </body>
                         </compMap>
@@ -1925,13 +2858,8 @@
                         <renderer />
                         <transform />
                       </item>
-                      <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="2865683922">
-                        <active dataType="Bool">true</active>
-                        <gameobj dataType="ObjectRef">3270008394</gameobj>
-                        <render />
-                      </item>
                     </_items>
-                    <_size dataType="Int">5</_size>
+                    <_size dataType="Int">4</_size>
                   </compList>
                   <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="4051709822" surrogate="true">
                     <header />
@@ -1940,14 +2868,12 @@
                         <item dataType="ObjectRef">3757206646</item>
                         <item dataType="ObjectRef">1240285980</item>
                         <item dataType="ObjectRef">1128967702</item>
-                        <item dataType="ObjectRef">1180528928</item>
                         <item dataType="ObjectRef">2905165420</item>
                       </keys>
                       <values dataType="Array" type="System.Object[]" id="1408193678">
                         <item dataType="ObjectRef">3327285612</item>
                         <item dataType="ObjectRef">443660378</item>
                         <item dataType="ObjectRef">3010204934</item>
-                        <item dataType="ObjectRef">2865683922</item>
                         <item dataType="ObjectRef">1780227121</item>
                       </values>
                     </body>
@@ -2018,10 +2944,11 @@
                               <spriteIndex dataType="Int">-1</spriteIndex>
                               <visibilityGroup dataType="Enum" type="Duality.Drawing.VisibilityFlag" name="Group1" value="2" />
                             </item>
-                            <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="1778774623">
+                            <item dataType="Struct" type="FNaFMP.Office.CameraButtonText" id="1843511577">
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">2183099095</gameobj>
-                              <render />
+                              <number dataType="Int">2</number>
+                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -2032,12 +2959,12 @@
                             <keys dataType="Array" type="System.Object[]" id="2568198649">
                               <item dataType="ObjectRef">3757206646</item>
                               <item dataType="ObjectRef">1240285980</item>
-                              <item dataType="ObjectRef">1180528928</item>
+                              <item dataType="ObjectRef">2951253646</item>
                             </keys>
                             <values dataType="Array" type="System.Object[]" id="3993162880">
                               <item dataType="ObjectRef">2240376313</item>
                               <item dataType="ObjectRef">3651718375</item>
-                              <item dataType="ObjectRef">1778774623</item>
+                              <item dataType="ObjectRef">1843511577</item>
                             </values>
                           </body>
                         </compMap>
@@ -2122,13 +3049,8 @@
                         <renderer />
                         <transform />
                       </item>
-                      <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="1508621378">
-                        <active dataType="Bool">true</active>
-                        <gameobj dataType="ObjectRef">1912945850</gameobj>
-                        <render />
-                      </item>
                     </_items>
-                    <_size dataType="Int">5</_size>
+                    <_size dataType="Int">4</_size>
                   </compList>
                   <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="2850145070" surrogate="true">
                     <header />
@@ -2137,14 +3059,12 @@
                         <item dataType="ObjectRef">3757206646</item>
                         <item dataType="ObjectRef">1240285980</item>
                         <item dataType="ObjectRef">1128967702</item>
-                        <item dataType="ObjectRef">1180528928</item>
                         <item dataType="ObjectRef">2905165420</item>
                       </keys>
                       <values dataType="Array" type="System.Object[]" id="1788510094">
                         <item dataType="ObjectRef">1970223068</item>
                         <item dataType="ObjectRef">3381565130</item>
                         <item dataType="ObjectRef">1653142390</item>
-                        <item dataType="ObjectRef">1508621378</item>
                         <item dataType="ObjectRef">423164577</item>
                       </values>
                     </body>
@@ -2215,10 +3135,11 @@
                               <spriteIndex dataType="Int">-1</spriteIndex>
                               <visibilityGroup dataType="Enum" type="Duality.Drawing.VisibilityFlag" name="Group1" value="2" />
                             </item>
-                            <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="1200696726">
+                            <item dataType="Struct" type="FNaFMP.Office.CameraButtonText" id="1265433680">
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">1605021198</gameobj>
-                              <render />
+                              <number dataType="Int">3</number>
+                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -2229,12 +3150,12 @@
                             <keys dataType="Array" type="System.Object[]" id="1970896344">
                               <item dataType="ObjectRef">3757206646</item>
                               <item dataType="ObjectRef">1240285980</item>
-                              <item dataType="ObjectRef">1180528928</item>
+                              <item dataType="ObjectRef">2951253646</item>
                             </keys>
                             <values dataType="Array" type="System.Object[]" id="3955629726">
                               <item dataType="ObjectRef">1662298416</item>
                               <item dataType="ObjectRef">3073640478</item>
-                              <item dataType="ObjectRef">1200696726</item>
+                              <item dataType="ObjectRef">1265433680</item>
                             </values>
                           </body>
                         </compMap>
@@ -2319,13 +3240,8 @@
                         <renderer />
                         <transform />
                       </item>
-                      <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="1735602489">
-                        <active dataType="Bool">true</active>
-                        <gameobj dataType="ObjectRef">2139926961</gameobj>
-                        <render />
-                      </item>
                     </_items>
-                    <_size dataType="Int">5</_size>
+                    <_size dataType="Int">4</_size>
                   </compList>
                   <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="3051422547" surrogate="true">
                     <header />
@@ -2334,14 +3250,12 @@
                         <item dataType="ObjectRef">3757206646</item>
                         <item dataType="ObjectRef">1240285980</item>
                         <item dataType="ObjectRef">1128967702</item>
-                        <item dataType="ObjectRef">1180528928</item>
                         <item dataType="ObjectRef">2905165420</item>
                       </keys>
                       <values dataType="Array" type="System.Object[]" id="1267714326">
                         <item dataType="ObjectRef">2197204179</item>
                         <item dataType="ObjectRef">3608546241</item>
                         <item dataType="ObjectRef">1880123501</item>
-                        <item dataType="ObjectRef">1735602489</item>
                         <item dataType="ObjectRef">650145688</item>
                       </values>
                     </body>
@@ -2412,10 +3326,11 @@
                               <spriteIndex dataType="Int">-1</spriteIndex>
                               <visibilityGroup dataType="Enum" type="Duality.Drawing.VisibilityFlag" name="Group1" value="2" />
                             </item>
-                            <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="1681043182">
+                            <item dataType="Struct" type="FNaFMP.Office.CameraButtonText" id="1745780136">
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">2085367654</gameobj>
-                              <render />
+                              <number dataType="Int">4</number>
+                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -2426,12 +3341,12 @@
                             <keys dataType="Array" type="System.Object[]" id="2246086868">
                               <item dataType="ObjectRef">3757206646</item>
                               <item dataType="ObjectRef">1240285980</item>
-                              <item dataType="ObjectRef">1180528928</item>
+                              <item dataType="ObjectRef">2951253646</item>
                             </keys>
                             <values dataType="Array" type="System.Object[]" id="1185912246">
                               <item dataType="ObjectRef">2142644872</item>
                               <item dataType="ObjectRef">3553986934</item>
-                              <item dataType="ObjectRef">1681043182</item>
+                              <item dataType="ObjectRef">1745780136</item>
                             </values>
                           </body>
                         </compMap>
@@ -2516,13 +3431,8 @@
                         <renderer />
                         <transform />
                       </item>
-                      <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="401666894">
-                        <active dataType="Bool">true</active>
-                        <gameobj dataType="ObjectRef">805991366</gameobj>
-                        <render />
-                      </item>
                     </_items>
-                    <_size dataType="Int">5</_size>
+                    <_size dataType="Int">4</_size>
                   </compList>
                   <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="664580090" surrogate="true">
                     <header />
@@ -2531,14 +3441,12 @@
                         <item dataType="ObjectRef">3757206646</item>
                         <item dataType="ObjectRef">1240285980</item>
                         <item dataType="ObjectRef">1128967702</item>
-                        <item dataType="ObjectRef">1180528928</item>
                         <item dataType="ObjectRef">2905165420</item>
                       </keys>
                       <values dataType="Array" type="System.Object[]" id="3500628430">
                         <item dataType="ObjectRef">863268584</item>
                         <item dataType="ObjectRef">2274610646</item>
                         <item dataType="ObjectRef">546187906</item>
-                        <item dataType="ObjectRef">401666894</item>
                         <item dataType="ObjectRef">3611177389</item>
                       </values>
                     </body>
@@ -2609,10 +3517,11 @@
                               <spriteIndex dataType="Int">-1</spriteIndex>
                               <visibilityGroup dataType="Enum" type="Duality.Drawing.VisibilityFlag" name="Group1" value="2" />
                             </item>
-                            <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="973527964">
+                            <item dataType="Struct" type="FNaFMP.Office.CameraButtonText" id="1038264918">
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">1377852436</gameobj>
-                              <render />
+                              <number dataType="Int">5</number>
+                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -2623,12 +3532,12 @@
                             <keys dataType="Array" type="System.Object[]" id="548213858">
                               <item dataType="ObjectRef">3757206646</item>
                               <item dataType="ObjectRef">1240285980</item>
-                              <item dataType="ObjectRef">1180528928</item>
+                              <item dataType="ObjectRef">2951253646</item>
                             </keys>
                             <values dataType="Array" type="System.Object[]" id="157135242">
                               <item dataType="ObjectRef">1435129654</item>
                               <item dataType="ObjectRef">2846471716</item>
-                              <item dataType="ObjectRef">973527964</item>
+                              <item dataType="ObjectRef">1038264918</item>
                             </values>
                           </body>
                         </compMap>
@@ -2713,13 +3622,8 @@
                         <renderer />
                         <transform />
                       </item>
-                      <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="2241622525">
-                        <active dataType="Bool">true</active>
-                        <gameobj dataType="ObjectRef">2645946997</gameobj>
-                        <render />
-                      </item>
                     </_items>
-                    <_size dataType="Int">5</_size>
+                    <_size dataType="Int">4</_size>
                   </compList>
                   <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="3604094719" surrogate="true">
                     <header />
@@ -2728,14 +3632,12 @@
                         <item dataType="ObjectRef">3757206646</item>
                         <item dataType="ObjectRef">1240285980</item>
                         <item dataType="ObjectRef">1128967702</item>
-                        <item dataType="ObjectRef">1180528928</item>
                         <item dataType="ObjectRef">2905165420</item>
                       </keys>
                       <values dataType="Array" type="System.Object[]" id="3048813206">
                         <item dataType="ObjectRef">2703224215</item>
                         <item dataType="ObjectRef">4114566277</item>
                         <item dataType="ObjectRef">2386143537</item>
-                        <item dataType="ObjectRef">2241622525</item>
                         <item dataType="ObjectRef">1156165724</item>
                       </values>
                     </body>
@@ -2806,10 +3708,11 @@
                               <spriteIndex dataType="Int">-1</spriteIndex>
                               <visibilityGroup dataType="Enum" type="Duality.Drawing.VisibilityFlag" name="Group1" value="2" />
                             </item>
-                            <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="3292899668">
+                            <item dataType="Struct" type="FNaFMP.Office.CameraButtonText" id="3357636622">
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">3697224140</gameobj>
-                              <render />
+                              <number dataType="Int">6</number>
+                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -2820,12 +3723,12 @@
                             <keys dataType="Array" type="System.Object[]" id="1925630634">
                               <item dataType="ObjectRef">3757206646</item>
                               <item dataType="ObjectRef">1240285980</item>
-                              <item dataType="ObjectRef">1180528928</item>
+                              <item dataType="ObjectRef">2951253646</item>
                             </keys>
                             <values dataType="Array" type="System.Object[]" id="840904922">
                               <item dataType="ObjectRef">3754501358</item>
                               <item dataType="ObjectRef">870876124</item>
-                              <item dataType="ObjectRef">3292899668</item>
+                              <item dataType="ObjectRef">3357636622</item>
                             </values>
                           </body>
                         </compMap>
@@ -2910,13 +3813,8 @@
                         <renderer />
                         <transform />
                       </item>
-                      <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="2621744859">
-                        <active dataType="Bool">true</active>
-                        <gameobj dataType="ObjectRef">3026069331</gameobj>
-                        <render />
-                      </item>
                     </_items>
-                    <_size dataType="Int">5</_size>
+                    <_size dataType="Int">4</_size>
                   </compList>
                   <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="4242876761" surrogate="true">
                     <header />
@@ -2925,14 +3823,12 @@
                         <item dataType="ObjectRef">3757206646</item>
                         <item dataType="ObjectRef">1240285980</item>
                         <item dataType="ObjectRef">1128967702</item>
-                        <item dataType="ObjectRef">1180528928</item>
                         <item dataType="ObjectRef">2905165420</item>
                       </keys>
                       <values dataType="Array" type="System.Object[]" id="2483735606">
                         <item dataType="ObjectRef">3083346549</item>
                         <item dataType="ObjectRef">199721315</item>
                         <item dataType="ObjectRef">2766265871</item>
-                        <item dataType="ObjectRef">2621744859</item>
                         <item dataType="ObjectRef">1536288058</item>
                       </values>
                     </body>
@@ -3003,10 +3899,11 @@
                               <spriteIndex dataType="Int">-1</spriteIndex>
                               <visibilityGroup dataType="Enum" type="Duality.Drawing.VisibilityFlag" name="Group1" value="2" />
                             </item>
-                            <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="3252765207">
+                            <item dataType="Struct" type="FNaFMP.Office.CameraButtonText" id="3317502161">
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">3657089679</gameobj>
-                              <render />
+                              <number dataType="Int">7</number>
+                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -3017,12 +3914,12 @@
                             <keys dataType="Array" type="System.Object[]" id="52910181">
                               <item dataType="ObjectRef">3757206646</item>
                               <item dataType="ObjectRef">1240285980</item>
-                              <item dataType="ObjectRef">1180528928</item>
+                              <item dataType="ObjectRef">2951253646</item>
                             </keys>
                             <values dataType="Array" type="System.Object[]" id="927631976">
                               <item dataType="ObjectRef">3714366897</item>
                               <item dataType="ObjectRef">830741663</item>
-                              <item dataType="ObjectRef">3252765207</item>
+                              <item dataType="ObjectRef">3317502161</item>
                             </values>
                           </body>
                         </compMap>
@@ -3107,13 +4004,8 @@
                         <renderer />
                         <transform />
                       </item>
-                      <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="668807115">
-                        <active dataType="Bool">true</active>
-                        <gameobj dataType="ObjectRef">1073131587</gameobj>
-                        <render />
-                      </item>
                     </_items>
-                    <_size dataType="Int">5</_size>
+                    <_size dataType="Int">4</_size>
                   </compList>
                   <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="2565754729" surrogate="true">
                     <header />
@@ -3122,14 +4014,12 @@
                         <item dataType="ObjectRef">3757206646</item>
                         <item dataType="ObjectRef">1240285980</item>
                         <item dataType="ObjectRef">1128967702</item>
-                        <item dataType="ObjectRef">1180528928</item>
                         <item dataType="ObjectRef">2905165420</item>
                       </keys>
                       <values dataType="Array" type="System.Object[]" id="132060086">
                         <item dataType="ObjectRef">1130408805</item>
                         <item dataType="ObjectRef">2541750867</item>
                         <item dataType="ObjectRef">813328127</item>
-                        <item dataType="ObjectRef">668807115</item>
                         <item dataType="ObjectRef">3878317610</item>
                       </values>
                     </body>
@@ -3200,10 +4090,11 @@
                               <spriteIndex dataType="Int">-1</spriteIndex>
                               <visibilityGroup dataType="Enum" type="Duality.Drawing.VisibilityFlag" name="Group1" value="2" />
                             </item>
-                            <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="3834969521">
+                            <item dataType="Struct" type="FNaFMP.Office.CameraButtonText" id="3899706475">
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">4239293993</gameobj>
-                              <render />
+                              <number dataType="Int">8</number>
+                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -3214,12 +4105,12 @@
                             <keys dataType="Array" type="System.Object[]" id="2319881607">
                               <item dataType="ObjectRef">3757206646</item>
                               <item dataType="ObjectRef">1240285980</item>
-                              <item dataType="ObjectRef">1180528928</item>
+                              <item dataType="ObjectRef">2951253646</item>
                             </keys>
                             <values dataType="Array" type="System.Object[]" id="966090112">
                               <item dataType="ObjectRef">1603915</item>
                               <item dataType="ObjectRef">1412945977</item>
-                              <item dataType="ObjectRef">3834969521</item>
+                              <item dataType="ObjectRef">3899706475</item>
                             </values>
                           </body>
                         </compMap>
@@ -3304,13 +4195,8 @@
                         <renderer />
                         <transform />
                       </item>
-                      <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="2076260754">
-                        <active dataType="Bool">true</active>
-                        <gameobj dataType="ObjectRef">2480585226</gameobj>
-                        <render />
-                      </item>
                     </_items>
-                    <_size dataType="Int">5</_size>
+                    <_size dataType="Int">4</_size>
                   </compList>
                   <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="891144254" surrogate="true">
                     <header />
@@ -3319,14 +4205,12 @@
                         <item dataType="ObjectRef">3757206646</item>
                         <item dataType="ObjectRef">1240285980</item>
                         <item dataType="ObjectRef">1128967702</item>
-                        <item dataType="ObjectRef">1180528928</item>
                         <item dataType="ObjectRef">2905165420</item>
                       </keys>
                       <values dataType="Array" type="System.Object[]" id="1811640206">
                         <item dataType="ObjectRef">2537862444</item>
                         <item dataType="ObjectRef">3949204506</item>
                         <item dataType="ObjectRef">2220781766</item>
-                        <item dataType="ObjectRef">2076260754</item>
                         <item dataType="ObjectRef">990803953</item>
                       </values>
                     </body>
@@ -3397,10 +4281,11 @@
                               <spriteIndex dataType="Int">-1</spriteIndex>
                               <visibilityGroup dataType="Enum" type="Duality.Drawing.VisibilityFlag" name="Group1" value="2" />
                             </item>
-                            <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="3735486688">
+                            <item dataType="Struct" type="FNaFMP.Office.CameraButtonText" id="3800223642">
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">4139811160</gameobj>
-                              <render />
+                              <number dataType="Int">10</number>
+                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -3411,12 +4296,12 @@
                             <keys dataType="Array" type="System.Object[]" id="3111953826">
                               <item dataType="ObjectRef">3757206646</item>
                               <item dataType="ObjectRef">1240285980</item>
-                              <item dataType="ObjectRef">1180528928</item>
+                              <item dataType="ObjectRef">2951253646</item>
                             </keys>
                             <values dataType="Array" type="System.Object[]" id="3811111178">
                               <item dataType="ObjectRef">4197088378</item>
                               <item dataType="ObjectRef">1313463144</item>
-                              <item dataType="ObjectRef">3735486688</item>
+                              <item dataType="ObjectRef">3800223642</item>
                             </values>
                           </body>
                         </compMap>
@@ -3501,13 +4386,8 @@
                         <renderer />
                         <transform />
                       </item>
-                      <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="3202787392">
-                        <active dataType="Bool">true</active>
-                        <gameobj dataType="ObjectRef">3607111864</gameobj>
-                        <render />
-                      </item>
                     </_items>
-                    <_size dataType="Int">5</_size>
+                    <_size dataType="Int">4</_size>
                   </compList>
                   <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="949072800" surrogate="true">
                     <header />
@@ -3516,14 +4396,12 @@
                         <item dataType="ObjectRef">3757206646</item>
                         <item dataType="ObjectRef">1240285980</item>
                         <item dataType="ObjectRef">1128967702</item>
-                        <item dataType="ObjectRef">1180528928</item>
                         <item dataType="ObjectRef">2905165420</item>
                       </keys>
                       <values dataType="Array" type="System.Object[]" id="2434265054">
                         <item dataType="ObjectRef">3664389082</item>
                         <item dataType="ObjectRef">780763848</item>
                         <item dataType="ObjectRef">3347308404</item>
-                        <item dataType="ObjectRef">3202787392</item>
                         <item dataType="ObjectRef">2117330591</item>
                       </values>
                     </body>

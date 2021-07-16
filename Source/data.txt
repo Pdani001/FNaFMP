@@ -9,17 +9,17 @@ Button: 60x40
 ============
 
 == CAMERAS ==
-0: 1A
-1: 1B
-2: 1C
-3: 2A
-4: 2B
-5: 3
-6: 4A
-7: 4B
-8: 5
-9: 6
-10: 7
+0: 1A (Showstage)
+1: 1B (Dining Area)
+2: 1C (Pirate Cove)
+3: 2A (West Hall)
+4: 2B (W.Hall Corner)
+5: 3 (Supply Closet)
+6: 4A (East Hall)
+7: 4B (E.Hall Corner)
+8: 5 (Backstage)
+9: 6 (Kitchen)
+10: 7 (Restrooms)
 =============
 
 == CHANNELS ==
