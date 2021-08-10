@@ -29,8 +29,8 @@ Button: 60x40
 Status change:
  - To master: *1* -> .character. .status (0-2).         ## Obselete
  - To player: *2* -> .character. .peer. .status (0-2).  [Also sent to joining players]
-Lobby info (from player to master): *12* -> .version, null terminated.
-Lobby info (from master to player): *12* -> .success (0/1). [On success: .player count. .password (0/1). .party length. .party.] [On fail: .fail reason, null terminated.]
+Lobby info (from player to master): *12* -> .length. .version.
+Lobby info (from master to player): *12* -> .success (0/1). [On success: .player count. .password (0/1). .party length. .party.] [On fail: .length. .fail reason.]
 Lobby chat: *15* -> .character. .message length. .message.
 Status request (after join, number): *21* -> .random number.
 Game info: *3* (text) -> .game code.
