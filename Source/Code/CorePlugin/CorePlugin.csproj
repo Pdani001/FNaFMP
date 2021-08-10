@@ -52,23 +52,29 @@
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="SharpYaml, Version=1.6.6.0, Culture=neutral, PublicKeyToken=1ced8108e942bc02, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpYaml.1.6.6\lib\net45\SharpYaml.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Net.Sockets, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Net.Sockets.4.3.0\lib\net46\System.Net.Sockets.dll</HintPath>
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Alzaitu.Lacewing.Client\ClientChannel.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\ClientEvent.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\ClientPeer.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\EnumHelper.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\LacewingClient.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Logger.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\BinaryReader.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventBinaryMessage.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventNumberMessage.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventPeer.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventError.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventPing.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventResponseChannelList.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventDisconnect.cs" />
@@ -104,6 +110,9 @@
     <Compile Include="Alzaitu.Lacewing.Client\Packet\Response\PacketResponseSetName.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\StateMachine\BaseThread.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\StateMachine\ClientThread.cs" />
+    <Compile Include="Configuration\Gamejolt.cs" />
+    <Compile Include="Configuration\RootConfig.cs" />
+    <Compile Include="Configuration\Settings.cs" />
     <Compile Include="Menu.cs" />
     <Compile Include="Select.cs" />
     <Compile Include="Splash.cs" />

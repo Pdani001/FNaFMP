@@ -13,6 +13,7 @@ using Duality.Resources;
 using Alzaitu.Lacewing.Client.Packet.EventData;
 using Alzaitu.Lacewing.Client.Packet;
 using Alzaitu.Lacewing.Client;
+using FNaFMP.Utility;
 
 namespace FNaFMP.Select
 {
@@ -32,7 +33,7 @@ namespace FNaFMP.Select
         }
 		public static Checkmark GetCheckmark(Core.Character c)
         {
-			if (c == Core.Character.None)
+			if (c == Core.Character.None || !Checkmarks.ContainsKey(c))
 				return null;
 			return Checkmarks[c];
         }
@@ -62,6 +63,7 @@ namespace FNaFMP.Select
 			}
 			Ready.Clear();
 			Peers.Clear();
+			Players.Clear();
             if(Core.Client != null)
             {
                 if (!Core.Client.IsConnected)
@@ -97,20 +99,27 @@ namespace FNaFMP.Select
         {
             if(e.SubChannel == 21)
             {
+				ClientPeer peer = ClientPeer.GetPeer(Core.Client, (ushort)e.PeerID);
+				ChatBox.AddChat(string.Format("[Game] {0} joined",peer.Name), ColorRgba.Grey);
 				if (Core.Client.IsMaster)
 				{
 					Utility.Utilities.Logger.Write("Status request from {0}",e.PeerID);
 					foreach (Core.Character cr in Checkmarks.Keys)
 					{
 						Checkmark check = Checkmarks[cr];
+						List<byte> message = new List<byte>();
+						message.Add((byte)cr);
+						message.AddRange(BitConverter.GetBytes((ushort)check.Peer));
 						if (check.Peer > -1)
 						{
-							List<byte> message = new List<byte>();
-							message.Add((byte)cr);
-							message.AddRange(BitConverter.GetBytes((ushort)check.Peer));
 							message.Add((byte)(check.Ready ? 2 : 1));
-							Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 2, message.ToArray());
 						}
+						else
+                        {
+							continue;
+                        }
+						peer.SendBinaryMessage(Core.Client, 2, Core.Client.joinedChannels[0], message.ToArray());
+						//Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 2, message.ToArray());
 					}
 					Core.DRPC.UpdatePartySize(Players.Count);
 				}
@@ -134,7 +143,7 @@ namespace FNaFMP.Select
             {
 				case 2:
 					byte cb = reader.ReadByte();
-					ushort peerId = reader.ReadUShort();
+					int peerId = reader.ReadUShort();
 					Core.Character c = (Core.Character)cb;
 					if (Enum.IsDefined(typeof(Core.Character), c))
 					{
@@ -143,16 +152,38 @@ namespace FNaFMP.Select
                         switch (status)
                         {
 							case 0:
+								if (e.Type == MessageEventType.Channel)
+								{
+									ClientPeer peer = ClientPeer.GetPeer(Core.Client, (ushort)e.PeerID);
+									ChatBox.AddChat(string.Format("[Game] {0} deselected {1}", peer.Name,check.Character.GetStringValue()), ColorRgba.Green);
+								}
 								check.Peer = -1;
 								check.Checked = false;
+								check.Ready = false;
+								Ready.Remove(c);
 								break;
 							case 1:
+								if (e.Type == MessageEventType.Channel)
+								{
+									ClientPeer peer = ClientPeer.GetPeer(Core.Client, (ushort)e.PeerID);
+									if(!check.Checked)
+										ChatBox.AddChat(string.Format("[Game] {0} selected {1}", peer.Name, check.Character.GetStringValue()), ColorRgba.Green);
+									else
+										ChatBox.AddChat(string.Format("[Game] {0} is no longer ready", check.Character.GetStringValue()), ColorRgba.Green);
+								}
 								check.Peer = peerId;
 								check.Checked = true;
 								check.Ready = false;
 								Ready.Remove(c);
 								break;
 							case 2:
+								if (e.Type == MessageEventType.Channel)
+								{
+									/*ClientPeer peer = ClientPeer.GetPeer(Core.Client, (ushort)e.PeerID);*/
+									ChatBox.AddChat(string.Format("[Game] {0} is ready", check.Character.GetStringValue()), ColorRgba.Green);
+								}
+								check.Peer = peerId;
+								check.Checked = true;
 								check.Ready = true;
 								Ready.Add(c);
 								break;
@@ -167,27 +198,32 @@ namespace FNaFMP.Select
 						Utility.Utilities.Logger.Write("Lobby join request from {0}",e.PeerID);
 						ClientChannel channel = Core.Client.joinedChannels[0];
 						int count = channel.Count;
-						string version = reader.ReadText();
+						int length = reader.ReadInt();
+						string version = reader.ReadText(length);
 						List<byte> msg = new List<byte>();
 						ClientPeer peer = ClientPeer.GetPeer(Core.Client, (ushort)e.PeerID);
 						if(version != Core.VERSION)
                         {
-							msg.Add(0);
+							Utility.Utilities.Logger.Write(Utility.DualityLogger.LogLevel.WARN, "Join request from {0} denied: Version mismatch",e.PeerID);
+							Utility.Utilities.Logger.Write(Utility.DualityLogger.LogLevel.WARN, "Received version: '{0}', current version: '{1}'",version,Core.VERSION);
+							msg.Add(0); // FAIL
+							msg.AddRange(BitConverter.GetBytes(Encoding.UTF8.GetByteCount("Version mismatch")));
 							msg.AddRange(Encoding.UTF8.GetBytes("Version mismatch"));
-							msg.Add(0);
 							peer.SendBinaryMessage(Core.Client, 12, channel, msg.ToArray());
 							break;
                         }
-						if(Players.Count > 5)
+						if(Players.Count >= 5)
                         {
-							msg.Add(0);
+							Utility.Utilities.Logger.Write(Utility.DualityLogger.LogLevel.WARN,"Join request from {0} denied: Lobby is full",e.PeerID);
+							msg.Add(0); // FAIL
+							msg.AddRange(BitConverter.GetBytes(Encoding.UTF8.GetByteCount("Lobby is full")));
 							msg.AddRange(Encoding.UTF8.GetBytes("Lobby is full"));
-							msg.Add(0);
 							peer.SendBinaryMessage(Core.Client, 12, channel, msg.ToArray());
 							break;
                         }
+						Utility.Utilities.Logger.Write("Join request from {0} accepted",e.PeerID);
 						Players.Add(e.PeerID);
-						msg.Add(1);
+						msg.Add(1);	// SUCCESS
 						msg.Add((byte)Players.Count);
 						msg.Add(0);
 						msg.AddRange(BitConverter.GetBytes(Core.PartyID.ToString().Length));
@@ -208,6 +244,7 @@ namespace FNaFMP.Select
 					bool left = Players.Remove(e.PeerID);
                     if (left)
                     {
+						ChatBox.AddChat(string.Format("[Game] {0} left",e.Name), ColorRgba.Grey);
 						Core.DRPC.UpdatePartySize(Players.Count);
 					}
 					foreach (Core.Character c in Checkmarks.Keys)
@@ -261,6 +298,7 @@ namespace FNaFMP.Select
 
         public void OnDeactivate()
         {
+			Checkmarks.Clear();
 			if (Core.Client != null)
 			{
 				Core.Client.Event.ResponseLeaveChannel -= Event_LeaveChannel;
@@ -314,7 +352,7 @@ namespace FNaFMP.Select
 					}
 					if(nextcount <= Time.MainTimer.TotalSeconds)
                     {
-						ChatBox.AddChat($"[Game] Starting in {countdown} second(s)...");
+						ChatBox.AddChat($"[Game] Starting in {countdown} second(s)...", ColorRgba.Red);
 						nextcount = (int)(Time.MainTimer.TotalSeconds + 1);
 						countdown--;
                     }
@@ -322,7 +360,7 @@ namespace FNaFMP.Select
                 {
 					if(nextcount > -1)
                     {
-						ChatBox.AddChat($"[Game] Starting aborted.");
+						ChatBox.AddChat($"[Game] Starting aborted.", ColorRgba.Red);
 					}
 					countdown = -1;
 					nextcount = -1;
@@ -358,13 +396,16 @@ namespace FNaFMP.Select
         {
 			if (Character == Core.Character.None)
 				return;
+			if(BGTasks.GetCheckmark(Character) == null)
+            {
+				BGTasks.LoadCheckmark(this);
+			}
 			if (renderer == null || transform == null)
 			{
 				transform = GameObj.Transform;
 				renderer = GameObj.GetComponent<SpriteRenderer>();
 				Checked = false;
 				Ready = false;
-				BGTasks.LoadCheckmark(this);
 			}
 			else
 			{
@@ -401,6 +442,7 @@ namespace FNaFMP.Select
                         {
 							if (Core.SelfCharacter != Core.Character.None)
 								return;
+							ChatBox.AddChat("[Game] You selected " + Character.GetStringValue(), ColorRgba.Green);
 							Checked = true;
 							Peer = Core.Client.ID;
 							List<byte> message = new List<byte>();
@@ -414,6 +456,7 @@ namespace FNaFMP.Select
                         {
 							if (Core.SelfCharacter == Character && !Ready)
 							{
+								ChatBox.AddChat("[Game] You deselected " + Character.GetStringValue(), ColorRgba.Green);
 								Checked = false;
 								Peer = -1;
 								List<byte> message = new List<byte>();
@@ -430,7 +473,7 @@ namespace FNaFMP.Select
 		}
     }
 
-	public class BackButton : Component, ICmpRenderer
+	public class BackButton : Component, ICmpRenderer, ICmpInitializable
 	{
 		[DontSerialize] private readonly Canvas canvas = new Canvas();
 
@@ -483,7 +526,17 @@ namespace FNaFMP.Select
 			}
 
 		}
-	}
+
+        public void OnActivate()
+        {
+            //throw new NotImplementedException();	//<-Throws an error
+        }
+
+        public void OnDeactivate()
+        {
+			leave = false;
+        }
+    }
 
 	[RequiredComponent(typeof(SpriteRenderer)), RequiredComponent(typeof(Transform))]
 	public class ReadyButton : Component, ICmpUpdatable
@@ -538,6 +591,11 @@ namespace FNaFMP.Select
 						message.Add((byte)(check.Ready ? 1 : 2));
 						Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 2, message.ToArray());
 						check.Ready = !check.Ready;
+
+						if (check.Ready)
+							ChatBox.AddChat("[Game] You are ready", ColorRgba.Green);
+						else
+							ChatBox.AddChat("[Game] You are no longer ready", ColorRgba.Green);
 						BGTasks.SetReady(Core.SelfCharacter, check.Ready);
 						Core.DRPC.UpdateState(check.Ready ? "Ready" : "Selecting");
 					}
@@ -580,7 +638,7 @@ namespace FNaFMP.Select
 			canvas.State.TextFont = font;
 
 			Point2 window = DualityApp.WindowSize;
-			string display = $"You selected: {Core.CharacterName[(int)Core.SelfCharacter]}";
+			string display = $"You selected: {Core.SelfCharacter.GetStringValue()}";
 			Vector2 size = canvas.MeasureText(display);
 			canvas.DrawText(display, location.X, location.Y);
 
@@ -593,7 +651,7 @@ namespace FNaFMP.Select
 	{
 		[DontSerialize] private readonly Canvas canvas = new Canvas();
 
-		private static List<string> Chat = new List<string>();
+		private static List<ChatLine> Chat = new List<ChatLine>();
 
 		private ContentRef<Font> font = null;
 		public ContentRef<Font> Font
@@ -686,6 +744,23 @@ namespace FNaFMP.Select
 					Text += c;
 			}
 			// CHAT DISPLAY
+			if(Chat.Count == 0)
+            {
+				Chat.Add(new ChatLine
+				{
+					Text = "Welcome to Fazbear Multiplayer!",
+					Color = new ColorRgba(255, 208, 0)
+				});
+				if(Core.Client != null)
+                {
+					Chat.Add(new ChatLine
+					{
+						Text = "Playing as: " + Core.Client.UserName,
+						Color = new ColorRgba(255, 208, 0)
+					});
+				}
+			}
+
 			this.canvas.Begin(device);
 
 			canvas.State.SetMaterial(DrawTechnique.Mask);
@@ -696,7 +771,20 @@ namespace FNaFMP.Select
 			int space = 0;
 			for(int i = start; i < Chat.Count; i++)
             {
-				canvas.DrawText(Chat[i], chatpos.X, chatpos.Y + (font.Res.Height*space));
+				ChatLine line = Chat[i];
+				ColorRgba color = line.Color;
+				if (color == null)
+					color = ColorRgba.White;
+				if(color != canvas.State.ColorTint)
+                {
+					this.canvas.End();
+					this.canvas.Begin(device);
+
+					canvas.State.SetMaterial(DrawTechnique.Mask);
+					canvas.State.ColorTint = color;
+					canvas.State.TextFont = this.font;
+				}
+				canvas.DrawText(line.Text, chatpos.X, chatpos.Y + (font.Res.Height*space));
 				space++;
             }
 
@@ -823,6 +911,10 @@ namespace FNaFMP.Select
 		private static int staticcut = 0;
 		public static void AddChat(string display)
         {
+			AddChat(display, ColorRgba.White);
+        }
+		public static void AddChat(string display, ColorRgba color)
+        {
 			if (display.Length > staticcut)
 			{
 				int cut = (int)Math.Floor(display.Length / (float)staticcut);
@@ -834,14 +926,21 @@ namespace FNaFMP.Select
 						max = display.Length - min;
 					if (Chat.Count > int.MaxValue)
 						Chat.RemoveAt(0);
-					Chat.Add(display.Substring(min, max));
+					Chat.Add(new ChatLine {
+						Text = display.Substring(min, max),
+						Color = color
+					});
 				}
 			}
 			else
 			{
 				if (Chat.Count > int.MaxValue)
 					Chat.RemoveAt(0);
-				Chat.Add(display);
+				Chat.Add(new ChatLine
+				{
+					Text = display,
+					Color = color
+				});
 			}
 		}
 
@@ -863,8 +962,8 @@ namespace FNaFMP.Select
 
 		public void OnActivate()
 		{
-			Chat.Clear();
-			AddChat("Welcome to Fazbear Multiplayer!");
+			if(Chat.Count > 0)
+				Chat.Clear();
 			DualityApp.Keyboard.KeyDown += KeyDown;
 			DualityApp.Keyboard.KeyUp += KeyUp;
 			if (Core.Client != null)
@@ -883,4 +982,10 @@ namespace FNaFMP.Select
 			}
 		}
 	}
+
+	internal class ChatLine
+    {
+		public string Text { get; set; }
+		public ColorRgba Color { get; set; }
+    }
 }

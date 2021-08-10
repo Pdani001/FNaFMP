@@ -7,6 +7,7 @@ using Duality.Resources;
 using Duality.Drawing;
 using FNaFMP.Office;
 using Duality.Components.Renderers;
+using System.Reflection;
 
 namespace FNaFMP.Utility
 {
@@ -36,16 +37,18 @@ namespace FNaFMP.Utility
     {
 		public DualityLogger(string prefix)
         {
-			this.prefix = "[" + prefix + "/{0}]";
+			this.prefix = "[{1}] [" + prefix + "/{0}]";
 		}
-		private readonly string prefix = "[Dualitor/{0}]";
+		private readonly string prefix = "[{1}] [Dualitor/{0}]";
 		public void Write(string msg, params object[] obj)
         {
 			Write(LogLevel.INFO, msg, obj);
         }
 		public void Write(LogLevel level, string msg, params object[] obj)
         {
-			string write = string.Format(prefix, LogLevelString[(int)level]) + " " + msg;
+			
+			string time = DateTime.Now.ToString("HH:mm:ss");
+			string write = string.Format(prefix, level.GetStringValue(), time) + " " + msg;
 			switch (level)
             {
 				case LogLevel.INFO:
@@ -59,16 +62,13 @@ namespace FNaFMP.Utility
 					break;
             }
 		}
-		private string[] LogLevelString =
-		{
-			"INFO",
-			"WARN",
-			"ERR"
-		};
 		public enum LogLevel
         {
+			[StringValue("INFO")]
 			INFO,
+			[StringValue("WARN")]
 			WARN,
+			[StringValue("ERR")]
 			ERROR
 		}
     }
@@ -339,4 +339,124 @@ namespace FNaFMP.Utility
 			render.ColorTint = color;
 		}
 	}
+
+    #region Enum helper
+
+    #region StringValue
+    public class StringValueAttribute : Attribute
+	{
+
+		#region Properties
+
+		/// <summary>
+		/// Holds the stringvalue for a value in an enum.
+		/// </summary>
+		public string StringValue { get; protected set; }
+
+		#endregion
+
+		#region Constructor
+
+		/// <summary>
+		/// Constructor used to init a StringValue Attribute
+		/// </summary>
+		/// <param name="value"></param>
+		public StringValueAttribute(string value)
+		{
+			this.StringValue = value;
+		}
+
+		#endregion
+
+	}
+
+	public static class StringValueReflector
+	{
+		/// <summary>
+		/// Will get the string value for a given enums value, this will
+		/// only work if you assign the StringValue attribute to
+		/// the items in your enum.
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public static string GetStringValue(this Enum value)
+		{
+			// Get the type
+			Type type = value.GetType();
+
+			// Get fieldinfo for this type
+			FieldInfo fieldInfo = type.GetField(value.ToString());
+
+			// Get the stringvalue attributes
+			StringValueAttribute[] attribs = fieldInfo.GetCustomAttributes(
+				typeof(StringValueAttribute), false) as StringValueAttribute[];
+
+			// Return the first if there was a match.
+			return attribs.Length > 0 ? attribs[0].StringValue : null;
+		}
+	}
+    #endregion
+
+    #region StringListValue
+    public class StringListValueAttribute : Attribute
+	{
+
+		#region Properties
+
+		/// <summary>
+		/// Holds the stringvalue for a value in an enum.
+		/// </summary>
+		public string[] StringValue { get; protected set; }
+
+		#endregion
+
+		#region Constructor
+
+		/// <summary>
+		/// Constructor used to init a StringValue Attribute
+		/// </summary>
+		/// <param name="value"></param>
+		public StringListValueAttribute(params string[] value)
+		{
+			this.StringValue = value;
+		}
+
+		#endregion
+
+	}
+
+	
+	public static class StringListValueReflector
+	{
+		/// <summary>
+		/// Will get the string value for a given enums value, this will
+		/// only work if you assign the StringListValue attribute to
+		/// the items in your enum.
+		/// </summary>
+		/// <param name="value"></param>
+		/// <param name="pos"></param>
+		/// <returns></returns>
+		public static string GetStringValue(this Enum value, int pos)
+		{
+			// Get the type
+			Type type = value.GetType();
+
+			// Get fieldinfo for this type
+			FieldInfo fieldInfo = type.GetField(value.ToString());
+
+			// Get the stringvalue attributes
+			StringListValueAttribute[] attribs = fieldInfo.GetCustomAttributes(
+				typeof(StringListValueAttribute), false) as StringListValueAttribute[];
+
+			string[] list = attribs.Length > 0 ? attribs[0].StringValue : null;
+			if (list == null)
+				return null;
+			if (list.Length <= pos)
+				return list[list.Length - 1];
+			return list[pos];
+		}
+	}
+    #endregion
+
+    #endregion
 }

@@ -41,8 +41,7 @@ namespace Alzaitu.Lacewing.Client
 
         public static ClientChannel GetChannelByID(LacewingClient ls, int id)
         {
-            ClientChannel ch;
-            if (!ls.globalChannelsByID.TryGetValue(id,out ch))
+            if (!ls.globalChannelsByID.TryGetValue(id, out ClientChannel ch))
                 return null;
             return ch;
         }
@@ -57,7 +56,17 @@ namespace Alzaitu.Lacewing.Client
 
         public void Clear() => _joinedClients.Clear();
 
-        public bool Contains(ClientPeer item) => _joinedClients.Contains(item);
+        public bool Contains(ClientPeer item)
+        {
+            foreach(ClientPeer peer in _joinedClients)
+            {
+                if (peer == null)
+                    continue;
+                if (peer.Id == item.Id)
+                    return true;
+            }
+            return false;
+        }
 
         public void CopyTo(ClientPeer[] array, int arrayIndex) => _joinedClients.CopyTo(array, arrayIndex);
 
@@ -86,7 +95,13 @@ namespace Alzaitu.Lacewing.Client
             if (obj.GetType() != GetType())
                 return false;
             ClientChannel other = (ClientChannel)obj;
-            return other.Id == Id;
+            return other.Id == Id
+                && other.Count == Count;
+        }
+
+        public override int GetHashCode()
+        {
+            return Id;
         }
     }
 }

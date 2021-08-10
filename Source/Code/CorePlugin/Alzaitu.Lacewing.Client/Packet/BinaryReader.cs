@@ -27,43 +27,23 @@ namespace Alzaitu.Lacewing.Client.Packet
             return 0;
         }
 
-        public string ReadText(int length = 0, int position = int.MaxValue)
+        public string ReadText(int length, int position = int.MaxValue)
         {
             if (position == int.MaxValue)
             {
                 position = cursor;
                 cursor++;
             }
-            if(length == 0)
+            if (Message.Length > position + length - 1)
             {
                 List<byte> list = new List<byte>();
-                bool terminate = false;
-                while (Message.Length > position)
+                for (int i = 0; i < length; i++)
                 {
-                    if (Message[position] != 0)
-                        list.Add(Message[position]);
-                    else
-                        terminate = true;
+                    list.Add(Message[position]);
                     position++;
                     cursor++;
-                    if (terminate)
-                        break;
                 }
-                if(terminate)
-                    return Encoding.UTF8.GetString(list.ToArray());
-            } else
-            {
-                if (Message.Length > position + length - 1)
-                {
-                    List<byte> list = new List<byte>();
-                    for (int i = 0; i < length; i++)
-                    {
-                        list.Add(Message[position]);
-                        position++;
-                        cursor++;
-                    }
-                    return Encoding.UTF8.GetString(list.ToArray());
-                }
+                return Encoding.UTF8.GetString(list.ToArray());
             }
             return null;
         }

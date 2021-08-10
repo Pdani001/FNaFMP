@@ -33,8 +33,8 @@ namespace Alzaitu.Lacewing.Client
         private ClientThread thread;
 
         private NetworkStream stream;
-        private readonly TcpClient _client;
-        public readonly UdpClient _udp;
+        private TcpClient _client;
+        public UdpClient _udp { get; private set; }
         public IPEndPoint UdpEndpoint = null;
         public ushort ID { get; internal set; }
         public bool IsConnected { get; internal set; }
@@ -58,28 +58,48 @@ namespace Alzaitu.Lacewing.Client
             IPAddress IP;
             try
             {
-                IP = IPAddress.Parse(address);
-                _client.BeginConnect(IP,port,OnConnect,null);
+                try
+                {
+                    IP = IPAddress.Parse(address);
+                    _client.BeginConnect(IP, port, OnConnect, null);
+                }
+                catch (FormatException)
+                {
+                    _client.BeginConnect(address, port, OnConnect, null);
+                }
+                ServerAddress = address;
+                ServerPort = port;
             }
-            catch (FormatException)
+            catch (Exception)
             {
-                _client.BeginConnect(address, port, OnConnect, null);
+                _client = new TcpClient();
+                _udp = new UdpClient();
+                IsConnected = false;
+                Connect(address, port);
             }
-            ServerAddress = address;
-            ServerPort = port;
         }
 
         private void OnConnect(IAsyncResult result)
         {
-            _client.EndConnect(result);
-            _client.NoDelay = true;
-            stream = _client.GetStream();
-            UdpEndpoint = (IPEndPoint)_client.Client.RemoteEndPoint;
-            thread = new ClientThread(this);
-            thread.Start();
-            WritePacket(new PacketRequestConnect{ 
-                Version = PacketRequestConnect.CURRENT_VERSION
-            });
+            try
+            {
+                _client.EndConnect(result);
+                _client.NoDelay = true;
+                stream = _client.GetStream();
+                UdpEndpoint = (IPEndPoint)_client.Client.RemoteEndPoint;
+                if (debug)
+                    logger.Write("TCP connected on address '{0}'", _client.Client.AddressFamily);
+                thread = new ClientThread(this);
+                thread.Start();
+                WritePacket(new PacketRequestConnect
+                {
+                    Version = PacketRequestConnect.CURRENT_VERSION
+                });
+            } catch(Exception e)
+            {
+                if (debug)
+                    logger.Write("TCP failed to connect: {0}",e);
+            }
         }
 
         internal void FinishConnect()
@@ -100,12 +120,15 @@ namespace Alzaitu.Lacewing.Client
                 {
                     _udp.Connect(ServerAddress, ServerPort);
                 }
+                if (debug)
+                    logger.Write("UDP connected on address '{0}'",_udp.Client.AddressFamily);
                 _udp.BeginReceive(UDPReceive,null);
                 WritePacket(new WritePacketUdpHello(), true);
             }
             catch (SocketException)
             {
-                logger.Write("Error - UDP failed to connect!");
+                if(debug)
+                    logger.Write("Error - UDP failed to connect!");
             }
         }
 

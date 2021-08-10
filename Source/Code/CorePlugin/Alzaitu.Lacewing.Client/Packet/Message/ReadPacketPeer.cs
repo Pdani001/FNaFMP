@@ -16,6 +16,7 @@ namespace Alzaitu.Lacewing.Client.Packet.Message
             get { return _peerId; }
             set { _peerId = value; }
         }
+        public string OldName { get; private set; }
         private bool isMaster = false;
         private string name = null;
 
@@ -70,6 +71,7 @@ namespace Alzaitu.Lacewing.Client.Packet.Message
                     channel.Add(peer);
                     break;
                 case PeerAction.Left:
+                    OldName = peer.Name;
                     lc.clientsByID.Remove(PeerID);
                     channel.Remove(peer);
                     break;

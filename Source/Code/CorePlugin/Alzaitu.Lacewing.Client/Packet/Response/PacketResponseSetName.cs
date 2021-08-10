@@ -14,7 +14,7 @@ namespace Alzaitu.Lacewing.Client.Packet.Response
 
         protected override void ReadResponse(byte[] bytes, long size, int pos, LacewingClient client = null)
         {
-            int length = bytes[pos++];
+            byte length = bytes[pos++];
             size--;
             byte[] data = new byte[length];
             for(int i = 0; i < data.Length; i++)

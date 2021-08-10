@@ -7,6 +7,12 @@ namespace Alzaitu.Lacewing.Client
     {
         internal ClientEvent() { }
 
+        public event EventHandler<EventError> Error;
+        internal virtual void OnError(EventError e)
+        {
+            Error?.Invoke(this, e);
+        }
+
         public event EventHandler<EventDisconnect> Disconnect;
         internal virtual void OnDisconnect(EventDisconnect e)
         {

@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Alzaitu.Lacewing.Client;
 using DiscordRPC;
 using DiscordRPC.Logging;
 using Duality;
+using FNaFMP.Configuration;
+using FNaFMP.Utility;
+using SharpYaml.Serialization;
 
 namespace FNaFMP
 {
@@ -14,7 +18,7 @@ namespace FNaFMP
     /// </summary>
     public class Core : CorePlugin
     {
-        public const string VERSION = "0.1.1";
+        public const string VERSION = "0.1.3";
         private static string secret = Guid.NewGuid().ToString();
         private static Guid party = Guid.NewGuid();
         public static Guid PartyID
@@ -28,22 +32,19 @@ namespace FNaFMP
             get { return character; }
             set { character = value; }
         }
-        public static readonly string[] CharacterName =
-        {
-            "None",
-            "Freddy",
-            "Bonnie",
-            "Chica",
-            "Foxy",
-            "Guard"
-        };
         public enum Character
         {
+            [StringValue("None")]
             None,
+            [StringValue("Freddy")]
             Freddy,
+            [StringValue("Bonnie")]
             Bonnie,
+            [StringValue("Chica")]
             Chica,
+            [StringValue("Foxy")]
             Foxy,
+            [StringValue("Guard")]
             Guard
         }
         private static DateTime Start = DateTime.UtcNow;
@@ -103,9 +104,51 @@ namespace FNaFMP
         {
             get { return debug; }
         }
+
+        private RootConfig DefaultConfig => new RootConfig
+        {
+            Settings = new Settings
+            {
+                TempServer = "shadsoft.fr"
+            }
+        };
+
+        public static RootConfig Config
+        {
+            get { return config; }
+        }
+        private static RootConfig config = null;
+        private void LoadConfig()
+        {
+            Serializer ser = new Serializer();
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\FNaFMultiplayer\\config1.yml";
+            if (!File.Exists(path))
+            {
+                config = DefaultConfig;
+                string content = ser.Serialize(DefaultConfig,typeof(RootConfig));
+                try
+                {
+                    FileInfo info = new FileInfo(path);
+                    info.Directory.Create();
+                    StreamWriter write = File.CreateText(path);
+                    write.Write(content);
+                    write.Flush();
+                }
+                catch (Exception e)
+                {
+                    Logs.Core.Write("Unable to create config file: {0}", e);
+                }
+            }
+            else
+            {
+                StreamReader input = new StreamReader(path);
+                config = (RootConfig)ser.Deserialize(input, typeof(RootConfig));
+            }
+        }
         
         protected override void OnGameStarting()
         {
+            LoadConfig();
             string[] args = Environment.GetCommandLineArgs();
             string t = "";
             foreach(string a in args)
@@ -120,7 +163,12 @@ namespace FNaFMP
 
             character = Character.None;
 
-            client = new LacewingClient();
+            string username = null;
+            if(config != null && config.Settings != null)
+            {
+                username = config.Settings.TempName;
+            }
+            client = new LacewingClient(username);
 
             Start = DateTime.UtcNow;
             party = Guid.NewGuid();

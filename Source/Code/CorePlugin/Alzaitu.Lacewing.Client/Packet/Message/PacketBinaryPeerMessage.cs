@@ -50,7 +50,19 @@ namespace Alzaitu.Lacewing.Client.Packet.Message
             }
             else
             {
-                data = ReadMessage(client.GetStream(), size - 5);
+                if (bytes.Length > pos)
+                {
+                    List<byte> m = new List<byte>();
+                    for (int i = pos; i < bytes.Length; i++)
+                    {
+                        m.Add(bytes[i]);
+                    }
+                    data = m.ToArray();
+                }
+                else
+                {
+                    data = ReadMessage(client.GetStream(), size - 5);
+                }
             }
             Message = data;
         }

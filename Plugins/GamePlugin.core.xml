@@ -33,6 +33,73 @@
             If true, this packet can be read.
             </summary>
         </member>
+        <member name="T:Alzaitu.Lacewing.EnumHelper.StringValueAttribute">
+            <summary>
+            This attribute is used to represent a string value
+            for a value in an enum.
+            </summary>
+        </member>
+        <member name="P:Alzaitu.Lacewing.EnumHelper.StringValueAttribute.StringValue">
+            <summary>
+            Holds the stringvalue for a value in an enum.
+            </summary>
+        </member>
+        <member name="M:Alzaitu.Lacewing.EnumHelper.StringValueAttribute.#ctor(System.String)">
+            <summary>
+            Constructor used to init a StringValue Attribute
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="M:Alzaitu.Lacewing.EnumHelper.StringValueReflector.GetStringValue(System.Enum)">
+            <summary>
+            Will get the string value for a given enums value, this will
+            only work if you assign the StringValue attribute to
+            the items in your enum.
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="P:FNaFMP.Utility.StringValueAttribute.StringValue">
+            <summary>
+            Holds the stringvalue for a value in an enum.
+            </summary>
+        </member>
+        <member name="M:FNaFMP.Utility.StringValueAttribute.#ctor(System.String)">
+            <summary>
+            Constructor used to init a StringValue Attribute
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="M:FNaFMP.Utility.StringValueReflector.GetStringValue(System.Enum)">
+            <summary>
+            Will get the string value for a given enums value, this will
+            only work if you assign the StringValue attribute to
+            the items in your enum.
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="P:FNaFMP.Utility.StringListValueAttribute.StringValue">
+            <summary>
+            Holds the stringvalue for a value in an enum.
+            </summary>
+        </member>
+        <member name="M:FNaFMP.Utility.StringListValueAttribute.#ctor(System.String[])">
+            <summary>
+            Constructor used to init a StringValue Attribute
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="M:FNaFMP.Utility.StringListValueReflector.GetStringValue(System.Enum,System.Int32)">
+            <summary>
+            Will get the string value for a given enums value, this will
+            only work if you assign the StringListValue attribute to
+            the items in your enum.
+            </summary>
+            <param name="value"></param>
+            <param name="pos"></param>
+            <returns></returns>
+        </member>
         <member name="T:FNaFMP.Core">
             <summary>
             Defines a Duality core plugin.

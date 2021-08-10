@@ -24,7 +24,7 @@ namespace Alzaitu.Lacewing.Client
             this.Id = Id;
         }
 
-        public void SendBinaryMessage(LacewingClient client, int subChannel, ClientChannel channel, byte[] data)
+        public void SendBinaryMessage(LacewingClient client, int subChannel, ClientChannel channel, byte[] data, bool blasted = false)
         {
             if (channel.Contains(this))
             {
@@ -36,7 +36,39 @@ namespace Alzaitu.Lacewing.Client
                     Message = data
                 };
                 packet.Variant = 2;
-                client.WritePacket(packet);
+                client.WritePacket(packet, blasted);
+            }
+        }
+
+        public void SendNumberMessage(LacewingClient client, int subChannel, ClientChannel channel, int data, bool blasted = false)
+        {
+            if (channel.Contains(this))
+            {
+                Packet.Packet packet = new PacketBinaryPeerMessage
+                {
+                    SubChannel = (byte)subChannel,
+                    Channel = channel.Id,
+                    Peer = Id,
+                    Message = BitConverter.GetBytes(data)
+                };
+                packet.Variant = 1;
+                client.WritePacket(packet, blasted);
+            }
+        }
+
+        public void SendTextMessage(LacewingClient client, int subChannel, ClientChannel channel, string data, bool blasted = false)
+        {
+            if (channel.Contains(this))
+            {
+                Packet.Packet packet = new PacketBinaryPeerMessage
+                {
+                    SubChannel = (byte)subChannel,
+                    Channel = channel.Id,
+                    Peer = Id,
+                    Message = Encoding.UTF8.GetBytes(data)
+                };
+                packet.Variant = 0;
+                client.WritePacket(packet, blasted);
             }
         }
 

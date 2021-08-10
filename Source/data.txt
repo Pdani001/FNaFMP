@@ -23,7 +23,7 @@ Button: 60x40
 =============
 
 == CHANNELS ==
-"TEMPLATE: *CHANNEL ID* -> ..message.."
+"TEMPLATE: *CHANNEL ID* (extra info/type) -> ..message.."
 
 -- SELECT --
 Status change:
@@ -34,5 +34,10 @@ Lobby info (from master to player): *12* -> .success (0/1). [On success: .player
 Lobby chat: *15* -> .character. .message length. .message.
 Status request (after join, number): *21* -> .random number.
 Game info: *3* (text) -> .game code.
+
+-- IN GAME --
+Robot join: *23* (number) -> .character.
+Guard status: *24* -> .light (0 off/1 left/2 right). .left door (0/1). .right door (0/1). .camera status (0/1). .camera position.
 Movement: *25* -> .character. .position. .magic value, can be left out.
-Disconnect: *26* (number) -> .character.
+Power & Time *26* -> .power. .time.
+==============

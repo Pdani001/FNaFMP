@@ -7,6 +7,7 @@ namespace Alzaitu.Lacewing.Client.Packet.EventData
     public class EventPeer : EventArgs
     {
         public LacewingClient Client { get; internal set; }
+        public string Name { get; set; }
         public int PeerID { get; set; }
         public int Channel { get; set; }
         public PeerAction Action { get; set; }

@@ -18,6 +18,10 @@ namespace Alzaitu.Lacewing.Client.Packet
                 switch (packet)
                 {
                     case PacketResponseConnect responseConnect:
+                        if (blasted)
+                            return;
+                        if(client.debug)
+                            client.logger.Write("Connect response packet received");
                         if (responseConnect.Success)
                         {
                             client.Event.OnResponseConnect(new EventResponseConnect
@@ -32,6 +36,10 @@ namespace Alzaitu.Lacewing.Client.Packet
                         else
                         {
                             //Console.WriteLine("Connection declined: " + responseConnect.DenyReason);
+                            client.Event.OnError(new EventError {
+                                Client = client,
+                                Error = responseConnect.DenyReason
+                            });
                             client.Dispose();
                         }
                         break;
@@ -46,6 +54,8 @@ namespace Alzaitu.Lacewing.Client.Packet
                     case PacketResponseSetName responseSetName:
                         if (blasted)
                             break;
+                        if (client.debug)
+                            client.logger.Write("Setname response packet received");
                         if (responseSetName.Success)
                         {
                             client.Event.OnResponseSetName(new EventResponseSetName
@@ -63,11 +73,19 @@ namespace Alzaitu.Lacewing.Client.Packet
                                 DenyReason = responseSetName.DenyReason,
                                 Client = client
                             });
+                            client.Event.OnError(new EventError
+                            {
+                                Client = client,
+                                PeerID = client.ID,
+                                Error = responseSetName.DenyReason
+                            });
                         }
                         break;
                     case PacketResponseJoinChannel responseJoinChannel:
                         if (blasted)
                             break;
+                        if (client.debug)
+                            client.logger.Write("Channel join response packet received");
                         if (responseJoinChannel.Success)
                         {
                             client.IsMaster = responseJoinChannel.IsMaster;
@@ -84,10 +102,21 @@ namespace Alzaitu.Lacewing.Client.Packet
                                 client.clientsByID[peer.Id] = peer;
                             }
                         }
+                        else
+                        {
+                            client.Event.OnError(new EventError
+                            {
+                                Client = client,
+                                PeerID = client.ID,
+                                Error = "Failed to join channel"
+                            });
+                        }
                         break;
                     case PacketResponseLeaveChannel responseLeaveChannel:
                         if (blasted)
                             break;
+                        if (client.debug)
+                            client.logger.Write("Channel leave response packet received");
                         if (responseLeaveChannel.Success)
                         {
                             ClientChannel channel = ClientChannel.GetChannelByID(client, responseLeaveChannel.ChannelID);
@@ -99,10 +128,21 @@ namespace Alzaitu.Lacewing.Client.Packet
                                 Client = client
                             });
                         }
+                        else
+                        {
+                            client.Event.OnError(new EventError
+                            {
+                                Client = client,
+                                PeerID = client.ID,
+                                Error = "Failed to leave channel"
+                            });
+                        }
                         break;
                     case PacketResponseChannelList responseChannelList:
                         if (blasted)
                             break;
+                        if (client.debug)
+                            client.logger.Write("Channel list response packet received");
                         client.Event.OnResponseChannelList(new EventResponseChannelList
                         {
                             ChannelList = responseChannelList.ChannelList,
@@ -110,12 +150,14 @@ namespace Alzaitu.Lacewing.Client.Packet
                         });
                         break;
                     case PacketBinaryPeerMessage packetBinaryPeer:
-                        ClientPeer c;
-                        client.clientsByID.TryGetValue(packetBinaryPeer.Peer, out c);
+                        if (client.debug)
+                            client.logger.Write("Binary peer packet received");
+                        bool hasClient = client.clientsByID.TryGetValue(packetBinaryPeer.Peer, out ClientPeer c);
                         ClientChannel ch = ClientChannel.GetChannelByID(client, packetBinaryPeer.Channel);
-                        if (ch.Contains(c))
+                        if (ch != null)
                         {
-                            switch (packet.Variant) {
+                            switch (packet.Variant)
+                            {
                                 case 2:
                                     client.Event.OnBinaryMessage(new EventBinaryMessage
                                     {
@@ -158,66 +200,67 @@ namespace Alzaitu.Lacewing.Client.Packet
                         }
                         break;
                     case ReadPacketBinaryChannelMessage packetBinaryChannel:
-                        switch (packet.Variant)
+                        ch = ClientChannel.GetChannelByID(client, packetBinaryChannel.Channel);
+                        if (ch != null)
                         {
-                            case 2:
-                                client.Event.OnBinaryMessage(new EventBinaryMessage
-                                {
-                                    PeerID = packetBinaryChannel.Peer,
-                                    Channel = packetBinaryChannel.Channel,
-                                    SubChannel = packetBinaryChannel.SubChannel,
-                                    Message = packetBinaryChannel.Message,
-                                    Blasted = blasted,
-                                    Client = client,
-                                    Type = MessageEventType.Channel
-                                });
-                                break;
-                            case 1:
-                                client.Event.OnNumberMessage(new EventNumberMessage
-                                {
-                                    PeerID = packetBinaryChannel.Peer,
-                                    Channel = packetBinaryChannel.Channel,
-                                    SubChannel = packetBinaryChannel.SubChannel,
-                                    Message = BitConverter.ToInt32(packetBinaryChannel.Message,0),
-                                    Blasted = blasted,
-                                    Client = client,
-                                    Type = MessageEventType.Channel
-                                });
-                                break;
-                            case 0:
-                                client.Event.OnTextMessage(new EventTextMessage
-                                {
-                                    PeerID = packetBinaryChannel.Peer,
-                                    Channel = packetBinaryChannel.Channel,
-                                    SubChannel = packetBinaryChannel.SubChannel,
-                                    Message = Encoding.UTF8.GetString(packetBinaryChannel.Message),
-                                    Blasted = blasted,
-                                    Client = client,
-                                    Type = MessageEventType.Channel
-                                });
-                                break;
-                            default:
-                                break;
+                            switch (packet.Variant)
+                            {
+                                case 2:
+                                    client.Event.OnBinaryMessage(new EventBinaryMessage
+                                    {
+                                        PeerID = packetBinaryChannel.Peer,
+                                        Channel = packetBinaryChannel.Channel,
+                                        SubChannel = packetBinaryChannel.SubChannel,
+                                        Message = packetBinaryChannel.Message,
+                                        Blasted = blasted,
+                                        Client = client,
+                                        Type = MessageEventType.Channel
+                                    });
+                                    break;
+                                case 1:
+                                    client.Event.OnNumberMessage(new EventNumberMessage
+                                    {
+                                        PeerID = packetBinaryChannel.Peer,
+                                        Channel = packetBinaryChannel.Channel,
+                                        SubChannel = packetBinaryChannel.SubChannel,
+                                        Message = BitConverter.ToInt32(packetBinaryChannel.Message, 0),
+                                        Blasted = blasted,
+                                        Client = client,
+                                        Type = MessageEventType.Channel
+                                    });
+                                    break;
+                                case 0:
+                                    client.Event.OnTextMessage(new EventTextMessage
+                                    {
+                                        PeerID = packetBinaryChannel.Peer,
+                                        Channel = packetBinaryChannel.Channel,
+                                        SubChannel = packetBinaryChannel.SubChannel,
+                                        Message = Encoding.UTF8.GetString(packetBinaryChannel.Message),
+                                        Blasted = blasted,
+                                        Client = client,
+                                        Type = MessageEventType.Channel
+                                    });
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
                         break;
                     case ReadPacketPeer packetPeer:
                         if (blasted)
                             break;
                         packetPeer.UpdatePeer(client);
+                        string name = packetPeer.Action == EventPeer.PeerAction.Left ? packetPeer.OldName : ClientPeer.GetPeer(client, (ushort)packetPeer.PeerID).Name;
                         client.Event.OnPeer(new EventPeer
                         {
                             PeerID = packetPeer.PeerID,
                             Action = packetPeer.Action,
                             Channel = packetPeer.Channel,
+                            Name = name,
                             Client = client
                         });
                         break;
                     case ReadPacketPing _:
-                        client.Event.OnPing(new EventPing
-                        {
-                            PeerID = client.ID,
-                            Client = client
-                        });
                         client.WritePacket(new WritePacketPong(), blasted);
                         break;
                     default:

@@ -10,6 +10,7 @@ using FNaFMP.Utility;
 using Alzaitu.Lacewing.Client.Packet.EventData;
 using Alzaitu.Lacewing.Client.Packet;
 using Duality.Editor;
+using System.Timers;
 
 namespace FNaFMP.Office
 {
@@ -283,6 +284,10 @@ namespace FNaFMP.Office
 					CameraViewer.IsViewing = true;
 					renderer.SharedMaterial = down;
 					BlipAnimator.PlayBlip();
+					if (Core.SelfCharacter == Core.Character.Guard)
+					{
+						GameController.SendStatus();
+					}
 				} else
 				{
 					renderer.SharedMaterial = up;
@@ -295,6 +300,10 @@ namespace FNaFMP.Office
 					renderer.ColorTint = renderer.ColorTint.WithAlpha(255);
 					animator.Paused = false;
 					CameraViewer.IsViewing = false;
+					if (Core.SelfCharacter == Core.Character.Guard)
+					{
+						GameController.SendStatus();
+					}
 				}
 				ForceCamera = false;
 			}
@@ -317,6 +326,10 @@ namespace FNaFMP.Office
 						if (down_sound != null)
 						{
 							down_source = SoundManager.PlaySound(down_sound, false);
+						}
+						if (Core.SelfCharacter == Core.Character.Guard)
+						{
+							GameController.SendStatus();
 						}
 					} else
 					{
@@ -434,6 +447,10 @@ namespace FNaFMP.Office
 					break;
 				default:
 					break;
+			}
+			if (Core.SelfCharacter == Core.Character.Guard)
+			{
+				GameController.SendStatus();
 			}
 		}
 		public Vector3 GetPos()
@@ -628,6 +645,10 @@ namespace FNaFMP.Office
 								(byte)ViewNumber
 							};
 							Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 25, msg.ToArray());
+							if(Core.SelfCharacter == Core.Character.Guard)
+                            {
+								GameController.SendStatus();
+                            }
 						}
 					}
 				}
@@ -1455,7 +1476,7 @@ namespace FNaFMP.Office
 			if (Core.DRPC != null)
 			{
 				DiscordRPC.RichPresence presence = Core.DRPC.CurrentPresence;
-				Core.DRPC.SetPresence(Core.BuildPresence("In Game", Core.CharacterName[(int)Core.SelfCharacter], presence.Party.ID, 5, presence.Party.Size));
+				Core.DRPC.SetPresence(Core.BuildPresence("In Game", Core.SelfCharacter.GetStringValue(), presence.Party.ID, 5, presence.Party.Size));
 			}
 			FlipButton.Disabled = Core.SelfCharacter != Core.Character.Guard;
 			started = true;
@@ -1604,6 +1625,10 @@ namespace FNaFMP.Office
 								{
 									DoorController.LightDirection = control.DoorDirection;
 								}
+								if (Core.SelfCharacter == Core.Character.Guard)
+								{
+									GameController.SendStatus();
+								}
 							}
 						}
 						else
@@ -1736,7 +1761,7 @@ namespace FNaFMP.Office
 				canvas.State.ColorTint = ColorRgba.White;
 				canvas.State.TextFont = this.rfont;
 				int time = (int)Math.Round((MovementControl.NextMove - Time.MainTimer.TotalMilliseconds)/1000);
-				string CharacterText = string.Format("Playing as: {0}", Core.CharacterName[(int)Core.SelfCharacter]);
+				string CharacterText = string.Format("Playing as: {0}", Core.SelfCharacter.GetStringValue());
 				Vector2 CharacterTextSize = canvas.MeasureText(CharacterText);
 				string MoveTimeText = time <= 0 ? "You can move!" : string.Format("You can move in {0} second{1}", time, time > 1 ? "s" : "");
 				Vector2 MoveTimeTextSize = canvas.MeasureText(MoveTimeText);
@@ -1783,8 +1808,22 @@ namespace FNaFMP.Office
 		}
 	}
 
-	internal class GameController
+	internal class GuardStatus
+    {
+		public byte Light { get; set; }
+		public bool LeftDoorClosed { get; set; }
+		public bool RightDoorClosed { get; set; }
+		public bool IsViewing { get; set; }
+		public byte Position { get; set; }
+    }
+
+	internal class GameController : ICmpInitializable, ICmpUpdatable
 	{
+		public ContentRef<Scene> SixAM { get; set; }
+		private static int usage = 1;
+		private static int power = 999;
+		private Timer GameTimer;
+		private Timer PowerTimer;
 		private static int time = 12;
 		private static bool finished = false;
 		public static bool IsFinished
@@ -1795,5 +1834,143 @@ namespace FNaFMP.Office
 		{
 			get { return time; }
 		}
-	}
+		public static int PowerUsage
+        {
+            get { return usage; }
+        }
+		public static GuardStatus Guard = new GuardStatus();
+
+		public static void SendStatus()
+        {
+			List<byte> msg = new List<byte>();
+			if (!CameraViewer.IsViewing)
+				msg.Add((byte)DoorController.LightDirection);
+			else
+				msg.Add(0);
+			msg.Add((byte)(DoorController.LeftDoor.IsOpen() ? 0 : 1));
+			msg.Add((byte)(DoorController.RightDoor.IsOpen() ? 0 : 1));
+			msg.Add((byte)(!CameraViewer.IsViewing ? 0 : 1));
+			msg.Add((byte)CameraViewer.ViewNumber);
+			Guard.Light = (byte)DoorController.LightDirection;
+			Guard.LeftDoorClosed = !DoorController.LeftDoor.IsOpen();
+			Guard.RightDoorClosed = !DoorController.RightDoor.IsOpen();
+			Guard.IsViewing = CameraViewer.IsViewing;
+			Guard.Position = (byte)CameraViewer.ViewNumber;
+			usage = 1;
+			if (DoorController.LightDirection != DoorDirection.None)
+				usage++;
+			if (!DoorController.LeftDoor.IsOpen())
+				usage++;
+			if (!DoorController.RightDoor.IsOpen())
+				usage++;
+			if (CameraViewer.IsViewing)
+				usage++;
+			Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 24, msg.ToArray());
+		}
+
+        public void OnActivate()
+        {
+			Guard = new GuardStatus();
+			if (Core.Client != null)
+			{
+                Core.Client.Event.BinaryMessage += Event_BinaryMessage;
+                Core.Client.Event.NumberMessage += Event_NumberMessage;
+				if (Core.SelfCharacter == Core.Character.Guard)
+				{
+					GameTimer = new Timer(85*1000);
+                    GameTimer.Elapsed += Guard_Timer;
+					GameTimer.AutoReset = true;
+					GameTimer.Enabled = true;
+					PowerTimer = new Timer(1000);
+                    PowerTimer.Elapsed += Power_Timer;
+					PowerTimer.AutoReset = true;
+					PowerTimer.Enabled = true;
+					List<byte> msg = new List<byte>(new byte[]{
+						0,
+						0,
+						0,
+						0,
+						0
+					});
+					Guard.Light = 0;
+					Guard.LeftDoorClosed = false;
+					Guard.RightDoorClosed = false;
+					Guard.IsViewing = false;
+					Guard.Position = (byte)CameraViewer.ViewNumber;
+					Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 24, msg.ToArray());
+				}
+				else
+				{
+					if (Core.SelfCharacter == Core.Character.None)
+						return;
+					Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 23, (int)Core.SelfCharacter);
+				}
+			}
+        }
+
+        private void Power_Timer(object sender, ElapsedEventArgs e)
+        {
+			if(power > 0)
+				power -= usage;
+			List<byte> msg = new List<byte>();
+			msg.AddRange(BitConverter.GetBytes(power));
+			msg.Add((byte)time);
+			Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 26, msg.ToArray());
+		}
+
+		private void Guard_Timer(object sender, ElapsedEventArgs e)
+        {
+            switch (time)
+            {
+				case 12:
+					time = 1;
+					break;
+				case 5:
+					time++;
+					GameTimer.Enabled = false;
+					break;
+				default:
+					time++;
+					break;
+            }
+			List<byte> msg = new List<byte>();
+			msg.AddRange(BitConverter.GetBytes(power));
+			msg.Add((byte)time);
+			Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 26, msg.ToArray());
+		}
+
+        private void Event_NumberMessage(object sender, EventNumberMessage e)
+        {
+            if(e.SubChannel == 23 && Core.SelfCharacter == Core.Character.Guard)
+            {
+				SendStatus();
+			}
+        }
+
+        private void Event_BinaryMessage(object sender, EventBinaryMessage e)
+        {
+            if(e.SubChannel == 24 && Core.SelfCharacter != Core.Character.Guard)
+            {
+				BinaryReader reader = new BinaryReader(e.Message);
+				Guard.Light = reader.ReadByte();
+				Guard.LeftDoorClosed = reader.ReadByte() == 1;
+				Guard.RightDoorClosed = reader.ReadByte() == 1;
+				Guard.IsViewing = reader.ReadByte() == 1;
+				Guard.Position = reader.ReadByte();
+            }
+        }
+
+        public void OnDeactivate()
+        {
+            
+        }
+
+        public void OnUpdate()
+        {
+			if(time == 6 && SixAM != null)
+            {
+				Scene.SwitchTo(SixAM);
+            }
+		}
+    }
 }

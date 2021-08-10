@@ -28,7 +28,9 @@ namespace FNaFMP.Menu
 				render = GameObj.GetComponent<SpriteRenderer>();
 			if (SplashText.IsLast)
 				render.ColorTint = render.ColorTint.WithAlpha(0);
-        }
+			else
+				render.ColorTint = render.ColorTint.WithAlpha(255);
+		}
 
         public void OnDeactivate()
         {
@@ -500,29 +502,37 @@ namespace FNaFMP.Menu
 
 		private void SendVersion()
         {
-			Utilities.Logger.Write("Sending client version...");
+			Utilities.Logger.Write("Sending client version '"+Core.VERSION+"'...");
 			List<byte> msg = new List<byte>();
+			int length = Encoding.UTF8.GetByteCount(Core.VERSION);
+			msg.AddRange(BitConverter.GetBytes(length));
 			msg.AddRange(Encoding.UTF8.GetBytes(Core.VERSION));
-			msg.Add(0);
+			Utilities.Logger.Write("Length: "+length+"; "+msg.Count);
 			Core.Client.joinedChannels[0].ChannelMaster.SendBinaryMessage(Core.Client, 12, Core.Client.joinedChannels[0], msg.ToArray());
 		}
 		
 		private void BinaryMessage(object sender, EventBinaryMessage e)
         {
 			if (e.Message == null)
+			{
+				Utilities.Logger.Write(DualityLogger.LogLevel.ERROR, "Message was null!");
 				return;
-			if(e.Type == MessageEventType.Peer && e.SubChannel == 12)
+			}
+			Utilities.Logger.Write("Received message type {0}, on subchannel {1}", (int)e.Type, e.SubChannel);
+			if (e.Type == MessageEventType.Peer && e.SubChannel == 12)
             {
-				if(e.PeerID == Core.Client.joinedChannels[0].ChannelMaster.Id)
+				Utilities.Logger.Write("Received lobby info from peer {0}", e.PeerID);
+				Utilities.Logger.Write("Channel master is {0}", Core.Client.joinedChannels[0].ChannelMaster.Id);
+				if (e.PeerID == Core.Client.joinedChannels[0].ChannelMaster.Id)
                 {
-					Utilities.Logger.Write("Received lobby info from channel master ({0})",e.PeerID);
+					Utilities.Logger.Write("Peer was channel master",e.PeerID);
 					inforetry = -1;
 					attempt = 0;
 					BinaryReader reader = new BinaryReader(e.Message);
 					bool success = reader.ReadByte() == 1;
                     if (!success)
                     {
-						DenyReason = reader.ReadText();
+						DenyReason = reader.ReadText(reader.ReadInt());
 						Event = "LobbyJoin";
 						Utilities.Logger.Write(DualityLogger.LogLevel.WARN,"'{0}': {1}", Event, DenyReason);
 						Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
@@ -550,6 +560,11 @@ namespace FNaFMP.Menu
         }
 		public void OnActivate()
         {
+			join = false;
+			ChannelList = null;
+			ListRects = null;
+			inforetry = -1;
+			attempt = 0;
 			if (Core.Client != null)
 			{
 				Core.Client.Event.ResponseConnect += ClientConnect;
@@ -560,7 +575,20 @@ namespace FNaFMP.Menu
                 Core.Client.Event.BinaryMessage += BinaryMessage;
 				if (!Core.Client.IsConnected)
 				{
-					Core.Client.Connect("lekkit.hopto.org", 6121);
+					string srv = null;
+					if(Core.Config != null && Core.Config.Settings != null)
+                    {
+						srv = Core.Config.Settings.TempServer;
+                    }
+					if (srv == null)
+						Core.Client.Connect("lekkit.hopto.org", 6121);
+					else
+					{
+						if(srv.Contains(":"))
+							Core.Client.Connect(srv.Split(':')[0], int.Parse(srv.Split(':')[1]));
+						else
+							Core.Client.Connect(srv, 6121);
+					}
 					Utilities.Logger.Write("Connecting to server...");
 				}
 				else
@@ -754,6 +782,8 @@ namespace FNaFMP.Menu
 				{
 					if (Name.Length < minlength)
 						return;
+					input = -1;
+					extra = "";
 					if (Core.Client != null)
 					{
 						if (Core.Client.IsConnected && Core.Client.UserName != null)
@@ -811,6 +841,11 @@ namespace FNaFMP.Menu
 
 		public void OnActivate()
         {
+			Name = "";
+			extra = "";
+			input = -1;
+			backspace = -1;
+			repeat = -1;
 			DualityApp.Keyboard.KeyDown += KeyDown;
 			DualityApp.Keyboard.KeyUp += KeyUp;
 			if (Core.Client != null)
@@ -838,6 +873,8 @@ namespace FNaFMP.Menu
 		public ContentRef<Scene> Continue { get; set; }
         public void OnActivate()
         {
+			hascode = false;
+			code = null;
 			SoundManager.StopAllSounds();
 			if (Core.Client != null)
 			{
@@ -902,19 +939,22 @@ namespace FNaFMP.Menu
             {
 				if(checkin <= Time.MainTimer.TotalSeconds)
                 {
-					if(!hascode)
-						Scene.SwitchTo(Lobby);
+					if (!hascode)
+					{
+						Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
+						checkin = -1;
+					}
 					else
-                    {
-						if(Core.Client.joinedChannels.Count > 0)
-                        {
+					{
+						if (Core.Client.joinedChannels.Count > 0)
+						{
 							Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
-                        }
-                        else
-                        {
+						}
+						else
+						{
 							Core.Client.JoinChannel(code, true, false);
 						}
-                    }
+					}
                 }
             }
         }
