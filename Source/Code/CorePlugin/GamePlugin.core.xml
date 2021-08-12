@@ -11,7 +11,7 @@
             <returns>A number between 0 and 4294967295 describing the length of the packet in bytes.</returns>
         </member>
         <member name="M:Alzaitu.Lacewing.Client.Packet.Packet.ReadPacket(System.Byte[],Alzaitu.Lacewing.Client.LacewingClient)">
-                     Example UDP Binary message: {Type: xx, Sub: xx, Channel id: x, x, User ID: x, x, Message...}
+            		 Example UDP Binary message: {Type: xx, Sub: xx, Channel id: x, x, User ID: x, x, Message...}
         </member>
         <member name="P:Alzaitu.Lacewing.Client.Packet.PacketTypeAttribute.Type">
             <summary>

@@ -70,6 +70,7 @@
     <Compile Include="Alzaitu.Lacewing.Client\EnumHelper.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\LacewingClient.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Logger.cs" />
+    <Compile Include="Alzaitu.Lacewing.Client\Packet\BinaryData.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\BinaryReader.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventBinaryMessage.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\Packet\EventData\EventNumberMessage.cs" />
@@ -110,9 +111,12 @@
     <Compile Include="Alzaitu.Lacewing.Client\Packet\Response\PacketResponseSetName.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\StateMachine\BaseThread.cs" />
     <Compile Include="Alzaitu.Lacewing.Client\StateMachine\ClientThread.cs" />
+    <Compile Include="Base64.cs" />
     <Compile Include="Configuration\Gamejolt.cs" />
     <Compile Include="Configuration\RootConfig.cs" />
+    <Compile Include="Configuration\ServerHostList.cs" />
     <Compile Include="Configuration\Settings.cs" />
+    <Compile Include="GamejoltAuth.cs" />
     <Compile Include="Menu.cs" />
     <Compile Include="Select.cs" />
     <Compile Include="Splash.cs" />

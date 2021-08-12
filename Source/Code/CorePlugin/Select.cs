@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Duality;
 using Duality.Components;
 using Duality.Components.Renderers;
@@ -14,11 +11,13 @@ using Alzaitu.Lacewing.Client.Packet.EventData;
 using Alzaitu.Lacewing.Client.Packet;
 using Alzaitu.Lacewing.Client;
 using FNaFMP.Utility;
+using FNaFMP.Alzaitu.Lacewing.Client.Packet;
 
 namespace FNaFMP.Select
 {
 	public class BGTasks : Component, ICmpInitializable, ICmpUpdatable
-    {
+	{
+		public static SoundManager SM { get; private set; }
 		private List<int> Players = new List<int>();
 		public ContentRef<Scene> LobbyScene { get; set; }
 		public ContentRef<Scene> LoadingScene { get; set; }
@@ -26,36 +25,37 @@ namespace FNaFMP.Select
 		private static Dictionary<int, Core.Character> Peers = new Dictionary<int, Core.Character>();
 		private static List<Core.Character> Ready = new List<Core.Character>();
 		public static void LoadCheckmark(Checkmark mark)
-        {
+		{
 			if (mark == null || mark.Character == Core.Character.None)
 				return;
 			Checkmarks[mark.Character] = mark;
-        }
+		}
 		public static Checkmark GetCheckmark(Core.Character c)
-        {
+		{
 			if (c == Core.Character.None || !Checkmarks.ContainsKey(c))
 				return null;
 			return Checkmarks[c];
-        }
+		}
 		public static void SetReady(Core.Character c, bool value)
-        {
-            if (value)
-            {
+		{
+			if (value)
+			{
 				if (!Ready.Contains(c))
 					Ready.Add(c);
-            } else
-            {
+			} else
+			{
 				Ready.Remove(c);
-            }
-        }
+			}
+		}
 
 		public static bool IsReady(Core.Character c)
-        {
+		{
 			return Ready.Contains(c);
-        }
+		}
 
-        public void OnActivate()
-        {
+		public void OnActivate()
+		{
+			SoundManager.OnLoad += SoundManager_OnLoad;
 			if (Core.DRPC != null)
 			{
 				DiscordRPC.RichPresence presence = Core.DRPC.CurrentPresence;
@@ -64,60 +64,66 @@ namespace FNaFMP.Select
 			Ready.Clear();
 			Peers.Clear();
 			Players.Clear();
-            if(Core.Client != null)
-            {
-                if (!Core.Client.IsConnected)
-                {
-					Utility.Utilities.Logger.Write(Utility.DualityLogger.LogLevel.ERROR, "Connection the the server was interrupted, returning to lobby...");
+			if(Core.Client != null)
+			{
+				if (!Core.Client.IsConnected)
+				{
+					Utilities.Logger.Write(Utility.DualityLogger.LogLevel.ERROR, "Connection the the server was interrupted, returning to lobby...");
 					Scene.SwitchTo(LobbyScene);
 					return;
-                }
-				Utility.Utilities.Logger.Write("Character select screen is ready!");
+				}
+				Utilities.Logger.Write("Character select screen is ready!");
 				Players.Add(Core.Client.ID);
-                Core.Client.Event.ResponseLeaveChannel += Event_LeaveChannel;
-                Core.Client.Event.Peer += Event_Peer;
-                Core.Client.Event.BinaryMessage += Event_BinaryMessage;
-                Core.Client.Event.NumberMessage += Event_NumberMessage;
-                Core.Client.Event.Disconnect += Event_Disconnect;
-                if (!Core.Client.IsMaster)
-                {
+				Core.Client.Event.ResponseLeaveChannel += Event_LeaveChannel;
+				Core.Client.Event.Peer += Event_Peer;
+				Core.Client.Event.BinaryMessage += Event_BinaryMessage;
+				Core.Client.Event.NumberMessage += Event_NumberMessage;
+				Core.Client.Event.Disconnect += Event_Disconnect;
+				if (!Core.Client.IsMaster)
+				{
 					Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 21, new Random().Next());
 					foreach(ClientPeer peer in Core.Client.joinedChannels[0]){
 						Players.Add(peer.Id);
-                    }
-                }
-            }
-        }
+					}
+				}
+			}
+		}
 
-        private void Event_Disconnect(object sender, EventDisconnect e)
-        {
-			Utility.Utilities.Logger.Write(Utility.DualityLogger.LogLevel.ERROR, "Disconnected from server: {0}", e.Reason);
+		private void SoundManager_OnLoad(object sender, SoundManager e)
+		{
+			SM = e;
+			SoundManager.OnLoad -= SoundManager_OnLoad;
+		}
+
+		private void Event_Disconnect(object sender, EventDisconnect e)
+		{
+			Utilities.Logger.Write(DualityLogger.LogLevel.ERROR, "Disconnected from server: {0}", e.Reason);
 			Scene.SwitchTo(LobbyScene);
-        }
+		}
 
-        private void Event_NumberMessage(object sender, EventNumberMessage e)
-        {
-            if(e.SubChannel == 21)
-            {
+		private void Event_NumberMessage(object sender, EventNumberMessage e)
+		{
+			if(e.SubChannel == 21)
+			{
 				ClientPeer peer = ClientPeer.GetPeer(Core.Client, (ushort)e.PeerID);
 				ChatBox.AddChat(string.Format("[Game] {0} joined",peer.Name), ColorRgba.Grey);
 				if (Core.Client.IsMaster)
 				{
-					Utility.Utilities.Logger.Write("Status request from {0}",e.PeerID);
+					Utilities.Logger.Write("Status request from {0}",e.PeerID);
 					foreach (Core.Character cr in Checkmarks.Keys)
 					{
 						Checkmark check = Checkmarks[cr];
 						List<byte> message = new List<byte>();
 						message.Add((byte)cr);
-						message.AddRange(BitConverter.GetBytes((ushort)check.Peer));
+						message.AddRange(BinaryData.GetData((ushort)check.Peer));
 						if (check.Peer > -1)
 						{
 							message.Add((byte)(check.Ready ? 2 : 1));
 						}
 						else
-                        {
+						{
 							continue;
-                        }
+						}
 						peer.SendBinaryMessage(Core.Client, 2, Core.Client.joinedChannels[0], message.ToArray());
 						//Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 2, message.ToArray());
 					}
@@ -129,18 +135,18 @@ namespace FNaFMP.Select
 					Core.DRPC.UpdatePartySize(Players.Count);
 				}
 			}
-        }
+		}
 
-        private void Event_BinaryMessage(object sender, EventBinaryMessage e)
-        {
+		private void Event_BinaryMessage(object sender, EventBinaryMessage e)
+		{
 			if (e.Message == null)
 			{
-				Utility.Utilities.Logger.Write(Utility.DualityLogger.LogLevel.ERROR, "Binary message was null!!");
+				Utilities.Logger.Write(DualityLogger.LogLevel.ERROR, "Binary message was null!!");
 				return;
 			}
 			BinaryReader reader = new BinaryReader(e.Message);
-            switch (e.SubChannel)
-            {
+			switch (e.SubChannel)
+			{
 				case 2:
 					byte cb = reader.ReadByte();
 					int peerId = reader.ReadUShort();
@@ -149,8 +155,8 @@ namespace FNaFMP.Select
 					{
 						byte status = reader.ReadByte();
 						Checkmark check = Checkmarks[c];
-                        switch (status)
-                        {
+						switch (status)
+						{
 							case 0:
 								if (e.Type == MessageEventType.Channel)
 								{
@@ -189,13 +195,13 @@ namespace FNaFMP.Select
 								break;
 							default:
 								break;
-                        }
+						}
 					}
 					break;
 				case 12:
-                    if (Core.Client.IsMaster)
-                    {
-						Utility.Utilities.Logger.Write("Lobby join request from {0}",e.PeerID);
+					if (Core.Client.IsMaster)
+					{
+						Utilities.Logger.Write("Lobby join request from {0}",e.PeerID);
 						ClientChannel channel = Core.Client.joinedChannels[0];
 						int count = channel.Count;
 						int length = reader.ReadInt();
@@ -203,47 +209,44 @@ namespace FNaFMP.Select
 						List<byte> msg = new List<byte>();
 						ClientPeer peer = ClientPeer.GetPeer(Core.Client, (ushort)e.PeerID);
 						if(version != Core.VERSION)
-                        {
-							Utility.Utilities.Logger.Write(Utility.DualityLogger.LogLevel.WARN, "Join request from {0} denied: Version mismatch",e.PeerID);
-							Utility.Utilities.Logger.Write(Utility.DualityLogger.LogLevel.WARN, "Received version: '{0}', current version: '{1}'",version,Core.VERSION);
+						{
+							Utilities.Logger.Write(DualityLogger.LogLevel.WARN, "Join request from {0} denied: Version mismatch",e.PeerID);
+							Utilities.Logger.Write(DualityLogger.LogLevel.WARN, "Received version: '{0}', current version: '{1}'",version,Core.VERSION);
 							msg.Add(0); // FAIL
-							msg.AddRange(BitConverter.GetBytes(Encoding.UTF8.GetByteCount("Version mismatch")));
-							msg.AddRange(Encoding.UTF8.GetBytes("Version mismatch"));
+							msg.AddRange(BinaryData.GetData("Version mismatch"));
 							peer.SendBinaryMessage(Core.Client, 12, channel, msg.ToArray());
 							break;
-                        }
+						}
 						if(Players.Count >= 5)
-                        {
-							Utility.Utilities.Logger.Write(Utility.DualityLogger.LogLevel.WARN,"Join request from {0} denied: Lobby is full",e.PeerID);
+						{
+							Utilities.Logger.Write(DualityLogger.LogLevel.WARN,"Join request from {0} denied: Lobby is full",e.PeerID);
 							msg.Add(0); // FAIL
-							msg.AddRange(BitConverter.GetBytes(Encoding.UTF8.GetByteCount("Lobby is full")));
-							msg.AddRange(Encoding.UTF8.GetBytes("Lobby is full"));
+							msg.AddRange(BinaryData.GetData("Lobby is full"));
 							peer.SendBinaryMessage(Core.Client, 12, channel, msg.ToArray());
 							break;
-                        }
-						Utility.Utilities.Logger.Write("Join request from {0} accepted",e.PeerID);
+						}
+						Utilities.Logger.Write("Join request from {0} accepted",e.PeerID);
 						Players.Add(e.PeerID);
 						msg.Add(1);	// SUCCESS
 						msg.Add((byte)Players.Count);
 						msg.Add(0);
-						msg.AddRange(BitConverter.GetBytes(Core.PartyID.ToString().Length));
-						msg.AddRange(Encoding.UTF8.GetBytes(Core.PartyID.ToString()));
+						msg.AddRange(BinaryData.GetData(Core.PartyID.ToString()));
 						peer.SendBinaryMessage(Core.Client, 12, channel, msg.ToArray());
 					}
 					break;
 				default:
 					break;
-            }
-        }
+			}
+		}
 
-        private void Event_Peer(object sender, EventPeer e)
-        {
-            switch (e.Action)
-            {
+		private void Event_Peer(object sender, EventPeer e)
+		{
+			switch (e.Action)
+			{
 				case EventPeer.PeerAction.Left:
 					bool left = Players.Remove(e.PeerID);
-                    if (left)
-                    {
+					if (left)
+					{
 						ChatBox.AddChat(string.Format("[Game] {0} left",e.Name), ColorRgba.Grey);
 						Core.DRPC.UpdatePartySize(Players.Count);
 					}
@@ -260,13 +263,13 @@ namespace FNaFMP.Select
 					}
 					break;
 				/*case EventPeer.PeerAction.Join:
-                    if (Core.Client.IsMaster)
-                    {
+					if (Core.Client.IsMaster)
+					{
 						foreach (Core.Character c in Checkmarks.Keys)
 						{
 							Checkmark check = Checkmarks[c];
 							if(check.Peer > -1)
-                            {
+							{
 								List<byte> message = new List<byte>();
 								message.Add((byte)c);
 								message.AddRange(BitConverter.GetBytes((ushort)check.Peer));
@@ -279,42 +282,51 @@ namespace FNaFMP.Select
 				default:
 					break;
 			}
-        }
+		}
 
-        private void Event_LeaveChannel(object sender, EventResponseLeaveChannel e)
-        {
+		private void Event_LeaveChannel(object sender, EventResponseLeaveChannel e)
+		{
+			if (BackButton.leave)
+			{
+				Core.LeaveReason = "You left the lobby.";
+			}
+			else
+			{
+				Core.LeaveReason = "The lobby owner left.";
+			}
 			Core.SelfCharacter = Core.Character.None;
 			if(LobbyScene != null)
-            {
-				Utility.Utilities.Logger.Write("Channel left, returning to lobby list...");
+			{
+				Utilities.Logger.Write("Channel left, returning to lobby list...");
 				Scene.SwitchTo(LobbyScene);
-            }
+			}
 			else
-            {
-				Utility.Utilities.Logger.Write(Utility.DualityLogger.LogLevel.ERROR, "Couldn't find the lobby screen!");
+			{
+				Utilities.Logger.Write(DualityLogger.LogLevel.ERROR, "Couldn't find the lobby screen!");
 				Scene.SwitchTo(DualityApp.AppData.StartScene);
 			}
-        }
+		}
 
-        public void OnDeactivate()
-        {
-			Checkmarks.Clear();
+		public void OnDeactivate()
+		{
+			SM.StopAllSounds();
+			Checkmarks = new Dictionary<Core.Character, Checkmark>();
 			if (Core.Client != null)
 			{
 				Core.Client.Event.ResponseLeaveChannel -= Event_LeaveChannel;
 				Core.Client.Event.Peer -= Event_Peer;
-                Core.Client.Event.BinaryMessage -= Event_BinaryMessage;
+				Core.Client.Event.BinaryMessage -= Event_BinaryMessage;
 				Core.Client.Event.NumberMessage -= Event_NumberMessage;
-                Core.Client.Event.Disconnect -= Event_Disconnect;
+				Core.Client.Event.Disconnect -= Event_Disconnect;
 			}
 		}
 		private int countdown = -1;
 		private int nextcount = -1;
 		private bool leaveing = false;
-        public void OnUpdate()
-        {
-            if(Core.Client != null)
-            {
+		public void OnUpdate()
+		{
+			if(Core.Client != null)
+			{
 				if (!Core.Client.IsConnected)
 				{
 					if (!leaveing)
@@ -333,11 +345,11 @@ namespace FNaFMP.Select
 					return;
 				}
 				if(Ready.Contains(Core.Character.Guard) && Ready.Count >= 2 && Ready.Count == Players.Count)
-                {
+				{
 					if(nextcount == -1 && countdown == -1)
-                    {
+					{
 						countdown = 6;
-                    }
+					}
 					if (nextcount > -1 && countdown == (Core.Client.IsMaster ? -1 : 0))
 					{
 						if (LoadingScene != null)
@@ -346,36 +358,36 @@ namespace FNaFMP.Select
 						}
 						else
 						{
-							Utility.Utilities.Logger.Write(Utility.DualityLogger.LogLevel.ERROR, "Couldn't find the loading screen!");
+							Utilities.Logger.Write(DualityLogger.LogLevel.ERROR, "Couldn't find the loading screen!");
 							Scene.SwitchTo(DualityApp.AppData.StartScene);
 						}
 					}
 					if(nextcount <= Time.MainTimer.TotalSeconds)
-                    {
+					{
 						ChatBox.AddChat($"[Game] Starting in {countdown} second(s)...", ColorRgba.Red);
 						nextcount = (int)(Time.MainTimer.TotalSeconds + 1);
 						countdown--;
-                    }
-                } else
-                {
+					}
+				} else
+				{
 					if(nextcount > -1)
-                    {
+					{
 						ChatBox.AddChat($"[Game] Starting aborted.", ColorRgba.Red);
 					}
 					countdown = -1;
 					nextcount = -1;
-                }
+				}
 			} else
-            {
-				Utility.Utilities.Logger.Write(Utility.DualityLogger.LogLevel.ERROR, "There was no Lacewing client on the character select menu!");
-				Utility.Utilities.Logger.Write(Utility.DualityLogger.LogLevel.ERROR, "If you see this, it means something went horribly wrong.");
+			{
+				Utilities.Logger.Write(DualityLogger.LogLevel.ERROR, "There was no Lacewing client on the character select menu!");
+				Utilities.Logger.Write(DualityLogger.LogLevel.ERROR, "If you see this, it means something went horribly wrong.");
 				Scene.SwitchTo(DualityApp.AppData.StartScene);
 			}
-        }
-    }
+		}
+	}
 	[RequiredComponent(typeof(SpriteRenderer)), RequiredComponent(typeof(Transform))]
-	public class Checkmark : Component, ICmpUpdatable
-    {
+	public class Checkmark : Component, ICmpUpdatable, ICmpInitializable
+	{
 		private Transform transform = null;
 		private SpriteRenderer renderer = null;
 		private Point2 Size = Point2.Zero;
@@ -386,20 +398,29 @@ namespace FNaFMP.Select
 		private int peer = -1;
 		[EditorHintFlags(MemberFlags.ReadOnly)]
 		public int Peer
-        {
+		{
 			get { return peer; }
 			set { peer = value; }
-        }
+		}
 		public Core.Character Character { get; set; }
 		private uint nextclick = 0;
+
+		public void OnActivate()
+		{
+			BGTasks.LoadCheckmark(this);
+		}
+
+		public void OnDeactivate()
+		{
+			peer = -1;
+			Ready = false;
+			Checked = false;
+		}
+
 		public void OnUpdate()
-        {
+		{
 			if (Character == Core.Character.None)
 				return;
-			if(BGTasks.GetCheckmark(Character) == null)
-            {
-				BGTasks.LoadCheckmark(this);
-			}
 			if (renderer == null || transform == null)
 			{
 				transform = GameObj.Transform;
@@ -433,13 +454,17 @@ namespace FNaFMP.Select
 				if (DualityApp.Mouse.ButtonHit(MouseButton.Left))
 				{
 					bool onbox = (mouse.X > pos.X && mouse.X < pos.X + Size.X && mouse.Y > pos.Y && mouse.Y < pos.Y + Size.Y);
-                    if (onbox)
-                    {
+					if (onbox)
+					{
+						if(Character == Core.Character.Foxy)	// TEMPORARY, UNTIL FOXY IS IMPLEMENTED PROPERLY
+						{
+							return;
+						}
 						if (nextclick > Time.MainTimer.TotalMilliseconds)
 							return;
 						nextclick = (uint)(Time.MainTimer.TotalMilliseconds + 500);
 						if (!Checked)
-                        {
+						{
 							if (Core.SelfCharacter != Core.Character.None)
 								return;
 							ChatBox.AddChat("[Game] You selected " + Character.GetStringValue(), ColorRgba.Green);
@@ -447,13 +472,13 @@ namespace FNaFMP.Select
 							Peer = Core.Client.ID;
 							List<byte> message = new List<byte>();
 							message.Add((byte)Character);
-							message.AddRange(BitConverter.GetBytes(Core.Client.ID));
+							message.AddRange(BinaryData.GetData(Core.Client.ID));
 							message.Add(1);
 							Core.SelfCharacter = Character;
 							Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 2, message.ToArray());
-                        }
-                        else
-                        {
+						}
+						else
+						{
 							if (Core.SelfCharacter == Character && !Ready)
 							{
 								ChatBox.AddChat("[Game] You deselected " + Character.GetStringValue(), ColorRgba.Green);
@@ -461,17 +486,17 @@ namespace FNaFMP.Select
 								Peer = -1;
 								List<byte> message = new List<byte>();
 								message.Add((byte)Character);
-								message.AddRange(BitConverter.GetBytes(Core.Client.ID));
+								message.AddRange(BinaryData.GetData(Core.Client.ID));
 								message.Add(0);
 								Core.SelfCharacter = Core.Character.None;
 								Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 2, message.ToArray());
 							}
 						}
-                    }
+					}
 				}
 			}
 		}
-    }
+	}
 
 	public class BackButton : Component, ICmpRenderer, ICmpInitializable
 	{
@@ -487,11 +512,11 @@ namespace FNaFMP.Select
 		//public ContentRef<Scene> LobbyScene { get; set; }
 		private Point2 location = new Point2(0, 0);
 		public Point2 ButtonLocation
-        {
+		{
 			get { return location; }
 			set { location = value; }
-        }
-		private bool leave = false;
+		}
+		public static bool leave { get; private set; }
 
 		void ICmpRenderer.GetCullingInfo(out CullingInfo info)
 		{
@@ -521,22 +546,22 @@ namespace FNaFMP.Select
 				{
 					leave = true;
 					Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
-					Utility.Utilities.Logger.Write("Leaving the lobby...");
+					Utilities.Logger.Write("Leaving the lobby...");
 				}
 			}
 
 		}
 
-        public void OnActivate()
-        {
-            //throw new NotImplementedException();	//<-Throws an error
-        }
-
-        public void OnDeactivate()
-        {
+		public void OnActivate()
+		{
 			leave = false;
-        }
-    }
+		}
+
+		public void OnDeactivate()
+		{
+			leave = false;
+		}
+	}
 
 	[RequiredComponent(typeof(SpriteRenderer)), RequiredComponent(typeof(Transform))]
 	public class ReadyButton : Component, ICmpUpdatable
@@ -556,9 +581,9 @@ namespace FNaFMP.Select
 			{
 				Checkmark check = BGTasks.GetCheckmark(Core.SelfCharacter);
 				if(check == null)
-                {
+				{
 					return;
-                }
+				}
 				if (Size == Point2.Zero)
 				{
 					Material mat = renderer.SharedMaterial.Res;
@@ -587,7 +612,7 @@ namespace FNaFMP.Select
 						nextclick = (uint)(Time.MainTimer.TotalMilliseconds + 500);
 						List<byte> message = new List<byte>();
 						message.Add((byte)Core.SelfCharacter);
-						message.AddRange(BitConverter.GetBytes(Core.Client.ID));
+						message.AddRange(BinaryData.GetData(Core.Client.ID));
 						message.Add((byte)(check.Ready ? 1 : 2));
 						Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 2, message.ToArray());
 						check.Ready = !check.Ready;
@@ -745,14 +770,14 @@ namespace FNaFMP.Select
 			}
 			// CHAT DISPLAY
 			if(Chat.Count == 0)
-            {
+			{
 				Chat.Add(new ChatLine
 				{
 					Text = "Welcome to Fazbear Multiplayer!",
 					Color = new ColorRgba(255, 208, 0)
 				});
 				if(Core.Client != null)
-                {
+				{
 					Chat.Add(new ChatLine
 					{
 						Text = "Playing as: " + Core.Client.UserName,
@@ -770,13 +795,13 @@ namespace FNaFMP.Select
 			int start = (int)(Chat.Count <= lines ? 0 : Chat.Count - lines);
 			int space = 0;
 			for(int i = start; i < Chat.Count; i++)
-            {
+			{
 				ChatLine line = Chat[i];
 				ColorRgba color = line.Color;
 				if (color == null)
 					color = ColorRgba.White;
 				if(color != canvas.State.ColorTint)
-                {
+				{
 					this.canvas.End();
 					this.canvas.Begin(device);
 
@@ -786,7 +811,7 @@ namespace FNaFMP.Select
 				}
 				canvas.DrawText(line.Text, chatpos.X, chatpos.Y + (font.Res.Height*space));
 				space++;
-            }
+			}
 
 			this.canvas.End();
 
@@ -896,25 +921,29 @@ namespace FNaFMP.Select
 				repeat = -1;
 		}
 
+		private const string ChatFormat = "{0}{1}{2}: {3}";
+
 		private void SendMessage()
-        {
+		{
 			List<byte> msg = new List<byte>();
 			msg.Add((byte)Core.SelfCharacter);
-			msg.AddRange(BitConverter.GetBytes(Text.Length));
-			msg.AddRange(Encoding.UTF8.GetBytes(Text));
+			msg.AddRange(BinaryData.GetData(Text));
 			Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 15, msg.ToArray());
-			string display = Core.Client.UserName + ": " + Text;
-			AddChat(display);
+			string display = string.Format(ChatFormat, "", Core.Client.UserName, Core.SelfCharacter == Core.Character.None ? "" : " (" + Core.SelfCharacter.GetStringValue() + ")", Text);
+			if(Core.Client.UserName != "Pdani")
+				AddChat(display);
+			else
+				AddChat(display,new ColorRgba(235, 52, 198));
 			Text = "";
-        }
+		}
 
 		private static int staticcut = 0;
 		public static void AddChat(string display)
-        {
+		{
 			AddChat(display, ColorRgba.White);
-        }
+		}
 		public static void AddChat(string display, ColorRgba color)
-        {
+		{
 			if (display.Length > staticcut)
 			{
 				int cut = (int)Math.Floor(display.Length / (float)staticcut);
@@ -945,20 +974,23 @@ namespace FNaFMP.Select
 		}
 
 		private void Event_BinaryMessage(object sender, EventBinaryMessage e)
-        {
+		{
 			if (e.Message == null)
 				return;
 			if(e.SubChannel == 15)
-            {
+			{
 				ClientPeer peer = ClientPeer.GetPeer(Core.Client, (ushort)e.PeerID);
 				BinaryReader reader = new BinaryReader(e.Message);
 				Core.Character c = (Core.Character)reader.ReadByte();
 				int length = reader.ReadInt();
 				string text = reader.ReadText(length);
-				string display = peer.Name + ": " + text;
-				AddChat(display);
-            }
-        }
+				string display = string.Format(ChatFormat, "", peer.Name, c == Core.Character.None ? "" : " ("+c.GetStringValue()+")", text);
+				if (peer.Name != "Pdani")
+					AddChat(display);
+				else
+					AddChat(display, new ColorRgba(235, 52, 198));
+			}
+		}
 
 		public void OnActivate()
 		{
@@ -968,11 +1000,11 @@ namespace FNaFMP.Select
 			DualityApp.Keyboard.KeyUp += KeyUp;
 			if (Core.Client != null)
 			{
-                Core.Client.Event.BinaryMessage += Event_BinaryMessage;
+				Core.Client.Event.BinaryMessage += Event_BinaryMessage;
 			}
 		}
 
-        public void OnDeactivate()
+		public void OnDeactivate()
 		{
 			DualityApp.Keyboard.KeyDown -= KeyDown;
 			DualityApp.Keyboard.KeyUp -= KeyUp;
@@ -984,8 +1016,8 @@ namespace FNaFMP.Select
 	}
 
 	internal class ChatLine
-    {
+	{
 		public string Text { get; set; }
 		public ColorRgba Color { get; set; }
-    }
+	}
 }

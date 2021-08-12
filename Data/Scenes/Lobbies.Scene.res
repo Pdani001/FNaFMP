@@ -132,6 +132,7 @@
             <ambience dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
               <contentPath dataType="String">Data\Menu\Music\Ambience.Sound.res</contentPath>
             </ambience>
+            <def dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]" />
             <fnaf57 dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
               <contentPath dataType="String">Data\Menu\Music\fis2.Sound.res</contentPath>
             </fnaf57>
@@ -154,6 +155,18 @@
               <contentPath dataType="String">Data\Menu\Music\ThemeTune.Sound.res</contentPath>
             </themetune>
           </item>
+          <item dataType="Struct" type="FNaFMP.Menu.LobbyStatusText" id="3230015161">
+            <_x003C_Font_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Font]]">
+              <contentPath dataType="String">Default:Font:GenericMonospace10</contentPath>
+            </_x003C_Font_x003E_k__BackingField>
+            <_x003C_MaxLength_x003E_k__BackingField dataType="Int">950</_x003C_MaxLength_x003E_k__BackingField>
+            <_x003C_Position_x003E_k__BackingField dataType="Struct" type="Duality.Point2">
+              <X dataType="Int">64</X>
+              <Y dataType="Int">680</Y>
+            </_x003C_Position_x003E_k__BackingField>
+            <active dataType="Bool">true</active>
+            <gameobj dataType="ObjectRef">2446385983</gameobj>
+          </item>
           <item dataType="Struct" type="FNaFMP.Menu.MenuText" id="3735910080">
             <active dataType="Bool">true</active>
             <font dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Font]]">
@@ -162,7 +175,7 @@
             <gameobj dataType="ObjectRef">2446385983</gameobj>
           </item>
         </_items>
-        <_size dataType="Int">4</_size>
+        <_size dataType="Int">5</_size>
       </compList>
       <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="1827536056" surrogate="true">
         <header />
@@ -172,12 +185,14 @@
             <item dataType="Type" id="1184914958" value="Duality.Components.Renderers.SpriteRenderer" />
             <item dataType="Type" id="3430358858" value="FNaFMP.Menu.Background" />
             <item dataType="Type" id="608493886" value="FNaFMP.Menu.MenuText" />
+            <item dataType="Type" id="1024877018" value="FNaFMP.Menu.LobbyStatusText" />
           </keys>
           <values dataType="Array" type="System.Object[]" id="2502412224">
             <item dataType="ObjectRef">2503663201</item>
             <item dataType="ObjectRef">3915005263</item>
             <item dataType="ObjectRef">1817012834</item>
             <item dataType="ObjectRef">3735910080</item>
+            <item dataType="ObjectRef">3230015161</item>
           </values>
         </body>
       </compMap>
@@ -490,13 +505,17 @@
           </item>
           <item dataType="Struct" type="FNaFMP.Menu.LobbyListText" id="75050219">
             <active dataType="Bool">true</active>
+            <attempt dataType="Int">0</attempt>
             <ChannelList />
             <DenyReason />
+            <error dataType="Bool">false</error>
             <Event />
             <font dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Font]]">
               <contentPath dataType="String">Data\Fonts\Consolas16Bold.Font.res</contentPath>
             </font>
             <gameobj dataType="ObjectRef">979695321</gameobj>
+            <host dataType="Int">0</host>
+            <inforetry dataType="Int">-1</inforetry>
             <join dataType="Bool">false</join>
             <lastFrame dataType="Int">0</lastFrame>
             <ListRects />
@@ -598,7 +617,7 @@
           </item>
           <item dataType="Struct" type="FNaFMP.Menu.LobbyNameText" id="2727264161">
             <active dataType="Bool">true</active>
-            <backspace dataType="Int">4776688</backspace>
+            <backspace dataType="Int">-1</backspace>
             <c dataType="String"></c>
             <extra dataType="String"></extra>
             <font dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Font]]">

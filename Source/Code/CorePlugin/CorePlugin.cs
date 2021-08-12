@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using Alzaitu.Lacewing.Client;
 using DiscordRPC;
@@ -9,196 +10,256 @@ using DiscordRPC.Logging;
 using Duality;
 using FNaFMP.Configuration;
 using FNaFMP.Utility;
+using Newtonsoft.Json;
 using SharpYaml.Serialization;
 
 namespace FNaFMP
 {
-    /// <summary>
-    /// Defines a Duality core plugin.
-    /// </summary>
-    public class Core : CorePlugin
-    {
-        public const string VERSION = "0.1.3";
-        private static string secret = Guid.NewGuid().ToString();
-        private static Guid party = Guid.NewGuid();
-        public static Guid PartyID
-        {
-            get { return party; }
-            set { party = value; }
-        }
-        private static Character character = Character.None;
-        public static Character SelfCharacter
-        {
-            get { return character; }
-            set { character = value; }
-        }
-        public enum Character
-        {
-            [StringValue("None")]
-            None,
-            [StringValue("Freddy")]
-            Freddy,
-            [StringValue("Bonnie")]
-            Bonnie,
-            [StringValue("Chica")]
-            Chica,
-            [StringValue("Foxy")]
-            Foxy,
-            [StringValue("Guard")]
-            Guard
-        }
-        private static DateTime Start = DateTime.UtcNow;
-        private static DiscordRpcClient discord;
-        public static DiscordRpcClient DRPC
-        {
-            get { return discord; }
-        }
-        private static LacewingClient client;
-        public static LacewingClient Client
-        {
-            get { return client; }
-        }
-        public static void Reset()
-        {
-            Start = DateTime.UtcNow;
-            client.Dispose();
-            client = new LacewingClient();
-            party = Guid.NewGuid();
-            discord.SetPresence(BuildPresence("In Menu", "", party.ToString(), 1, 1));
-        }
-        public static RichPresence BuildPresence(string Details, string State, string PartyID, int PartyMax, int PartySize)
-        {
-            return new RichPresence()
-            {
-                Details = Details,
-                State = State,
-                Assets = new Assets()
-                {
-                    LargeImageKey = "icon"
-                },
-                Timestamps = new Timestamps()
-                {
-                    Start = Start,
-                },
-                Secrets = new Secrets()
-                {
-                    JoinSecret = secret
-                },
-                Party = new Party()
-                {
-                    ID = PartyID,
-                    Max = PartyMax,
-                    Size = PartySize,
-                    Privacy = Party.PrivacySetting.Public
-                }
-            };
-        }
-        private static bool debug = false;
+	/// <summary>
+	/// Defines a Duality core plugin.
+	/// </summary>
+	public class Core : CorePlugin
+	{
+		private string ConfigPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\FNaFMultiplayer\\config1.yml";
+		public const string VERSION = "0.1.4";
+		public static string LeaveReason { get; set; }
+		private static string secret = Guid.NewGuid().ToString();
+		private static Guid party = Guid.NewGuid();
+		public static Guid PartyID
+		{
+			get { return party; }
+			set { party = value; }
+		}
+		private static Character character = Character.None;
+		public static Character SelfCharacter
+		{
+			get { return character; }
+			set { character = value; }
+		}
+		public enum Character
+		{
+			[StringValue("None")]
+			None,
+			[StringValue("Freddy")]
+			Freddy,
+			[StringValue("Bonnie")]
+			Bonnie,
+			[StringValue("Chica")]
+			Chica,
+			[StringValue("Foxy")]
+			Foxy,
+			[StringValue("Guard")]
+			Guard
+		}
+		private static DateTime Start = DateTime.UtcNow;
+		private static DiscordRpcClient discord;
+		public static DiscordRpcClient DRPC
+		{
+			get { return discord; }
+		}
+		private static LacewingClient client;
+		public static LacewingClient Client
+		{
+			get { return client; }
+		}
+		public static void Reset()
+		{
+			Start = DateTime.UtcNow;
+			client.Dispose();
+			client = new LacewingClient(username);
+			party = Guid.NewGuid();
+			discord.SetPresence(BuildPresence("In Menu", "", party.ToString(), 1, 1));
+		}
+		public static RichPresence BuildPresence(string Details, string State, string PartyID, int PartyMax, int PartySize)
+		{
+			return new RichPresence()
+			{
+				Details = Details,
+				State = State,
+				Assets = new Assets()
+				{
+					LargeImageKey = "icon"
+				},
+				Timestamps = new Timestamps()
+				{
+					Start = Start,
+				},
+				Secrets = new Secrets()
+				{
+					JoinSecret = secret
+				},
+				Party = new Party()
+				{
+					ID = PartyID,
+					Max = PartyMax,
+					Size = PartySize,
+					Privacy = Party.PrivacySetting.Public
+				}
+			};
+		}
+		private static bool debug = false;
 
-        /**
-         * <summary>
-         * If true, more information will be available to the user
-         * </summary>
-         */
-        public static bool DEBUG
-        {
-            get { return debug; }
-        }
+		/**
+		 * <summary>
+		 * If true, more information will be available to the user
+		 * </summary>
+		 */
+		public static bool DEBUG
+		{
+			get { return debug; }
+		}
 
-        private RootConfig DefaultConfig => new RootConfig
-        {
-            Settings = new Settings
-            {
-                TempServer = "shadsoft.fr"
-            }
-        };
+		private RootConfig DefaultConfig => new RootConfig
+		{
+			Settings = new Settings
+			{
+				Server = "shadsoft.org:6121"
+			}
+		};
 
-        public static RootConfig Config
-        {
-            get { return config; }
-        }
-        private static RootConfig config = null;
-        private void LoadConfig()
-        {
-            Serializer ser = new Serializer();
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\FNaFMultiplayer\\config1.yml";
-            if (!File.Exists(path))
-            {
-                config = DefaultConfig;
-                string content = ser.Serialize(DefaultConfig,typeof(RootConfig));
-                try
-                {
-                    FileInfo info = new FileInfo(path);
-                    info.Directory.Create();
-                    StreamWriter write = File.CreateText(path);
-                    write.Write(content);
-                    write.Flush();
-                }
-                catch (Exception e)
-                {
-                    Logs.Core.Write("Unable to create config file: {0}", e);
-                }
-            }
-            else
-            {
-                StreamReader input = new StreamReader(path);
-                config = (RootConfig)ser.Deserialize(input, typeof(RootConfig));
-            }
-        }
-        
-        protected override void OnGameStarting()
-        {
-            LoadConfig();
-            string[] args = Environment.GetCommandLineArgs();
-            string t = "";
-            foreach(string a in args)
-            {
-                if (t.Length == 0)
-                    t += $"'{a}'";
-                else
-                    t += ", " + $"'{a}'";
-            }
-            Console.WriteLine("args = [{0}]",t);
-            debug = args.Contains("--debug");
+		public static RootConfig Config
+		{
+			get { return config; }
+		}
+		private static RootConfig config = null;
+		private void LoadConfig()
+		{
+			Serializer ser = new Serializer();
+			if (!File.Exists(ConfigPath))
+			{
+				config = DefaultConfig;
+				string content = ser.Serialize(DefaultConfig,typeof(RootConfig));
+				try
+				{
+					FileInfo info = new FileInfo(ConfigPath);
+					info.Directory.Create();
+					StreamWriter write = File.CreateText(ConfigPath);
+					write.Write(content);
+					write.Flush();
+					write.Close();
+				}
+				catch (Exception e)
+				{
+					Logs.Core.Write("Unable to create config file: {0}", e);
+				}
+			}
+			else
+			{
+				StreamReader input = new StreamReader(ConfigPath);
+				config = (RootConfig)ser.Deserialize(input, typeof(RootConfig));
+				if (config == null)
+				{
+					File.Delete(ConfigPath);
+					LoadConfig();
+				}
+			}
+		}
 
-            character = Character.None;
+		private void SaveConfig()
+		{
+			if(config == null)
+			{
+				File.Delete(ConfigPath);
+				return;
+			}
+			Serializer ser = new Serializer();
+			string content = ser.Serialize(Config, typeof(RootConfig));
+			try
+			{
+				StreamWriter write = File.CreateText(ConfigPath);
+				write.Write(content);
+				write.Flush();
+				write.Close();
+			}
+			catch (Exception e)
+			{
+				Logs.Core.Write("Unable to write config file: {0}", e);
+			}
+		}
 
-            string username = null;
-            if(config != null && config.Settings != null)
-            {
-                username = config.Settings.TempName;
-            }
-            client = new LacewingClient(username);
+		public static string[] Hosts { get; private set; }
 
-            Start = DateTime.UtcNow;
-            party = Guid.NewGuid();
-            discord = new DiscordRpcClient("629989727549784085");
-            discord.Logger = new ConsoleLogger() { Level = LogLevel.Warning };
-            //Subscribe to events
-            discord.OnReady += (sender, e) =>
-            {
-                Console.WriteLine("Received Ready from user {0}", e.User.Username);
-            };
-            discord.OnPresenceUpdate += (sender, e) =>
-            {
-                Console.WriteLine("Received Update! {0}", e.Presence);
-            };
-            discord.Initialize();
-            discord.RegisterUriScheme();
-            discord.SetPresence(BuildPresence("In Menu", "", party.ToString(), 1, 1));
-        }
-        protected override void OnGameEnded()
-        {
-            if(discord != null)
-            {
-                discord.Dispose();
-                discord = null;
-            }
-            if(client != null)
-            {
-                client.Dispose();
-                client = null;
-            }
-        }
-    }
+		internal static void LoadHosts()
+		{
+			Hosts = new string[0];
+			Logs.Core.Write("Loading server list");
+			WebClient web = new WebClient();
+			string hosts = web.DownloadString("https://pdani.hu/lacewing.php");
+			var result = JsonConvert.DeserializeObject<ServerHostList>(hosts);
+			Hosts = result.hosts;
+			Logs.Core.Write("Loaded {0} servers",Hosts.Length);
+			web.Dispose();
+		}
+
+
+		private static string username = null;
+
+		protected override void OnGameStarting()
+		{
+			username = null;
+			LoadConfig();
+			string[] args = Environment.GetCommandLineArgs();
+			string t = "";
+			foreach(string a in args)
+			{
+				if (t.Length == 0)
+					t += $"'{a}'";
+				else
+					t += ", " + $"'{a}'";
+			}
+			if(!args.Contains("D:\\Duality\\DualityEditor.exe"))
+				LoadHosts();
+			Console.WriteLine("args = [{0}]",t);
+			Logs.Core.Write("args = [{0}]",t);
+			Logs.Core.Write("CurrentDirectory = [{0}]", System.Reflection.Assembly.GetEntryAssembly().Location);
+			debug = args.Contains("--debug");
+			character = Character.None;
+			
+
+			if(Config != null && Config.Gamejolt != null && !debug)
+			{
+				if(Config.Gamejolt.UserName != null && Config.Gamejolt.Token != null)
+				{
+					GamejoltAuth gamejolt = new GamejoltAuth("637821", "b285cf95496af9351bbab65b39322eaf");
+					AuthResponse auth = gamejolt.Login(Config.Gamejolt.UserName, Base64.Decode(Config.Gamejolt.Token));
+					if (auth.response.success)
+					{
+						Logs.Core.Write("Logged in as {0}",Config.Gamejolt.UserName);
+						username = Config.Gamejolt.UserName;
+					}
+				}
+			}
+			client = new LacewingClient(username);
+
+			Start = DateTime.UtcNow;
+			party = Guid.NewGuid();
+			discord = new DiscordRpcClient("629989727549784085");
+			discord.Logger = new ConsoleLogger() { Level = LogLevel.Warning };
+			/*discord.OnReady += (sender, e) =>
+			{
+				Console.WriteLine("Received Ready from user {0}", e.User.Username);
+			};
+			discord.OnPresenceUpdate += (sender, e) =>
+			{
+				Console.WriteLine("Received Update! {0}", e.Presence);
+			};*/
+			discord.Initialize();
+			discord.RegisterUriScheme();
+			discord.SetPresence(BuildPresence("In Menu", "", party.ToString(), 1, 1));
+		}
+		protected override void OnGameEnded()
+		{
+			if(discord != null)
+			{
+				discord.Dispose();
+				discord = null;
+			}
+			if(client != null)
+			{
+				client.Dispose();
+				client = null;
+			}
+			SaveConfig();
+		}
+	}
 }

@@ -74,7 +74,7 @@
           <X dataType="Float">0</X>
           <Y dataType="Float">0</Y>
         </targetRect>
-        <visibilityMask dataType="Enum" type="Duality.Drawing.VisibilityFlag" name="Group1, Group2, Group3" value="14" />
+        <visibilityMask dataType="Enum" type="Duality.Drawing.VisibilityFlag" name="Group1, Group2, Group3, Group4" value="30" />
       </item>
       <item dataType="Struct" type="Duality.Resources.RenderStep" id="732033882">
         <clearColor dataType="Struct" type="Duality.Drawing.ColorRgba" />

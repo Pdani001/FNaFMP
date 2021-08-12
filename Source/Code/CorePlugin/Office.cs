@@ -11,6 +11,7 @@ using Alzaitu.Lacewing.Client.Packet.EventData;
 using Alzaitu.Lacewing.Client.Packet;
 using Duality.Editor;
 using System.Timers;
+using FNaFMP.Alzaitu.Lacewing.Client.Packet;
 
 namespace FNaFMP.Office
 {
@@ -171,7 +172,7 @@ namespace FNaFMP.Office
 					animator.Paused = false;
 					if(BlipSound != null)
 					{
-						SoundManager.PlaySound(BlipSound, false);
+						DisplayController.SM.PlaySound(BlipSound, false);
 					}
 				}
 			} else
@@ -320,12 +321,12 @@ namespace FNaFMP.Office
 						CameraViewer.IsViewing = false;
 						if (up_source != null)
 						{
-							SoundManager.StopSound(up_source);
+							DisplayController.SM.StopSound(up_source);
 							up_source = null;
 						}
 						if (down_sound != null)
 						{
-							down_source = SoundManager.PlaySound(down_sound, false);
+							down_source = DisplayController.SM.PlaySound(down_sound, false);
 						}
 						if (Core.SelfCharacter == Core.Character.Guard)
 						{
@@ -335,11 +336,11 @@ namespace FNaFMP.Office
 					{
 						if (up_sound != null)
 						{
-							up_source = SoundManager.PlaySound(up_sound, false);
+							up_source = DisplayController.SM.PlaySound(up_sound, false);
 						}
 						if (down_source != null)
 						{
-							SoundManager.StopSound(down_source);
+							DisplayController.SM.StopSound(down_source);
 							down_source = null;
 						}
 					}
@@ -375,7 +376,7 @@ namespace FNaFMP.Office
 		public static DoorAnimator RightDoor = null;
 	}
 	[RequiredComponent(typeof(SpriteRenderer)), RequiredComponent(typeof(SpriteAnimator)), RequiredComponent(typeof(Transform))]
-	public class DoorAnimator : Component, ICmpUpdatable
+	public class DoorAnimator : Component, ICmpUpdatable, ICmpInitializable
 	{
 		private DoorDirection direction = DoorDirection.None;
 		public DoorDirection DoorDirection
@@ -442,7 +443,7 @@ namespace FNaFMP.Office
 					anim = true;
 					if (sound != null)
 					{
-						SoundManager.PlaySound(sound, false);
+						DisplayController.SM.PlaySound(sound, false);
 					}
 					break;
 				default:
@@ -463,31 +464,19 @@ namespace FNaFMP.Office
 		{
 			if (open == null || opening == null || close == null || closing == null || direction == 0)
 				return;
-			
-			if(direction == DoorDirection.Left)
+
+			open.EnsureLoaded();
+			opening.EnsureLoaded();
+			close.EnsureLoaded();
+			closing.EnsureLoaded();
+			if (sound != null)
 			{
-				if(DoorController.LeftDoor == null)
-					DoorController.LeftDoor = this;
+				sound.EnsureLoaded();
 			}
-			if (direction == DoorDirection.Right)
-			{
-				if(DoorController.RightDoor == null)
-					DoorController.RightDoor = this;
-			}
+
 			if (renderer == null || transform == null || animator == null)
 			{
-				transform = this.GameObj.Transform;
-				renderer = this.GameObj.GetComponent<SpriteRenderer>();
-				animator = this.GameObj.GetComponent<SpriteAnimator>();
-				state = 0;
-				open.EnsureLoaded();
-				opening.EnsureLoaded();
-				close.EnsureLoaded();
-				closing.EnsureLoaded();
-				if (sound != null)
-				{
-					sound.EnsureLoaded();
-				}
+				
 			}
 			else
 			{
@@ -532,6 +521,29 @@ namespace FNaFMP.Office
 				}
 			}
 		}
+
+		public void OnActivate()
+		{
+			if (direction == DoorDirection.Left)
+			{
+				DoorController.LeftDoor = this;
+			}
+			if (direction == DoorDirection.Right)
+			{
+				DoorController.RightDoor = this;
+			}
+			if (renderer == null || transform == null || animator == null)
+			{
+				transform = this.GameObj.Transform;
+				renderer = this.GameObj.GetComponent<SpriteRenderer>();
+				animator = this.GameObj.GetComponent<SpriteAnimator>();
+				state = 0;
+			}
+		}
+
+		public void OnDeactivate()
+		{
+		}
 	}
 	[RequiredComponent(typeof(SpriteRenderer))]
 	public class CameraButtonText : Component, ICmpUpdatable
@@ -566,7 +578,7 @@ namespace FNaFMP.Office
 					}
 					else
 					{
-						renderer.ColorTint = renderer.ColorTint.WithAlpha(0);
+						renderer.ColorTint = renderer.ColorTint.WithAlpha(127);
 					}
 				}
 			}
@@ -620,7 +632,7 @@ namespace FNaFMP.Office
 					}
 					else
 					{
-						renderer.ColorTint = renderer.ColorTint.WithAlpha(0);
+						renderer.ColorTint = renderer.ColorTint.WithAlpha(127);
 					}
 				}
 				Point2 size = text.Size;
@@ -635,7 +647,8 @@ namespace FNaFMP.Office
 						CameraViewer.ViewNumber = ViewNumber;
 						BlipAnimator.PlayBlip();
 						Positions.SetPosition(Core.SelfCharacter, ViewNumber);
-						MovementControl.Buttons.Clear();
+						if(Core.SelfCharacter != Core.Character.Guard)
+							MovementControl.Buttons.Clear();
 						MovementControl.SelfTime = MovementControl.GetRandomMoveTime(Core.SelfCharacter);
 						if(Core.Client != null && Core.Client.IsConnected && Core.Client.joinedChannels.Count > 0)
 						{
@@ -646,10 +659,49 @@ namespace FNaFMP.Office
 							};
 							Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 25, msg.ToArray());
 							if(Core.SelfCharacter == Core.Character.Guard)
-                            {
+							{
 								GameController.SendStatus();
-                            }
+							}
 						}
+					}
+				}
+			}
+		}
+	}
+	public class AttackButton : Component, ICmpUpdatable
+	{
+		[EditorHintFlags(MemberFlags.Visible)]
+		private Rect Position { get; set; }
+		public static Rect box { get; private set; }
+		public void OnUpdate()
+		{
+			box = Position;
+			Vector2 size = Position.Size;
+			Vector2 pos = Position.Pos;
+			Vector2 mouse = DualityApp.Mouse.Pos;
+			if (mouse.X > pos.X && mouse.X < pos.X + size.X && mouse.Y > pos.Y && mouse.Y < pos.Y + size.Y)
+			{
+				if (DualityApp.Mouse.ButtonHit(Duality.Input.MouseButton.Left) && CameraViewer.IsViewing && MovementControl.IsValid(CameraViewer.ViewNumber, 21))
+				{
+					int target = 21;
+					if ((Core.SelfCharacter != Core.Character.Bonnie && GameController.Guard.RightDoorClosed) || (Core.SelfCharacter == Core.Character.Bonnie && GameController.Guard.LeftDoorClosed))
+					{
+						target = 1;
+					}
+					CameraViewer.ViewNumber = target;
+					BlipAnimator.PlayBlip();
+					Positions.SetPosition(Core.SelfCharacter, target);
+					if (Core.SelfCharacter != Core.Character.Guard)
+						MovementControl.Buttons.Clear();
+					MovementControl.SelfTime = MovementControl.GetRandomMoveTime(Core.SelfCharacter);
+					if (Core.Client != null && Core.Client.IsConnected && Core.Client.joinedChannels.Count > 0)
+					{
+						List<byte> msg = new List<byte>
+						{
+							(byte)Core.SelfCharacter,
+							(byte)target
+						};
+						Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 25, msg.ToArray());
 					}
 				}
 			}
@@ -727,7 +779,7 @@ namespace FNaFMP.Office
 		{
 			if (Core.SelfCharacter == Core.Character.Guard)
 			{
-				return true;
+				return to != 21;
 			}
 			bool allow = (int)Math.Round((NextMove - Time.MainTimer.TotalMilliseconds) / 1000) <= 0;
 			if (!allow)
@@ -796,6 +848,7 @@ namespace FNaFMP.Office
 		public void OnActivate()
 		{
 			random = new Random();
+			random = new Random((int)(random.NextDouble() * Time.StartupTime.Ticks));
 			check = movements;
 			times = mt;
 			SelfTime = GetRandomMoveTime(Core.SelfCharacter);
@@ -820,6 +873,7 @@ namespace FNaFMP.Office
 				Core.Character character = (Core.Character)charbyte;
 				byte position = reader.ReadByte();
 				Positions.SetPosition(character, position);
+				Positions.SetUser(character, e.PeerID);
 			}
 		}
 
@@ -836,6 +890,15 @@ namespace FNaFMP.Office
 
 		public void OnUpdate()
 		{
+			if(Core.SelfCharacter != Core.Character.Guard)
+			{
+				if (DualityApp.Keyboard.KeyHit(Duality.Input.Key.M) && HudRenderer.IsDebug)
+					SelfTime = 0;
+				if (!GameController.Guard.Active)
+				{
+					nextmove = (int)(Time.MainTimer.TotalMilliseconds + (time * 1000));
+				}
+			}
 			if (Buttons.Count == 0)
 			{
 				if (check != null && check.ContainsKey(Core.SelfCharacter))
@@ -855,6 +918,7 @@ namespace FNaFMP.Office
 	public class Positions
 	{
 		private static Dictionary<Core.Character,int> pos = new Dictionary<Core.Character,int>();
+		private static Dictionary<Core.Character,int> users = new Dictionary<Core.Character,int>();
 		private static Dictionary<int, List<Core.Character>> cams = new Dictionary<int, List<Core.Character>>();
 		public static List<Core.Character> GetRobots(int camera)
 		{
@@ -878,19 +942,25 @@ namespace FNaFMP.Office
 			{
 				old = -1;
 			}
-			pos[robot] = value;
+			if (value != -1)
+				pos[robot] = value;
+			else
+				pos.Remove(robot);
 			if (robot != Core.Character.Foxy && robot != Core.Character.Guard)
 			{
-				if (!cams.ContainsKey(value))
+				if (value != -1)
 				{
-					cams[value] = new List<Core.Character>() { robot };
-				}
-				else
-				{
-					List<Core.Character> characters = new List<Core.Character>(cams[value]);
-					characters.Add(robot);
-					Utilities.Logger.Write("ADD - There are {0} robots on cam {1}",characters.Count,value);
-					cams[value] = characters;
+					if (!cams.ContainsKey(value))
+					{
+						cams[value] = new List<Core.Character>() { robot };
+					}
+					else
+					{
+						List<Core.Character> characters = new List<Core.Character>(cams[value]);
+						characters.Add(robot);
+						Utilities.Logger.Write("ADD - There are {0} robots on cam {1}", characters.Count, value);
+						cams[value] = characters;
+					}
 				}
 				if (cams.ContainsKey(old))
 				{
@@ -901,10 +971,27 @@ namespace FNaFMP.Office
 				}
 			}
 		}
+		public static void SetUser(Core.Character robot, int user)
+		{
+			if (user != -1)
+				users[robot] = user;
+			else
+				users.Remove(robot);
+		}
+		public static Core.Character GetUserCharacter(int user)
+		{
+			foreach(Core.Character c in users.Keys)
+			{
+				if (users[c] == user)
+					return c;
+			}
+			return Core.Character.None;
+		}
 		public static void Reset()
 		{
 			pos = new Dictionary<Core.Character, int>();
 			cams = new Dictionary<int, List<Core.Character>>();
+			users = new Dictionary<Core.Character, int>();
 		}
 	}
 	
@@ -1204,6 +1291,8 @@ namespace FNaFMP.Office
 					startup = true;
 					ChangeView(def);
 				}
+				if (Core.SelfCharacter == Core.Character.Guard && JumpscareManager.Jumpscared)
+					return;
 				if (CameraViewer.IsViewing && Positions.GetPosition(Core.SelfCharacter) < 21)
 				{
 					return;
@@ -1322,7 +1411,9 @@ namespace FNaFMP.Office
 			{
 				disabled = !disabled;
 			}
-			SoundManager.ChangeVolume("fan_sound", IsViewing ? 20 : 80);
+			if (SixAM.Started)
+				return;
+			DisplayController.SM.ChangeVolume("fan_sound", IsViewing ? 20 : 80);
 			TimeSpan span = Time.MainTimer;
 			int seconds = (int)span.TotalSeconds;
 			if (seconds - 3 >= lastTime)
@@ -1345,6 +1436,7 @@ namespace FNaFMP.Office
 	[RequiredComponent(typeof(Camera))]
 	public class DisplayController : Component, ICmpUpdatable, ICmpInitializable
 	{
+		public static SoundManager SM { get; private set; }
 		private bool started = false;
 		private static float direction = 0;
 		public static float OfficeDirection
@@ -1357,9 +1449,10 @@ namespace FNaFMP.Office
 			get { return defaultX; }
 		}
 		public static bool movement = true;
-		private void SoundLoad(object sender, EventArgs args)
+		private void SoundLoad(object sender, SoundManager e)
 		{
-			SoundManager.ToggleSound("fan_sound", true);
+			SM = e;
+			SM.ToggleSound("fan_sound", true);
 			SoundManager.OnLoad -= SoundLoad;
 		}
 		private static Camera camera = null;
@@ -1396,7 +1489,12 @@ namespace FNaFMP.Office
 				xPos = direction;
 			}
 
-			if (DualityApp.Mouse.IsAvailable && !CameraViewer.IsViewing && !CameraAnimator.IsOpening)
+			if (JumpscareManager.Jumpscared && Core.SelfCharacter == Core.Character.Guard)
+			{
+				xPos = JumpscareManager.Direction;
+			}
+			
+			if (DualityApp.Mouse.IsAvailable && !CameraViewer.IsViewing && !CameraAnimator.IsOpening && !CameraAnimator.DisableCamera)
 			{
 				if (cursorPos.X < cancelStart && xPos > 0)
 				{
@@ -1404,7 +1502,7 @@ namespace FNaFMP.Office
 					int i = 1;
 					while (cursorPos.X < cancelStart - (limit * i) && xPos > 0)
 					{
-						xPos -= i*2;
+						xPos -= i*4;
 						i++;
 					}
 					direction = xPos;
@@ -1420,7 +1518,7 @@ namespace FNaFMP.Office
 					int i = 1;
 					while (cursorPos.X > cancelEnd + (limit * i) && xPos < 320)
 					{
-						xPos += i*2;
+						xPos += i*4;
 						i++;
 					}
 					direction = xPos;
@@ -1435,6 +1533,14 @@ namespace FNaFMP.Office
 
 			Vector3 targetPos = new Vector3(defaultX+xPos, camPos.Y, 0.0f - camera.FocusDist);
 			transform.MoveTo(targetPos);
+
+			if (SixAM.Started)
+			{
+				if (!SixAM.Visible)
+					camera.VisibilityMask = VisibilityFlag.All;
+				else
+					camera.VisibilityMask = VisibilityFlag.Group4;
+			}
 		}
 
 		public void OnActivate()	// OFFICE STARTUP
@@ -1447,22 +1553,31 @@ namespace FNaFMP.Office
 					return;
 				} else
 				{
-					Core.SelfCharacter = Core.Character.Freddy;
+					Core.SelfCharacter = Core.Character.Guard;
 				}
 			}
+			SoundManager.OnLoad += SoundLoad;
 			direction = 0;
 			defaultX = float.NaN;
 			DoorController.LightDirection = DoorDirection.None;
 			DoorController.LightFlicker = false;
-			DoorController.LeftDoor = null;
-			DoorController.RightDoor = null;
 			CameraViewer.IsViewing = Core.SelfCharacter != Core.Character.Guard;
+
 			Positions.Reset();
 			Positions.SetPosition(Core.Character.Guard, 0);
-			Positions.SetPosition(Core.Character.Freddy, 0);
-			Positions.SetPosition(Core.Character.Bonnie, 0);
-			Positions.SetPosition(Core.Character.Chica, 0);
-			Positions.SetPosition(Core.Character.Foxy, 0);
+
+			if(Core.SelfCharacter == Core.Character.Freddy)
+				Positions.SetPosition(Core.Character.Freddy, 0);
+
+			if(Core.SelfCharacter == Core.Character.Bonnie)
+				Positions.SetPosition(Core.Character.Bonnie, 0);
+
+			if(Core.SelfCharacter == Core.Character.Chica)
+				Positions.SetPosition(Core.Character.Chica, 0);
+
+			if(Core.SelfCharacter == Core.Character.Foxy)
+				Positions.SetPosition(Core.Character.Foxy, 0);
+
 			if(Core.SelfCharacter == Core.Character.Foxy)
 			{
 				CameraViewer.ViewNumber = Positions.GetPosition(Core.Character.Foxy) <= 2 ? 2 : Positions.GetPosition(Core.Character.Foxy) < 5 ? 3 : 21;
@@ -1471,8 +1586,18 @@ namespace FNaFMP.Office
 			{
 				CameraViewer.ViewNumber = Positions.GetPosition(Core.SelfCharacter);
 			}
+
+			List<byte> msg = new List<byte>
+							{
+								(byte)Core.SelfCharacter,
+								(byte)CameraViewer.ViewNumber
+							};
+			if(Core.Client != null && Core.Client.joinedChannels.Count > 0)
+				Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 25, msg.ToArray());
+
+			MovementControl.SelfTime = MovementControl.GetRandomMoveTime(Core.SelfCharacter);
+
 			camera = this.GameObj.GetComponent<Camera>();
-			SoundManager.OnLoad += SoundLoad;
 			if (Core.DRPC != null)
 			{
 				DiscordRPC.RichPresence presence = Core.DRPC.CurrentPresence;
@@ -1484,16 +1609,11 @@ namespace FNaFMP.Office
 
 		public void OnDeactivate()
 		{
-			if(Core.Client != null && Core.Client.IsConnected)
-			{
-				if(!GameController.IsFinished)
-					Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name,26,(byte)Core.SelfCharacter);
-			}
 			Core.SelfCharacter = Core.Character.None;
 		}
 	}
 	[RequiredComponent(typeof(SpriteRenderer))]
-	public class OfficeController : Component, ICmpUpdatable
+	public class OfficeController : Component, ICmpUpdatable, ICmpInitializable
 	{
 		private SoundEmitter.Source source = null;
 		private bool started = false;
@@ -1516,21 +1636,21 @@ namespace FNaFMP.Office
 			{
 				return;
 			}
+			control.OpenWLight.EnsureLoaded();
+			control.OpenWoLight.EnsureLoaded();
+			control.ClosedWLight.EnsureLoaded();
+			control.ClosedWoLight.EnsureLoaded();
+			if (control.LightSound != null)
+			{
+				control.LightSound.EnsureLoaded();
+			}
+			if (control.KilledSound != null)
+			{
+				control.KilledSound.EnsureLoaded();
+			}
 			if (renderer == null)
 			{
-				renderer = this.GameObj.GetComponent<SpriteRenderer>();
-				control.OpenWLight.EnsureLoaded();
-				control.OpenWoLight.EnsureLoaded();
-				control.ClosedWLight.EnsureLoaded();
-				control.ClosedWoLight.EnsureLoaded();
-				if(control.LightSound != null)
-				{
-					control.LightSound.EnsureLoaded();
-				}
-				if(control.KilledSound != null)
-				{
-					control.KilledSound.EnsureLoaded();
-				}
+				
 			}
 			else
 			{
@@ -1540,7 +1660,7 @@ namespace FNaFMP.Office
 					renderer.SharedMaterial = control.OpenWoLight;
 					if (control.LightSound != null)
 					{
-						source = SoundManager.PlaySound(control.LightSound, true);
+						source = DisplayController.SM.PlaySound(control.LightSound, true);
 						source.Volume = 0;
 					}
 				} else
@@ -1562,6 +1682,14 @@ namespace FNaFMP.Office
 							break;
 						default:
 							break;
+					}
+					if(control.DoorDirection == DoorDirection.Left && Positions.GetPosition(Core.Character.Bonnie) == 22)
+					{
+						control.IsKilled = true;
+					}
+					if (control.DoorDirection == DoorDirection.Right && Positions.GetPosition(Core.Character.Chica) == 22)
+					{
+						control.IsKilled = true;
 					}
 					bool islight = DoorController.LightDirection == control.DoorDirection;
 					if(islight && control.IsKilled)
@@ -1588,6 +1716,8 @@ namespace FNaFMP.Office
 				}
 				if (!CameraViewer.IsViewing)
 				{
+					if (SixAM.Started || GameController.Power <= 0)
+						return;
 					renderer.ColorTint = renderer.ColorTint.WithAlpha(255);
 					bool isDoorHit = MousePosition.InRect(control.DoorArea);
 					bool isLightHit = MousePosition.InRect(control.LightArea);
@@ -1633,7 +1763,7 @@ namespace FNaFMP.Office
 						}
 						else
 						{
-							SoundManager.PlaySound(control.KilledSound);
+							DisplayController.SM.PlaySound(control.KilledSound);
 						}
 					}
 				}
@@ -1642,6 +1772,19 @@ namespace FNaFMP.Office
 					renderer.ColorTint = renderer.ColorTint.WithAlpha(0);
 				}
 			}
+		}
+
+		public void OnActivate()
+		{
+			if (renderer == null)
+			{
+				renderer = this.GameObj.GetComponent<SpriteRenderer>();
+				
+			}
+		}
+
+		public void OnDeactivate()
+		{
 		}
 	}
 
@@ -1710,7 +1853,7 @@ namespace FNaFMP.Office
 			{
 				if (DualityApp.Mouse.ButtonHit(Duality.Input.MouseButton.Left) && !CameraViewer.IsViewing)
 				{
-					SoundManager.PlaySound(sound);
+					DisplayController.SM.PlaySound(sound);
 					limit = (int)Time.MainTimer.TotalMilliseconds + 200;
 				}
 			}
@@ -1721,19 +1864,11 @@ namespace FNaFMP.Office
 	{
 		[DontSerialize] private readonly Canvas canvas = new Canvas();
 
-		private ContentRef<Font> rfont = null;
-		public ContentRef<Font> RobotFont
-		{
-			get { return this.rfont; }
-			set { this.rfont = value; }
-		}
-		
-		private ContentRef<Font> tfont = null;
-		public ContentRef<Font> TimeFont
-		{
-			get { return this.tfont; }
-			set { this.tfont = value; }
-		}
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Font> TextFont { get; set; }
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Font> TimeFont { get; set; }
 
 		private static bool isDebug = false;
 		public static bool IsDebug
@@ -1753,18 +1888,34 @@ namespace FNaFMP.Office
 			{
 				isDebug = !isDebug;
 			}
+			if (SixAM.Started)
+				return;
+
 			this.canvas.Begin(device);
 
 			if(Core.SelfCharacter != Core.Character.Guard && Core.SelfCharacter != Core.Character.None)
 			{
 				canvas.State.SetMaterial(DrawTechnique.Mask);
 				canvas.State.ColorTint = ColorRgba.White;
-				canvas.State.TextFont = this.rfont;
+				canvas.State.TextFont = this.TextFont;
 				int time = (int)Math.Round((MovementControl.NextMove - Time.MainTimer.TotalMilliseconds)/1000);
 				string CharacterText = string.Format("Playing as: {0}", Core.SelfCharacter.GetStringValue());
 				Vector2 CharacterTextSize = canvas.MeasureText(CharacterText);
 				string MoveTimeText = time <= 0 ? "You can move!" : string.Format("You can move in {0} second{1}", time, time > 1 ? "s" : "");
 				Vector2 MoveTimeTextSize = canvas.MeasureText(MoveTimeText);
+
+				if(time <= 0 && CameraViewer.ViewNumber == 21)
+				{
+					switch(Core.SelfCharacter)
+					{
+						case Core.Character.Chica:
+						case Core.Character.Bonnie:
+							Attack();
+							break;
+						default:
+							break;
+					}
+				}
 
 				canvas.DrawText(CharacterText, 24, DualityApp.WindowSize.Y - CharacterTextSize.Y - 24);
 				canvas.DrawText(MoveTimeText, 24, DualityApp.WindowSize.Y - MoveTimeTextSize.Y - 24 - 24);
@@ -1774,13 +1925,38 @@ namespace FNaFMP.Office
 
 			canvas.State.SetMaterial(DrawTechnique.Mask);
 			canvas.State.ColorTint = ColorRgba.White;
-			canvas.State.TextFont = this.tfont;
+			canvas.State.TextFont = this.TimeFont;
 
 			string TimeText = string.Format("{0} AM", GameController.GameTime);
 			Vector2 TimeTextSize = canvas.MeasureText(TimeText);
-			canvas.DrawText(TimeText, DualityApp.WindowSize.X - TimeTextSize.X - 24, 24);
+			if(!JumpscareManager.Jumpscared)
+				canvas.DrawText(TimeText, DualityApp.WindowSize.X - TimeTextSize.X - 24, 24);
 
 			this.canvas.End();
+		}
+
+		private void Attack()
+		{
+			int target = 22;
+			if ((Core.SelfCharacter != Core.Character.Bonnie && GameController.Guard.RightDoorClosed) || (Core.SelfCharacter == Core.Character.Bonnie && GameController.Guard.LeftDoorClosed))
+			{
+				target = 1;
+			}
+			CameraViewer.ViewNumber = target;
+			BlipAnimator.PlayBlip();
+			Positions.SetPosition(Core.SelfCharacter, target);
+			if (Core.SelfCharacter != Core.Character.Guard)
+				MovementControl.Buttons.Clear();
+			MovementControl.SelfTime = MovementControl.GetRandomMoveTime(Core.SelfCharacter);
+			if (Core.Client != null && Core.Client.IsConnected && Core.Client.joinedChannels.Count > 0)
+			{
+				List<byte> msg = new List<byte>
+						{
+							(byte)Core.SelfCharacter,
+							(byte)target
+						};
+				Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 25, msg.ToArray());
+			}
 		}
 
 		public void OnActivate()
@@ -1791,6 +1967,288 @@ namespace FNaFMP.Office
 		public void OnDeactivate()
 		{
 
+		}
+	}
+
+	[RequiredComponent(typeof(SpriteRenderer)), RequiredComponent(typeof(Transform))]
+	public class GuardText : Component, ICmpRenderer, ICmpInitializable
+	{
+		[DontSerialize] private readonly Canvas canvas = new Canvas();
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Font> TextFont { get; set; }
+
+		private SpriteRenderer renderer;
+		private Transform transform;
+
+		private static bool isDebug = false;
+		public static bool IsDebug
+		{
+			get { return isDebug; }
+		}
+
+		void ICmpRenderer.GetCullingInfo(out CullingInfo info)
+		{
+			info.Position = Vector3.Zero;
+			info.Radius = float.MaxValue;
+			info.Visibility = VisibilityFlag.Group2;
+		}
+		void ICmpRenderer.Draw(IDrawDevice device)
+		{
+			if (DualityApp.Keyboard.KeyHit(Duality.Input.Key.F5))
+			{
+				isDebug = !isDebug;
+			}
+
+			if (renderer == null || transform == null)
+				return;
+
+			if (Core.SelfCharacter == Core.Character.Guard && !JumpscareManager.Jumpscared && !SixAM.Started)
+			{
+				renderer.ColorTint = renderer.ColorTint.WithAlpha(255);
+				canvas.Begin(device);
+				canvas.State.SetMaterial(DrawTechnique.Mask);
+				canvas.State.ColorTint = ColorRgba.White;
+				canvas.State.TextFont = TextFont;
+
+				string PowerText = string.Format("Power left: {0}%", GameController.Power/10);
+				Vector2 PowerTextSize = canvas.MeasureText(PowerText);
+				string UsageText = "Usage: ";
+				Vector2 UsageTextSize = canvas.MeasureText(UsageText);
+
+				renderer.SpriteIndex = GameController.PowerUsage - 1;
+
+				canvas.DrawText(UsageText, 34, transform.Pos.Y);
+				canvas.DrawText(PowerText, 34, transform.Pos.Y - 40);
+				canvas.End();
+			}
+			else
+			{
+				renderer.ColorTint = renderer.ColorTint.WithAlpha(0);
+			}
+		}
+
+		public void OnActivate()
+		{
+			transform = this.GameObj.Transform;
+			renderer = this.GameObj.GetComponent<SpriteRenderer>();
+			isDebug = Core.DEBUG;
+		}
+
+		public void OnDeactivate()
+		{
+
+		}
+	}
+
+	[RequiredComponent(typeof(SpriteRenderer)), RequiredComponent(typeof(Transform)), RequiredComponent(typeof(SpriteAnimator))]
+	public class JumpscareManager : Component, ICmpUpdatable, ICmpInitializable
+	{
+		[EditorHintFlags(MemberFlags.Visible)]
+		private Dictionary<Core.Character, CameraView> jumpscare { get; set; }
+		[EditorHintFlags(MemberFlags.Visible)]
+		private Dictionary<Core.Character, int> jumpscaretime { get; set; }
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Scene> AfterJump { get; set; }
+
+		private SpriteRenderer renderer;
+		private Transform transform;
+		private SpriteAnimator animator;
+
+		private Core.Character killer = Core.Character.None;
+
+		private bool finished = false;
+		private bool start = false;
+		private static int jumped = -1;
+		public static bool Jumpscared { get { return jumped > -1; } }
+
+		public static int Direction { get; private set; }
+
+		public void OnActivate()
+		{
+			killer = Core.Character.None;
+			Direction = 0;
+			if(Core.Client != null)
+			{
+				Core.Client.Event.NumberMessage += Event_NumberMessage;
+			}
+			finished = false;
+			start = false;
+			jumped = -1;
+			if(renderer == null || transform == null || animator == null)
+			{
+				transform = this.GameObj.Transform;
+				renderer = this.GameObj.GetComponent<SpriteRenderer>();
+				animator = this.GameObj.GetComponent<SpriteAnimator>();
+			}
+		}
+
+		private void Event_NumberMessage(object sender, EventNumberMessage e)
+		{
+			if(e.SubChannel == 27 && Core.SelfCharacter == Core.Character.Guard)
+			{
+				if (CameraViewer.IsViewing)
+				{
+					CameraAnimator.ForceCamera = true;
+				}
+				CameraAnimator.DisableCamera = true;
+				jumped = (int)Time.MainTimer.TotalMilliseconds;
+				killer = (Core.Character)e.Message;
+				if (!jumpscare.ContainsKey(killer))
+				{
+					Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 28, (int)killer);
+					if(AfterJump != null)
+					{
+						Scene.SwitchTo(AfterJump);
+					}
+				}
+				else
+				{
+					CameraView view = jumpscare[killer];
+					renderer.SharedMaterial = view.Material;
+					if(view.Extra > -1)
+					{
+						Direction = view.Extra;
+					}
+					else
+					{
+						Direction = 0;
+					}
+					animator.AnimLoopMode = view.AnimLoopMode;
+					animator.AnimDuration = view.AnimDuration;
+					animator.AnimTime = 0;
+					animator.Paused = false;
+				}
+			}
+			if(e.SubChannel == 28 && Core.SelfCharacter != Core.Character.Guard)
+			{
+				finished = true;
+				if (AfterJump != null)
+				{
+					Scene.SwitchTo(AfterJump);
+				}
+			}
+		}
+
+		public void OnDeactivate()
+		{
+			if (Core.Client != null)
+			{
+				Core.Client.Event.NumberMessage -= Event_NumberMessage;
+			}
+		}
+
+		public void OnUpdate()
+		{
+			if (!start)
+			{
+				start = true;
+				if (jumpscare != null)
+				{
+					foreach (Core.Character c in jumpscare.Keys)
+					{
+						CameraView view = jumpscare[c];
+						if (view.Material != null)
+						{
+							view.Material.EnsureLoaded();
+						}
+					}
+				}
+			}
+			if(Core.SelfCharacter != Core.Character.Guard)
+			{
+				int time = (int)Math.Round((MovementControl.NextMove - Time.MainTimer.TotalMilliseconds) / 1000);
+				if(time <= 0 && CameraViewer.ViewNumber == 22 && !Jumpscared)
+				{
+					jumped = (int)Time.MainTimer.TotalMilliseconds;
+					Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 27, (int)Core.SelfCharacter);
+				}
+			}
+			else
+			{
+				if (Jumpscared && !finished)
+				{
+					if (jumpscaretime.ContainsKey(killer))
+					{
+						int time = jumpscaretime[killer];
+						if(jumped+(time*1000) > Time.MainTimer.TotalMilliseconds)
+						{
+							return;
+						}
+					}
+					else
+					{
+						if(animator.IsAnimationRunning && animator.AnimLoopMode != SpriteAnimator.LoopMode.Loop)
+						{
+							return;
+						}
+					}
+					finished = true;
+					Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 28, (int)killer);
+					if (AfterJump != null)
+					{
+						Scene.SwitchTo(AfterJump);
+					}
+				}
+			}
+		}
+	}
+
+	public class FreddyMusicbox : Component, ICmpInitializable, ICmpUpdatable
+	{
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Sound> MusicBox { get; set; }
+		private SoundEmitter.Source source { get; set; }
+
+		public void OnActivate()
+		{
+			
+		}
+
+		public void OnDeactivate()
+		{
+			
+		}
+
+		public void OnUpdate()
+		{
+			if (MusicBox == null)
+				return;
+			if (GameController.Power > 0)
+			{
+				if (Positions.GetPosition(Core.Character.Freddy) == -1)
+					return;
+				if (Positions.GetPosition(Core.Character.Freddy) == 9)
+				{
+					if (!DisplayController.SM.IsPlaying(source))
+					{
+						source = DisplayController.SM.PlaySound(MusicBox);
+					}
+				}
+				else
+				{
+					if (DisplayController.SM.IsPlaying(source))
+					{
+						DisplayController.SM.StopSound(source);
+					}
+					source = null;
+				}
+				if(source != null && Core.SelfCharacter == Core.Character.Guard)
+				{
+					if (CameraViewer.IsViewing)
+					{
+						if (CameraViewer.ViewNumber == 9)
+							source.Volume = 1.0f;
+						else
+							source.Volume = 0.5f;
+					}
+					else
+					{
+						source.Volume = 0.3f;
+					}
+				}
+			}
 		}
 	}
 
@@ -1808,22 +2266,27 @@ namespace FNaFMP.Office
 		}
 	}
 
-	internal class GuardStatus
-    {
+	public class GuardStatus
+	{
 		public byte Light { get; set; }
 		public bool LeftDoorClosed { get; set; }
 		public bool RightDoorClosed { get; set; }
 		public bool IsViewing { get; set; }
 		public byte Position { get; set; }
-    }
+		public bool Active { get; set; }
+	}
 
-	internal class GameController : ICmpInitializable, ICmpUpdatable
+	public class GameController : Component, ICmpInitializable, ICmpUpdatable
 	{
-		public ContentRef<Scene> SixAM { get; set; }
+		
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Scene> Menu { get; set; }
+
 		private static int usage = 1;
 		private static int power = 999;
 		private Timer GameTimer;
 		private Timer PowerTimer;
+		private Timer RobotTimer;
 		private static int time = 12;
 		private static bool finished = false;
 		public static bool IsFinished
@@ -1835,13 +2298,17 @@ namespace FNaFMP.Office
 			get { return time; }
 		}
 		public static int PowerUsage
-        {
-            get { return usage; }
-        }
-		public static GuardStatus Guard = new GuardStatus();
+		{
+			get { return usage; }
+		}
+		public static int Power
+		{
+			get { return power; }
+		}
+		public static GuardStatus Guard { get; private set; }
 
 		public static void SendStatus()
-        {
+		{
 			List<byte> msg = new List<byte>();
 			if (!CameraViewer.IsViewing)
 				msg.Add((byte)DoorController.LightDirection);
@@ -1851,38 +2318,86 @@ namespace FNaFMP.Office
 			msg.Add((byte)(DoorController.RightDoor.IsOpen() ? 0 : 1));
 			msg.Add((byte)(!CameraViewer.IsViewing ? 0 : 1));
 			msg.Add((byte)CameraViewer.ViewNumber);
-			Guard.Light = (byte)DoorController.LightDirection;
-			Guard.LeftDoorClosed = !DoorController.LeftDoor.IsOpen();
-			Guard.RightDoorClosed = !DoorController.RightDoor.IsOpen();
-			Guard.IsViewing = CameraViewer.IsViewing;
+			if(Guard.Light != (byte)DoorController.LightDirection)
+			{
+				byte last = Guard.Light;
+				Guard.Light = (byte)DoorController.LightDirection;
+				switch (Guard.Light)
+				{
+					case 0:
+						usage--;
+						break;
+					case 1:
+					case 2:
+						if(last == 0)
+							usage++;
+						break;
+				}
+			}
+			if(Guard.LeftDoorClosed != (!DoorController.LeftDoor.IsOpen()))
+			{
+				Guard.LeftDoorClosed = !DoorController.LeftDoor.IsOpen();
+				if (Guard.LeftDoorClosed)
+				{
+					usage++;
+				}
+				else
+				{
+					usage--;
+				}
+			}
+			if(Guard.RightDoorClosed != (!DoorController.RightDoor.IsOpen()))
+			{
+				Guard.RightDoorClosed = !DoorController.RightDoor.IsOpen();
+				if (Guard.RightDoorClosed)
+				{
+					usage++;
+				}
+				else
+				{
+					usage--;
+				}
+			}
+			if(Guard.IsViewing != CameraViewer.IsViewing)
+			{
+				Guard.IsViewing = CameraViewer.IsViewing;
+				if (Guard.IsViewing)
+				{
+					usage++;
+				}
+				else
+				{
+					usage--;
+				}
+			}
 			Guard.Position = (byte)CameraViewer.ViewNumber;
-			usage = 1;
-			if (DoorController.LightDirection != DoorDirection.None)
-				usage++;
-			if (!DoorController.LeftDoor.IsOpen())
-				usage++;
-			if (!DoorController.RightDoor.IsOpen())
-				usage++;
-			if (CameraViewer.IsViewing)
-				usage++;
+			Positions.SetPosition(Core.Character.Guard, Guard.Position);
+			if (Core.Client == null || !Core.Client.IsConnected)
+				return;
 			Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 24, msg.ToArray());
 		}
 
-        public void OnActivate()
-        {
+		public void OnActivate()
+		{
+			finished = false;
+			power = 999;
+			usage = 1;
+			time = 12;
 			Guard = new GuardStatus();
 			if (Core.Client != null)
 			{
-                Core.Client.Event.BinaryMessage += Event_BinaryMessage;
-                Core.Client.Event.NumberMessage += Event_NumberMessage;
+				Core.Client.Event.BinaryMessage += Event_BinaryMessage;
+				Core.Client.Event.NumberMessage += Event_NumberMessage;
+				Core.Client.Event.Peer += Event_Peer;
+				Core.Client.Event.Disconnect += Event_Disconnect;
 				if (Core.SelfCharacter == Core.Character.Guard)
 				{
 					GameTimer = new Timer(85*1000);
-                    GameTimer.Elapsed += Guard_Timer;
+					GameTimer.Elapsed += Guard_Timer;
 					GameTimer.AutoReset = true;
 					GameTimer.Enabled = true;
 					PowerTimer = new Timer(1000);
-                    PowerTimer.Elapsed += Power_Timer;
+					PowerTimer.Elapsed += Power_Timer;
 					PowerTimer.AutoReset = true;
 					PowerTimer.Enabled = true;
 					List<byte> msg = new List<byte>(new byte[]{
@@ -1897,80 +2412,442 @@ namespace FNaFMP.Office
 					Guard.RightDoorClosed = false;
 					Guard.IsViewing = false;
 					Guard.Position = (byte)CameraViewer.ViewNumber;
-					Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 24, msg.ToArray());
+					Guard.Active = true;
+					if(Core.Client.IsConnected)
+						Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 24, msg.ToArray());
 				}
 				else
 				{
-					if (Core.SelfCharacter == Core.Character.None)
+					if (Core.SelfCharacter == Core.Character.None || !Core.Client.IsConnected)
 						return;
+					RobotTimer = new Timer(2000);
+					RobotTimer.Elapsed += Robot_Timer;
+					RobotTimer.AutoReset = true;
+					RobotTimer.Enabled = true;
 					Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 23, (int)Core.SelfCharacter);
 				}
 			}
-        }
+		}
 
-        private void Power_Timer(object sender, ElapsedEventArgs e)
-        {
+		private bool disconnected = false;
+		private void Event_Disconnect(object sender, EventDisconnect e)
+		{
+			disconnected = true;
+			Core.LeaveReason = "Disconnected from the server";
+			if (Menu != null)
+				Scene.SwitchTo(Menu);
+		}
+
+		private void Robot_Timer(object sender, ElapsedEventArgs e)
+		{
+			if (!Guard.Active)
+			{
+				Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 23, (int)Core.SelfCharacter);
+			}
+			else
+			{
+				RobotTimer.Enabled = false;
+			}
+		}
+
+		private void Event_Peer(object sender, EventPeer e)
+		{
+			if(e.Action == EventPeer.PeerAction.Left)
+			{
+				if (finished)
+					return;
+				Core.Character c = Positions.GetUserCharacter(e.PeerID);
+				if (c == Core.Character.None)
+					return;
+				if(c != Core.Character.Guard)
+				{
+					Positions.SetUser(c, -1);
+					Positions.SetPosition(c, -1);
+					if(Core.Client.joinedChannels[0].Count == 1)
+					{
+						finished = true;
+						Core.LeaveReason = "Game ended due to all players leaving";
+						Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
+						if (Menu != null)
+							Scene.SwitchTo(Menu);
+					}
+				}
+				else
+				{
+					finished = true;
+					Core.LeaveReason = "Game ended due to the night guard leaving";
+					Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
+					if (Menu != null)
+						Scene.SwitchTo(Menu);
+				}
+			}
+		}
+
+		private void Power_Timer(object sender, ElapsedEventArgs e)
+		{
+			if (finished)
+			{
+				PowerTimer.Enabled = false;
+				return;
+			}
 			if(power > 0)
 				power -= usage;
+			else
+			{
+				finished = true;
+				if (!DoorController.LeftDoor.IsOpen())
+					DoorController.LeftDoor.ToggleDoor();
+				if (!DoorController.RightDoor.IsOpen())
+					DoorController.RightDoor.ToggleDoor();
+				DoorController.LightDirection = DoorDirection.None;
+				if (CameraViewer.IsViewing)
+				{
+					CameraAnimator.ForceCamera = true;
+				}
+			}
 			List<byte> msg = new List<byte>();
-			msg.AddRange(BitConverter.GetBytes(power));
+			msg.AddRange(BinaryData.GetData(power));
 			msg.Add((byte)time);
-			Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 26, msg.ToArray());
+			Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 26, msg.ToArray(),true);
 		}
 
 		private void Guard_Timer(object sender, ElapsedEventArgs e)
-        {
-            switch (time)
-            {
+		{
+			switch (time)
+			{
 				case 12:
 					time = 1;
 					break;
 				case 5:
+					finished = true;
 					time++;
 					GameTimer.Enabled = false;
 					break;
 				default:
 					time++;
 					break;
-            }
+			}
 			List<byte> msg = new List<byte>();
-			msg.AddRange(BitConverter.GetBytes(power));
+			msg.AddRange(BinaryData.GetData(power));
 			msg.Add((byte)time);
 			Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 26, msg.ToArray());
 		}
 
-        private void Event_NumberMessage(object sender, EventNumberMessage e)
-        {
-            if(e.SubChannel == 23 && Core.SelfCharacter == Core.Character.Guard)
-            {
-				SendStatus();
+		private void Event_NumberMessage(object sender, EventNumberMessage e)
+		{
+			if(e.SubChannel == 23)
+			{
+				if(Core.SelfCharacter == Core.Character.Guard)
+					SendStatus();
+				else
+				{
+					List<byte> msg = new List<byte>
+							{
+								(byte)Core.SelfCharacter,
+								(byte)CameraViewer.ViewNumber
+							};
+					Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 25, msg.ToArray());
+					Positions.SetUser((Core.Character)e.Message, e.PeerID);
+				}
 			}
-        }
+		}
 
-        private void Event_BinaryMessage(object sender, EventBinaryMessage e)
-        {
-            if(e.SubChannel == 24 && Core.SelfCharacter != Core.Character.Guard)
-            {
+		private void Event_BinaryMessage(object sender, EventBinaryMessage e)
+		{
+			if(e.SubChannel == 24 && Core.SelfCharacter != Core.Character.Guard)
+			{
+				Positions.SetUser(Core.Character.Guard, e.PeerID);
 				BinaryReader reader = new BinaryReader(e.Message);
 				Guard.Light = reader.ReadByte();
 				Guard.LeftDoorClosed = reader.ReadByte() == 1;
 				Guard.RightDoorClosed = reader.ReadByte() == 1;
 				Guard.IsViewing = reader.ReadByte() == 1;
 				Guard.Position = reader.ReadByte();
-            }
-        }
-
-        public void OnDeactivate()
-        {
-            
-        }
-
-        public void OnUpdate()
-        {
-			if(time == 6 && SixAM != null)
-            {
-				Scene.SwitchTo(SixAM);
-            }
+				if (!Guard.Active)
+				{
+					List<byte> msg = new List<byte>
+							{
+								(byte)Core.SelfCharacter,
+								(byte)CameraViewer.ViewNumber
+							};
+					Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 25, msg.ToArray());
+				}
+				Guard.Active = true;
+			}
+			if(e.SubChannel == 26 && Core.SelfCharacter != Core.Character.Guard)
+			{
+				BinaryReader reader = new BinaryReader(e.Message);
+				power = reader.ReadInt();
+				time = reader.ReadByte();
+				if(power <= 0)
+				{
+					finished = true;
+					Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
+					if (Menu != null)
+						Scene.SwitchTo(Menu);
+				}
+				if(time == 6)
+				{
+					finished = true;
+				}
+			}
 		}
-    }
+
+		public void OnDeactivate()
+		{
+			if (GameTimer != null)
+				GameTimer.Close();
+
+			if (PowerTimer != null)
+				PowerTimer.Close();
+
+			if (RobotTimer != null)
+				RobotTimer.Close();
+
+			if (Core.Client != null)
+			{
+				Core.Client.Event.BinaryMessage -= Event_BinaryMessage;
+				Core.Client.Event.NumberMessage -= Event_NumberMessage;
+				Core.Client.Event.Peer -= Event_Peer;
+				Core.Client.Event.Disconnect -= Event_Disconnect;
+			}
+			if (disconnected)
+			{
+				Core.Reset();
+				disconnected = false;
+			}
+		}
+
+		public void OnUpdate()
+		{
+			if (Core.SelfCharacter == Core.Character.Guard)
+			{
+				if (DualityApp.Keyboard.KeyPressed(Duality.Input.Key.C) && DualityApp.Keyboard.KeyPressed(Duality.Input.Key.T))
+				{
+					if (DualityApp.Keyboard.KeyHit(Duality.Input.Key.Number1))
+					{
+						if (time == 5)
+							return;
+						GameTimer.Stop();
+						GameTimer.Start();
+						if (time == 12)
+							time = 1;
+						else
+							time++;
+					}
+					if (DualityApp.Keyboard.KeyHit(Duality.Input.Key.Number2))
+					{
+						if (time == 12)
+							return;
+						GameTimer.Stop();
+						GameTimer.Start();
+						if (time == 1)
+							time = 12;
+						else
+							time--;
+					}
+					if (DualityApp.Keyboard.KeyHit(Duality.Input.Key.N))
+					{
+						GameTimer.Stop();
+						GameTimer.Interval = 1000;
+						GameTimer.Start();
+					}
+				}
+			}
+			if (SixAM.Finished)
+			{
+				Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
+				if (Menu != null)
+					Scene.SwitchTo(Menu);
+			}
+		}
+	}
+
+	internal class GameObjectData
+	{
+		public GameObject GameObj { get; private set; }
+		public SpriteRenderer Renderer { get; private set; }
+		public GameObjectData(GameObject gameobj)
+		{
+			GameObj = gameobj;
+			if(GameObj == null)
+				throw new ArgumentNullException("GameObj");
+			Renderer = GameObj.GetComponent<SpriteRenderer>();
+		}
+	}
+
+	public class SixAM : Component, ICmpInitializable, ICmpUpdatable
+	{
+		public static bool Visible { get; private set; }
+		public static bool Finished { get; private set; }
+		public static bool Started { get { return begin; } }
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Sound> SixAMSound { get; set; }
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Sound> ChildrenSound { get; set; }
+
+		private GameObjectData BG = null;
+		private GameObjectData NumFive = null;
+		private GameObjectData NumSix = null;
+		private GameObjectData BlackUp = null;
+		private GameObjectData BlackDown = null;
+		private GameObjectData AM = null;
+		private int alpha = 0;
+		private int next = 0;
+		private static bool begin = false;
+
+		private void DataCheck()
+		{
+			if (BG == null)
+			{
+				try
+				{
+					BG = new GameObjectData(GameObj.GetChildByName("BG"));
+					BG.Renderer.ColorTint = BG.Renderer.ColorTint.WithAlpha(0);
+				}
+				catch (Exception) { }
+			}
+			if (NumFive == null)
+			{
+				try
+				{
+					NumFive = new GameObjectData(GameObj.GetChildByName("5"));
+					NumFive.Renderer.ColorTint = NumFive.Renderer.ColorTint.WithAlpha(0);
+				}
+				catch (Exception) { }
+			}
+			if (NumSix == null)
+			{
+				try
+				{
+					NumSix = new GameObjectData(GameObj.GetChildByName("6"));
+					NumSix.Renderer.ColorTint = NumSix.Renderer.ColorTint.WithAlpha(0);
+				}
+				catch (Exception) { }
+			}
+			if (BlackUp == null)
+			{
+				try
+				{
+					BlackUp = new GameObjectData(GameObj.GetChildByName("BlackUp"));
+					BlackUp.Renderer.ColorTint = BlackUp.Renderer.ColorTint.WithAlpha(0);
+				}
+				catch (Exception) { }
+			}
+			if (BlackDown == null)
+			{
+				try
+				{
+					BlackDown = new GameObjectData(GameObj.GetChildByName("BlackDown"));
+					BlackDown.Renderer.ColorTint = BlackDown.Renderer.ColorTint.WithAlpha(0);
+				}
+				catch (Exception) { }
+			}
+			if (AM == null)
+			{
+				try
+				{
+					AM = new GameObjectData(GameObj.GetChildByName("AM"));
+					AM.Renderer.ColorTint = AM.Renderer.ColorTint.WithAlpha(0);
+				}
+				catch (Exception) { }
+			}
+		}
+
+		public void OnActivate()
+		{
+			DataCheck();
+			Visible = false;
+			Finished = false;
+			begin = false;
+			alpha = 0;
+			next = 0;
+		}
+
+		public void OnDeactivate()
+		{
+			BG = null;
+			NumFive = null;
+			NumSix = null;
+			BlackUp = null;
+			BlackDown = null;
+		}
+
+		public void OnUpdate()
+		{
+			DataCheck();
+			if(GameController.GameTime == 6)
+			{
+				if (Finished)
+					return;
+				if(AM.Renderer.ColorTint.A < 255)
+				{
+					if (!begin)
+					{
+						DisplayController.SM.StopAllSounds();
+						begin = true;
+						if(SixAMSound != null)
+						{
+							DisplayController.SM.PlaySound(SixAMSound);
+						}
+						CameraAnimator.DisableCamera = true;
+					}
+					if (next == 0)
+					{
+						alpha+=2;
+						if (alpha > 255)
+							alpha = 255;
+						BG.Renderer.ColorTint = BG.Renderer.ColorTint.WithAlpha((byte)alpha);
+						NumFive.Renderer.ColorTint = NumFive.Renderer.ColorTint.WithAlpha((byte)alpha);
+						AM.Renderer.ColorTint = AM.Renderer.ColorTint.WithAlpha((byte)alpha);
+					}
+					else
+					{
+						alpha--;
+						if (alpha < 0)
+							alpha = 0;
+						NumSix.Renderer.ColorTint = NumSix.Renderer.ColorTint.WithAlpha((byte)alpha);
+						AM.Renderer.ColorTint = AM.Renderer.ColorTint.WithAlpha((byte)alpha);
+						Finished = alpha == 0;
+					}
+				}
+				else
+				{
+					Visible = true;
+					NumSix.Renderer.ColorTint = NumSix.Renderer.ColorTint.WithAlpha(255);
+					BlackUp.Renderer.ColorTint = BlackUp.Renderer.ColorTint.WithAlpha(255);
+					BlackDown.Renderer.ColorTint = BlackDown.Renderer.ColorTint.WithAlpha(255);
+					if (NumFive.GameObj.Transform.Pos.Y > -110)
+					{
+						Vector3 pos = NumFive.GameObj.Transform.Pos;
+						pos.Y--;
+						NumFive.GameObj.Transform.MoveTo(pos);
+						NumSix.GameObj.Transform.MoveTo(pos);
+					}
+					else
+					{
+						if (next < 600)
+						{
+							if (ChildrenSound != null)
+								DisplayController.SM.PlaySound(ChildrenSound);
+							NumFive.Renderer.ColorTint = NumFive.Renderer.ColorTint.WithAlpha(0);
+							BlackUp.Renderer.ColorTint = BlackUp.Renderer.ColorTint.WithAlpha(0);
+							BlackDown.Renderer.ColorTint = BlackDown.Renderer.ColorTint.WithAlpha(0);
+							while (next < 600)
+							{
+								next++;
+							}
+						}
+						else
+						{
+							alpha--;
+							NumSix.Renderer.ColorTint = NumSix.Renderer.ColorTint.WithAlpha((byte)alpha);
+							AM.Renderer.ColorTint = AM.Renderer.ColorTint.WithAlpha((byte)alpha);
+						}
+					}
+				}
+			}
+		}
+	}
 }

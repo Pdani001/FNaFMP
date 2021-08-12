@@ -67,6 +67,7 @@
             <active dataType="Bool">true</active>
             <countdown dataType="Int">-1</countdown>
             <gameobj dataType="ObjectRef">2624407573</gameobj>
+            <leaveing dataType="Bool">false</leaveing>
             <nextcount dataType="Int">-1</nextcount>
             <Players dataType="Struct" type="System.Collections.Generic.List`1[[System.Int32]]" id="3090428434">
               <_items dataType="Array" type="System.Int32[]" id="1547880016"></_items>
@@ -1156,6 +1157,77 @@
       </identifier>
       <initState dataType="Enum" type="Duality.InitState" name="Initialized" value="1" />
       <name dataType="String">msgbox</name>
+      <parent />
+      <prefabLink />
+    </item>
+    <item dataType="Struct" type="Duality.GameObject" id="1903651373">
+      <active dataType="Bool">true</active>
+      <children />
+      <compList dataType="Struct" type="System.Collections.Generic.List`1[[Duality.Component]]" id="2338922271">
+        <_items dataType="Array" type="Duality.Component[]" id="2749388654">
+          <item dataType="Struct" type="Duality.Components.Transform" id="1960928591">
+            <active dataType="Bool">true</active>
+            <angle dataType="Float">0</angle>
+            <angleAbs dataType="Float">0</angleAbs>
+            <gameobj dataType="ObjectRef">1903651373</gameobj>
+            <ignoreParent dataType="Bool">false</ignoreParent>
+            <pos dataType="Struct" type="Duality.Vector3" />
+            <posAbs dataType="Struct" type="Duality.Vector3" />
+            <scale dataType="Float">1</scale>
+            <scaleAbs dataType="Float">1</scaleAbs>
+          </item>
+          <item dataType="Struct" type="Duality.Components.VelocityTracker" id="3974785840">
+            <active dataType="Bool">true</active>
+            <gameobj dataType="ObjectRef">1903651373</gameobj>
+          </item>
+          <item dataType="Struct" type="Duality.Components.SoundEmitter" id="4124463256">
+            <active dataType="Bool">true</active>
+            <gameobj dataType="ObjectRef">1903651373</gameobj>
+            <sources dataType="Struct" type="System.Collections.Generic.List`1[[Duality.Components.SoundEmitter+Source]]" id="3427744196">
+              <_items dataType="Array" type="Duality.Components.SoundEmitter+Source[]" id="1326881092" length="0" />
+              <_size dataType="Int">0</_size>
+            </sources>
+          </item>
+          <item dataType="Struct" type="FNaFMP.Utility.SoundManager" id="3400831269">
+            <active dataType="Bool">true</active>
+            <emitter dataType="ObjectRef">4124463256</emitter>
+            <gameobj dataType="ObjectRef">1903651373</gameobj>
+            <list dataType="ObjectRef">3427744196</list>
+            <nonloop dataType="Struct" type="System.Collections.Generic.List`1[[Duality.Components.SoundEmitter+Source]]" id="3916387205">
+              <_items dataType="ObjectRef">1326881092</_items>
+              <_size dataType="Int">0</_size>
+            </nonloop>
+            <transform dataType="ObjectRef">1960928591</transform>
+          </item>
+        </_items>
+        <_size dataType="Int">4</_size>
+      </compList>
+      <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="3668789792" surrogate="true">
+        <header />
+        <body>
+          <keys dataType="Array" type="System.Object[]" id="2992597653">
+            <item dataType="ObjectRef">522836518</item>
+            <item dataType="Type" id="712393846" value="Duality.Components.VelocityTracker" />
+            <item dataType="Type" id="1062334746" value="Duality.Components.SoundEmitter" />
+            <item dataType="Type" id="605175702" value="FNaFMP.Utility.SoundManager" />
+          </keys>
+          <values dataType="Array" type="System.Object[]" id="1107928776">
+            <item dataType="ObjectRef">1960928591</item>
+            <item dataType="ObjectRef">3974785840</item>
+            <item dataType="ObjectRef">4124463256</item>
+            <item dataType="ObjectRef">3400831269</item>
+          </values>
+        </body>
+      </compMap>
+      <compTransform dataType="ObjectRef">1960928591</compTransform>
+      <identifier dataType="Struct" type="System.Guid" surrogate="true">
+        <header>
+          <data dataType="Array" type="System.Byte[]" id="1526456735">ann4hzLOjESpoci/z/ZT5g==</data>
+        </header>
+        <body />
+      </identifier>
+      <initState dataType="Enum" type="Duality.InitState" name="Initialized" value="1" />
+      <name dataType="String">Sound</name>
       <parent />
       <prefabLink />
     </item>

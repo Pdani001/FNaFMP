@@ -13,9 +13,9 @@ namespace FNaFMP.Utility
 {
 	
 	public class Randomizer
-    {
+	{
 		public static int Random(int val)
-        {
+		{
 			return new Random().Next(0, val+1);
 		}
 		public static int Random(int min, int max)
@@ -26,7 +26,7 @@ namespace FNaFMP.Utility
 		}
 	}
 	public class Utilities
-    {
+	{
 		private static readonly DualityLogger logger = new DualityLogger("FNaF MP");
 		public static DualityLogger Logger
 		{
@@ -34,23 +34,23 @@ namespace FNaFMP.Utility
 		}
 	}
 	public class DualityLogger
-    {
+	{
 		public DualityLogger(string prefix)
-        {
+		{
 			this.prefix = "[{1}] [" + prefix + "/{0}]";
 		}
 		private readonly string prefix = "[{1}] [Dualitor/{0}]";
 		public void Write(string msg, params object[] obj)
-        {
+		{
 			Write(LogLevel.INFO, msg, obj);
-        }
+		}
 		public void Write(LogLevel level, string msg, params object[] obj)
-        {
+		{
 			
 			string time = DateTime.Now.ToString("HH:mm:ss");
 			string write = string.Format(prefix, level.GetStringValue(), time) + " " + msg;
 			switch (level)
-            {
+			{
 				case LogLevel.INFO:
 					Logs.Game.Write(write,obj);
 					break;
@@ -60,10 +60,10 @@ namespace FNaFMP.Utility
 				case LogLevel.ERROR:
 					Logs.Game.WriteError(write, obj);
 					break;
-            }
+			}
 		}
 		public enum LogLevel
-        {
+		{
 			[StringValue("INFO")]
 			INFO,
 			[StringValue("WARN")]
@@ -71,65 +71,68 @@ namespace FNaFMP.Utility
 			[StringValue("ERR")]
 			ERROR
 		}
-    }
+	}
 	[RequiredComponent(typeof(SoundEmitter))]
-	public class SoundManager : Component, ICmpUpdatable
-    {
-		private static SoundEmitter emitter = null;
+	public class SoundManager : Component, ICmpUpdatable, ICmpInitializable
+	{
+		private SoundEmitter emitter = null;
 		private Transform transform = null;
-		private static List<SoundEmitter.Source> list = null;
-		private static readonly List<SoundEmitter.Source> nonloop = new List<SoundEmitter.Source>();
-		public static bool IsPlaying(SoundEmitter.Source sound)
-        {
-			foreach(SoundEmitter.Source src in emitter.Sources)
-            {
-				if (src.Sound.Name.Equals(sound.Sound.Name))
-					return true;
-            }
+		private List<SoundEmitter.Source> list = null;
+		private readonly List<SoundEmitter.Source> nonloop = new List<SoundEmitter.Source>();
+		public bool IsPlaying(SoundEmitter.Source sound)
+		{
+			if (sound != null)
+			{
+				foreach (SoundEmitter.Source src in emitter.Sources)
+				{
+					if (src.Sound.Name.Equals(sound.Sound.Name))
+						return true;
+				}
+			}
 			return false;
-        }
-		public static SoundEmitter.Source PlaySound(ContentRef<Sound> sound, bool loop = false)
-        {
+		}
+		public SoundEmitter.Source PlaySound(ContentRef<Sound> sound, bool loop = false)
+		{
 			if (sound == null)
 				return null;
 			var source = new SoundEmitter.Source(sound, loop);
 			emitter.Sources.Add(source);
 			return source;
-        }
-		public static void StopSound(SoundEmitter.Source sound)
-        {
+		}
+		public void StopSound(SoundEmitter.Source sound)
+		{
 			if (sound == null)
 				return;
-			emitter.Sources.Remove(sound);
 			sound.Volume = 0;
+			emitter.Sources.Remove(sound);
 		}
 
-		public static void StopAllSounds()
-        {
+		public void StopAllSounds()
+		{
 			if (emitter == null)
 				return;
 			List<SoundEmitter.Source> clone = new List<SoundEmitter.Source>(emitter.Sources);
 			foreach(SoundEmitter.Source source in clone)
-            {
+			{
 				StopSound(source);
-            }
-        }
+			}
+		}
 
-		public static bool ToggleSound(String name, bool value)
-        {
+		public bool ToggleSound(String name, bool value)
+		{
 			if (list != null)
 			foreach (var item in emitter.Sources)
 			{
 				ContentRef<Sound> sound = item.Sound;
-                if (sound.Name.Equals(name))
-                {
-                    if (!item.Looped && !nonloop.Contains(item))
+				if (sound.Name.Equals(name))
+				{
+					if (!item.Looped && !nonloop.Contains(item))
 					{
 						nonloop.Add(item);
 					}
 					item.Paused = !value;
 					return true;
-                }
+				}
 			}
 			foreach (var item in nonloop)
 			{
@@ -142,8 +145,8 @@ namespace FNaFMP.Utility
 			}
 			return false;
 		}
-		public static bool ChangeVolume(String name, int value)
-        {
+		public bool ChangeVolume(String name, int value)
+		{
 			if (value > 200)
 				value = 200;
 			if (value < 0)
@@ -160,32 +163,32 @@ namespace FNaFMP.Utility
 			}
 			return false;
 		}
-		public static event EventHandler OnLoad;
+		public static event EventHandler<SoundManager> OnLoad;
 		public void OnUpdate()
-        {
-			if (transform == null)
+		{
+			if (transform != null)
 			{
-				transform = this.GameObj.GetComponent<Transform>();
-				emitter = null;
-				list = null;
+				if (GameObj.Scene.Name.Equals("Office"))
+					transform.Pos = DisplayController.Camera.FocusPos;
 			}
-			if (emitter == null)
-			{
-				emitter = this.GameObj.GetComponent<SoundEmitter>();
-				list = null;
-			}
-			if (list == null && emitter != null)
+		}
+
+		public void OnActivate()
+		{
+			list = null;
+			transform = this.GameObj.GetComponent<Transform>();
+			emitter = this.GameObj.GetComponent<SoundEmitter>();
+			if (emitter != null)
 			{
 				list = emitter.Sources;
-				OnLoad?.Invoke(this, null);
+				OnLoad?.Invoke(this, this);
 			}
-			if (transform != null)
-            {
-				if(GameObj.Scene.Name.Equals("Office"))
-				transform.Pos = DisplayController.Camera.FocusPos;
-            }
 		}
-    }
+
+		public void OnDeactivate()
+		{
+		}
+	}
 
 	public class HudRenderer : Component, ICmpRenderer, ICmpInitializable
 	{
@@ -217,6 +220,11 @@ namespace FNaFMP.Utility
 			}
 			if (IsDebug)
 			{
+				if (this.GameObj.Scene.Name.Equals("Office"))
+				{
+					if (SixAM.Started || JumpscareManager.Jumpscared)
+						return;
+				}
 				this.canvas.Begin(device);
 
 				canvas.State.SetMaterial(DrawTechnique.Mask);
@@ -224,31 +232,56 @@ namespace FNaFMP.Utility
 				canvas.State.TextFont = this.font;
 
 				string cursorText = string.Format("{0}, {1}", (int)DualityApp.Mouse.Pos.X, (int)DualityApp.Mouse.Pos.Y);
+				string cursorBottomText = string.Format("{0}, {1}", DualityApp.WindowSize.X, DualityApp.WindowSize.Y);
 
-				float x = DualityApp.Mouse.Pos.X - (canvas.MeasureText(cursorText).X/2);
-				float end_x = DualityApp.Mouse.Pos.X + (canvas.MeasureText(cursorText).X/2);
-				float y = DualityApp.Mouse.Pos.Y - 20;
+				float top_x = DualityApp.Mouse.Pos.X - (canvas.MeasureText(cursorText).X/2);
+				float top_end_x = DualityApp.Mouse.Pos.X + (canvas.MeasureText(cursorText).X/2);
+				float top_y = DualityApp.Mouse.Pos.Y - 20;
 
-				if(x < 0)
-                {
-					x = 0;
-                }
-				if(end_x > DualityApp.WindowSize.X)
-                {
-					x = DualityApp.WindowSize.X - (cursorText.Length * 8);
+				float bot_x = DualityApp.Mouse.Pos.X - (canvas.MeasureText(cursorBottomText).X / 2);
+				float bot_end_x = DualityApp.Mouse.Pos.X + (canvas.MeasureText(cursorBottomText).X / 2);
+				float bot_y = DualityApp.Mouse.Pos.Y + 20;
+
+				if (top_x < 0)
+				{
+					top_x = 0;
 				}
-				if(y < 0)
-                {
-					y = 0;
-                }
-				canvas.DrawText(cursorText, x, y);
+				if(top_end_x > DualityApp.WindowSize.X)
+				{
+					top_x = DualityApp.WindowSize.X - (cursorText.Length * 8);
+				}
+				if(top_y < 0)
+				{
+					top_y = 0;
+				}
+				if(top_y > DualityApp.WindowSize.Y - 40)
+				{
+					top_y = DualityApp.WindowSize.Y - canvas.MeasureText(cursorText).Y - 20;
+				}
+
+				if (bot_x < 0)
+				{
+					bot_x = 0;
+				}
+				if (bot_end_x > DualityApp.WindowSize.X)
+				{
+					bot_x = DualityApp.WindowSize.X - (cursorBottomText.Length * 8);
+				}
+				if(bot_y > DualityApp.WindowSize.Y - 20)
+				{
+					bot_y = DualityApp.WindowSize.Y - canvas.MeasureText(cursorBottomText).Y;
+				}
+				canvas.DrawText(cursorText, top_x, top_y);
+				canvas.DrawText(cursorBottomText, bot_x, bot_y);
 				canvas.DrawText("FPS: " + Time.Fps, 0, 0);
 				canvas.DrawText("Client: " + (Core.Client != null && Core.Client.IsConnected ? "connected" : "not connected"), 0, 32);
 
-                if (this.GameObj.Scene.Name.Equals("Office"))
-                {
-                    if (!CameraViewer.IsViewing)
-                    {
+				if (this.GameObj.Scene.Name.Equals("Office"))
+				{
+					if (SixAM.Started || JumpscareManager.Jumpscared)
+						return;
+					if (!CameraViewer.IsViewing)
+					{
 						float subX = DisplayController.Camera.FocusPos.X - DisplayController.DefaultCamX;
 						if (DoorController.LeftDoor != null)
 						{
@@ -290,25 +323,27 @@ namespace FNaFMP.Utility
 						}
 					}
 					else
-                    {
+					{
 						canvas.DrawText("2A dark: "+(CameraRenderer.IsRandom ? "yes":"no"), 0,50);
+						if(Core.SelfCharacter != Core.Character.Guard)
+							canvas.DrawRect(AttackButton.box.X, AttackButton.box.Y, AttackButton.box.W, AttackButton.box.H);
 					}
-                }
+				}
 
 				this.canvas.End();
 			}
 		}
 
-        public void OnActivate()
-        {
+		public void OnActivate()
+		{
 			isDebug = Core.DEBUG;
-        }
+		}
 
-        public void OnDeactivate()
-        {
-            
-        }
-    }
+		public void OnDeactivate()
+		{
+			
+		}
+	}
 	public class GlobalStatic : Component, ICmpUpdatable
 	{
 		private static int opacity = 0;
@@ -340,10 +375,10 @@ namespace FNaFMP.Utility
 		}
 	}
 
-    #region Enum helper
+	#region Enum helper
 
-    #region StringValue
-    public class StringValueAttribute : Attribute
+	#region StringValue
+	public class StringValueAttribute : Attribute
 	{
 
 		#region Properties
@@ -395,10 +430,10 @@ namespace FNaFMP.Utility
 			return attribs.Length > 0 ? attribs[0].StringValue : null;
 		}
 	}
-    #endregion
+	#endregion
 
-    #region StringListValue
-    public class StringListValueAttribute : Attribute
+	#region StringListValue
+	public class StringListValueAttribute : Attribute
 	{
 
 		#region Properties
@@ -456,7 +491,7 @@ namespace FNaFMP.Utility
 			return list[pos];
 		}
 	}
-    #endregion
+	#endregion
 
-    #endregion
+	#endregion
 }
