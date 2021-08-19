@@ -34,7 +34,7 @@ namespace FNaFMP.Startup
 		private bool isKeyDown = false;
 		private void Keyboard_KeyDown(object sender, KeyboardKeyEventArgs e)
 		{
-			isKeyDown = e.IsPressed;
+			isKeyDown = e.IsPressed && e.Key != Key.F2;
 		}
 		public void OnUpdate()
 		{
@@ -191,7 +191,7 @@ namespace FNaFMP.Startup
 			canvas.State.ColorTint = ColorRgba.White;
 			canvas.State.TextFont = this.font;
 
-			Point2 window = DualityApp.WindowSize;
+			Point2 window = Core.MaxWindowSize;
 			if (display != null)
 			{
 				Vector2 size = canvas.MeasureText(display);

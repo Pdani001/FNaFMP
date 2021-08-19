@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Alzaitu.Lacewing.Client.Packet.Response
@@ -16,21 +17,21 @@ namespace Alzaitu.Lacewing.Client.Packet.Response
 		{
 			byte length = bytes[pos++];
 			size--;
-			byte[] data = new byte[length];
-			for(int i = 0; i < data.Length; i++)
+			List<byte> data = new List<byte>();
+			for(int i = 0; i < length; i++)
 			{
-				data[i] = bytes[pos++];
+				data.Add(bytes[pos++]);
 			}
-			Name = Encoding.UTF8.GetString(data);
+			Name = Encoding.UTF8.GetString(data.ToArray());
 			size -= length;
 			if (!Success)
 			{
-				data = new byte[size];
-				for (int i = 0; i < data.Length; i++)
+				data = new List<byte>();
+				while(bytes.Length > pos)
 				{
-					data[i] = bytes[pos++];
+					data.Add(bytes[pos++]);
 				}
-				DenyReason = Encoding.UTF8.GetString(data);
+				DenyReason = Encoding.UTF8.GetString(data.ToArray());
 			}
 		}
 	}

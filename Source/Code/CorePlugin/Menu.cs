@@ -229,7 +229,7 @@ namespace FNaFMP.Menu
 			canvas.State.ColorTint = ColorRgba.White;
 			canvas.State.TextFont = font;
 
-			Point2 window = DualityApp.WindowSize;
+			Point2 window = Core.MaxWindowSize;
 			string display = string.Format("v{0}, Build {1}", Core.VERSION, DualityApp.AppData.Version);
 			Vector2 size = canvas.MeasureText(display);
 			canvas.DrawText(display, window.X - size.X - 5, window.Y - size.Y);
@@ -271,7 +271,6 @@ namespace FNaFMP.Menu
 			canvas.State.ColorTint = ColorRgba.White;
 			canvas.State.TextFont = Font;
 
-			Point2 window = DualityApp.WindowSize;
 			Vector2 size = canvas.MeasureText(Status);
 			int height = 16;
 			if (Font != null)
@@ -442,7 +441,7 @@ namespace FNaFMP.Menu
 			canvas.State.ColorTint = !SplashText.IsLast ? ColorRgba.White : new ColorRgba(181, 0, 0);
 			canvas.State.TextFont = this.font;
 
-			Point2 window = DualityApp.WindowSize;
+			Point2 window = Core.MaxWindowSize;
 			if(ChannelList != null)
 			{
 				int row = 0;
@@ -584,6 +583,7 @@ namespace FNaFMP.Menu
 		{
 			if(args.DenyReason != null)
 			{
+				Utilities.Logger.Write("Name set failed: "+args.DenyReason);
 				LobbyStatusText.Status = "Name set failed: "+args.DenyReason;
 				Event = "SetName";
 				DenyReason = args.DenyReason;
@@ -608,6 +608,12 @@ namespace FNaFMP.Menu
 		{
 			if (!join)
 				return;
+			if (Core.Client.IsMaster)
+			{
+				LobbyStatusText.Status = "Lobby no longer exists";
+				Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
+				return;
+			}
 			LobbyStatusText.Status = "Authenticating with lobby master...";
 			Utilities.Logger.Write("Joined channel '{0}', starting authentication", args.Channel);
 			SendVersion();
@@ -679,6 +685,7 @@ namespace FNaFMP.Menu
 		}
 		public void OnActivate()
 		{
+			Core.Difficulty = Core.GameDifficulty.VeryEasy;
 			join = false;
 			ChannelList = null;
 			ListRects = null;
@@ -737,6 +744,8 @@ namespace FNaFMP.Menu
 		{
 			if(e.Error.ToLower().StartsWith("failed to connect"))
 			{
+				Logs.Game.WriteWarning("Failed to connect to server: {0}", e.Error);
+				Logs.Game.WriteWarning("Current host: {0}", Core.Config.Settings.Server);
 				LobbyStatusText.Status = "Failed to connect to server";
 				if (Core.Hosts == null)
 					return;
@@ -1112,6 +1121,158 @@ namespace FNaFMP.Menu
 							Core.Client.JoinChannel(code, true, false);
 						}
 					}
+				}
+			}
+		}
+	}
+
+	[RequiredComponent(typeof(SpriteAnimator)),RequiredComponent(typeof(SpriteRenderer))]
+	public class GameOverBlip : Component, ICmpInitializable, ICmpUpdatable
+	{
+		[DontSerialize] private SpriteRenderer renderer = null;
+		[DontSerialize] private SpriteAnimator animator = null;
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Sound> BlipSound { get; set; }
+		public void OnActivate()
+		{
+			renderer = GameObj.GetComponent<SpriteRenderer>();
+			animator = GameObj.GetComponent<SpriteAnimator>();
+			SoundManager.OnLoad += SoundManager_OnLoad;
+			renderer.SpriteIndex = 0;
+			renderer.ColorTint = renderer.ColorTint.WithAlpha(255);
+			animator.Paused = false;
+
+		}
+
+		private void SoundManager_OnLoad(object sender, SoundManager e)
+		{
+			e.StopAllSounds();
+			e.PlaySound(BlipSound);
+			SoundManager.OnLoad -= SoundManager_OnLoad;
+		}
+
+		public void OnDeactivate()
+		{
+			renderer = null;
+			animator = null;
+		}
+		public void OnUpdate()
+		{
+			if (!animator.IsAnimationRunning)
+			{
+				renderer.ColorTint = renderer.ColorTint.WithAlpha(0);
+			}
+		}
+	}
+	
+	[RequiredComponent(typeof(SpriteAnimator)),RequiredComponent(typeof(SpriteRenderer))]
+	public class JumpscareFreddy : Component, ICmpInitializable, ICmpUpdatable
+	{
+		[DontSerialize] private SpriteRenderer renderer = null;
+		[DontSerialize] private SpriteAnimator animator = null;
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Scene> DiedScreen { get; set; }
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Sound> KillSound { get; set; }
+
+		public void OnActivate()
+		{
+			SoundManager.OnLoad += SoundManager_OnLoad;
+			renderer = GameObj.GetComponent<SpriteRenderer>();
+			animator = GameObj.GetComponent<SpriteAnimator>();
+			renderer.SpriteIndex = 0;
+			renderer.ColorTint = renderer.ColorTint.WithAlpha(255);
+			animator.Paused = false;
+
+		}
+
+		private void SoundManager_OnLoad(object sender, SoundManager e)
+		{
+			e.StopAllSounds();
+			e.PlaySound(KillSound);
+			SoundManager.OnLoad -= SoundManager_OnLoad;
+		}
+
+		public void OnDeactivate()
+		{
+			renderer = null;
+			animator = null;
+		}
+		public void OnUpdate()
+		{
+			if (!animator.IsAnimationRunning)
+			{
+				if (Core.Client != null && Core.Client.IsConnected)
+					Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 28, (int)Core.Character.Freddy);
+				renderer.ColorTint = renderer.ColorTint.WithAlpha(0);
+				Scene.SwitchTo(DiedScreen);
+			}
+		}
+	}
+
+	[RequiredComponent(typeof(SpriteAnimator)),RequiredComponent(typeof(SpriteRenderer))]
+	public class GameOverScreen : Component, ICmpInitializable, ICmpUpdatable
+	{
+		[DontSerialize] private SpriteRenderer renderer = null;
+		[DontSerialize] private SpriteAnimator animator = null;
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Scene> Lobby { get; set; }
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Sound> StaticSound { get; set; }
+		private SoundEmitter.Source source = null;
+		public void OnActivate()
+		{
+			renderer = GameObj.GetComponent<SpriteRenderer>();
+			animator = GameObj.GetComponent<SpriteAnimator>();
+			source = null;
+			SoundManager.OnLoad += SoundManager_OnLoad;
+			checkin = (int)(Time.MainTimer.TotalMilliseconds + 10000);
+			renderer.ColorTint = renderer.ColorTint.WithAlpha(255);
+			animator.Paused = false;
+			alpha = 255;
+
+		}
+
+		private void SoundManager_OnLoad(object sender, SoundManager e)
+		{
+			if(source == null)
+				source = e.PlaySound(StaticSound);
+			SoundManager.OnLoad -= SoundManager_OnLoad;
+		}
+
+		public void OnDeactivate()
+		{
+			renderer = null;
+			animator = null;
+			if (Core.Client != null)
+			{
+				if(Core.Client.joinedChannels.Count > 0)
+					Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
+			}
+		}
+		private int checkin = 0;
+		private int alpha = 255;
+		public void OnUpdate()
+		{
+			if(checkin <= Time.MainTimer.TotalMilliseconds)
+			{
+				if(renderer.ColorTint.A > 0)
+				{
+					animator.Paused = true;
+					alpha -= 2;
+					if (alpha < 0)
+						alpha = 0;
+					renderer.ColorTint = renderer.ColorTint.WithAlpha((byte)alpha);
+					if(alpha == 0)
+						checkin = (int)(Time.MainTimer.TotalMilliseconds + 10000);
+				}
+				else
+				{
+					if (Lobby != null)
+						Scene.SwitchTo(Lobby);
+					checkin = (int)(Time.MainTimer.TotalMilliseconds + 10000);
 				}
 			}
 		}

@@ -9,8 +9,8 @@
   <windowMode dataType="Enum" type="Duality.ScreenMode" name="FixedWindow" value="1" />
   <windowRefreshMode dataType="Enum" type="Duality.RefreshMode" name="ManualSync" value="1" />
   <windowSize dataType="Struct" type="Duality.Point2">
-    <X dataType="Int">1264</X>
-    <Y dataType="Int">680</Y>
+    <X dataType="Int">1280</X>
+    <Y dataType="Int">720</Y>
   </windowSize>
 </root>
 <!-- XmlFormatterBase Document Separator -->

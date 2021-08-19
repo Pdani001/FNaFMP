@@ -16,7 +16,7 @@ namespace FNaFMP.Utility
 	{
 		public static int Random(int val)
 		{
-			return new Random().Next(0, val+1);
+			return new Random().Next(0, val + 1);
 		}
 		public static int Random(int min, int max)
 		{
@@ -91,6 +91,18 @@ namespace FNaFMP.Utility
 			}
 			return false;
 		}
+		public bool IsPlaying(ContentRef<Sound> sound)
+		{
+			if (sound != null)
+			{
+				foreach (SoundEmitter.Source src in emitter.Sources)
+				{
+					if (src.Sound.Name.Equals(sound.Name))
+						return true;
+				}
+			}
+			return false;
+		}
 		public SoundEmitter.Source PlaySound(ContentRef<Sound> sound, bool loop = false)
 		{
 			if (sound == null)
@@ -157,7 +169,7 @@ namespace FNaFMP.Utility
 				ContentRef<Sound> sound = item.Sound;
 				if (sound.Name.Equals(name))
 				{
-					item.Volume = (float)value/100;
+					item.Volume = value/100f;
 					return true;
 				}
 			}
@@ -232,7 +244,7 @@ namespace FNaFMP.Utility
 				canvas.State.TextFont = this.font;
 
 				string cursorText = string.Format("{0}, {1}", (int)DualityApp.Mouse.Pos.X, (int)DualityApp.Mouse.Pos.Y);
-				string cursorBottomText = string.Format("{0}, {1}", DualityApp.WindowSize.X, DualityApp.WindowSize.Y);
+				string cursorBottomText = string.Format("{0}, {1}", Core.MaxWindowSize.X, Core.MaxWindowSize.Y);
 
 				float top_x = DualityApp.Mouse.Pos.X - (canvas.MeasureText(cursorText).X/2);
 				float top_end_x = DualityApp.Mouse.Pos.X + (canvas.MeasureText(cursorText).X/2);
@@ -246,30 +258,30 @@ namespace FNaFMP.Utility
 				{
 					top_x = 0;
 				}
-				if(top_end_x > DualityApp.WindowSize.X)
+				if(top_end_x > Core.MaxWindowSize.X)
 				{
-					top_x = DualityApp.WindowSize.X - (cursorText.Length * 8);
+					top_x = Core.MaxWindowSize.X - (cursorText.Length * 8);
 				}
 				if(top_y < 0)
 				{
 					top_y = 0;
 				}
-				if(top_y > DualityApp.WindowSize.Y - 40)
+				if(top_y > Core.MaxWindowSize.Y - 40)
 				{
-					top_y = DualityApp.WindowSize.Y - canvas.MeasureText(cursorText).Y - 20;
+					top_y = Core.MaxWindowSize.Y - canvas.MeasureText(cursorText).Y - 20;
 				}
 
 				if (bot_x < 0)
 				{
 					bot_x = 0;
 				}
-				if (bot_end_x > DualityApp.WindowSize.X)
+				if (bot_end_x > Core.MaxWindowSize.X)
 				{
-					bot_x = DualityApp.WindowSize.X - (cursorBottomText.Length * 8);
+					bot_x = Core.MaxWindowSize.X - (cursorBottomText.Length * 8);
 				}
-				if(bot_y > DualityApp.WindowSize.Y - 20)
+				if(bot_y > Core.MaxWindowSize.Y - 20)
 				{
-					bot_y = DualityApp.WindowSize.Y - canvas.MeasureText(cursorBottomText).Y;
+					bot_y = Core.MaxWindowSize.Y - canvas.MeasureText(cursorBottomText).Y;
 				}
 				canvas.DrawText(cursorText, top_x, top_y);
 				canvas.DrawText(cursorBottomText, bot_x, bot_y);
@@ -296,7 +308,7 @@ namespace FNaFMP.Utility
 							canvas.DrawText("State: " + DoorController.RightDoor.GetState(), right.X, right.Y + 50);
 						}
 
-						float half = DualityApp.WindowSize.X / 2;
+						float half = Core.MaxWindowSize.X / 2;
 
 						float limit = (half / 4);
 
@@ -305,19 +317,19 @@ namespace FNaFMP.Utility
 
 						if (!CameraAnimator.IsOpening)
 						{
-							canvas.DrawLine(cancelStart, 0, cancelStart, DualityApp.WindowSize.Y);
-							canvas.DrawLine(cancelEnd, 0, cancelEnd, DualityApp.WindowSize.Y);
+							canvas.DrawLine(cancelStart, 0, cancelStart, Core.MaxWindowSize.Y);
+							canvas.DrawLine(cancelEnd, 0, cancelEnd, Core.MaxWindowSize.Y);
 
 							int i = 1;
 							while (cancelStart - (limit * i) > 0)
 							{
-								canvas.DrawLine(cancelStart - (limit * i), 0, cancelStart - (limit * i), DualityApp.WindowSize.Y);
+								canvas.DrawLine(cancelStart - (limit * i), 0, cancelStart - (limit * i), Core.MaxWindowSize.Y);
 								i++;
 							}
 							i = 1;
-							while (cancelEnd + (limit * i) < DualityApp.WindowSize.X)
+							while (cancelEnd + (limit * i) < Core.MaxWindowSize.X)
 							{
-								canvas.DrawLine(cancelEnd + (limit * i), 0, cancelEnd + (limit * i), DualityApp.WindowSize.Y);
+								canvas.DrawLine(cancelEnd + (limit * i), 0, cancelEnd + (limit * i), Core.MaxWindowSize.Y);
 								i++;
 							}
 						}

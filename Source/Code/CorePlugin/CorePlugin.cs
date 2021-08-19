@@ -8,6 +8,7 @@ using Alzaitu.Lacewing.Client;
 using DiscordRPC;
 using DiscordRPC.Logging;
 using Duality;
+using Duality.Resources;
 using FNaFMP.Configuration;
 using FNaFMP.Utility;
 using Newtonsoft.Json;
@@ -21,7 +22,7 @@ namespace FNaFMP
 	public class Core : CorePlugin
 	{
 		private string ConfigPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\FNaFMultiplayer\\config1.yml";
-		public const string VERSION = "0.1.4";
+		public const string VERSION = "0.1.6";
 		public static string LeaveReason { get; set; }
 		private static string secret = Guid.NewGuid().ToString();
 		private static Guid party = Guid.NewGuid();
@@ -36,6 +37,10 @@ namespace FNaFMP
 			get { return character; }
 			set { character = value; }
 		}
+
+		/// <summary>
+		/// List of characters, starting with None (0)
+		/// </summary>
 		public enum Character
 		{
 			[StringValue("None")]
@@ -113,7 +118,7 @@ namespace FNaFMP
 		{
 			Settings = new Settings
 			{
-				Server = "shadsoft.org:6121"
+				Server = "server1.dark-wire.com:6121"
 			}
 		};
 
@@ -194,22 +199,116 @@ namespace FNaFMP
 
 		private static string username = null;
 
+		bool fullscreen = false;
+
+		public static Point2 MaxWindowSize { get; private set; }
+
+		private int restart = -1;
+		protected override void OnAfterUpdate()
+		{
+			DualityUserData data = DualityApp.UserData;
+			if(DualityApp.WindowSize.X != MaxWindowSize.X || DualityApp.WindowSize.Y != MaxWindowSize.Y)
+			{
+				if (DualityApp.UserData.WindowMode == ScreenMode.FixedWindow)
+				{
+					Logs.Core.WriteError($"Window size is not {MaxWindowSize.X}x{MaxWindowSize.Y} !! (Current: {DualityApp.WindowSize.X}x{DualityApp.WindowSize.Y})");
+					data.WindowSize = new Point2(MaxWindowSize.X, MaxWindowSize.Y);
+					DualityApp.UserData = data;
+				}
+			}
+			if (DualityApp.Keyboard.KeyHit(Duality.Input.Key.F11))
+			{
+				fullscreen = !fullscreen;
+				Logs.Core.Write($"Changing to {(fullscreen ? "fullscreen" : "windowed")}");
+				if (!fullscreen)
+				{
+					data.WindowMode = ScreenMode.FixedWindow;
+				}
+				else
+				{
+					data.WindowMode = ScreenMode.Fullscreen;
+				}
+			}
+			if (DualityApp.Keyboard.KeyHit(Duality.Input.Key.F2))
+			{
+				if (restart == -1)
+					restart = Time.FrameCount;
+				if(restart > -1 && restart + 90 > Time.FrameCount && restart + 1 <= Time.FrameCount && DualityApp.Keyboard.KeyHit(Duality.Input.Key.F2))
+				{
+					restart = -1;
+					if (Scene.Current != DualityApp.AppData.StartScene.Res)
+						Scene.SwitchTo(DualityApp.AppData.StartScene);
+					else
+						Scene.Reload();
+				}
+				if(restart > -1 && restart + 90 <= Time.FrameCount)
+				{
+					restart = -1;
+				}
+			}
+			DualityApp.UserData = data;
+		}
+
+		/**
+		 * <summary>List of game difficulties</summary>
+		 */
+		public enum GameDifficulty
+		{
+			/// <summary>
+			/// StringValue: Very Easy
+			/// </summary>
+			[StringValue("Very Easy")]
+			VeryEasy = 0,
+			/// <summary>
+			/// StringValue: Easy
+			/// </summary>
+			[StringValue("Easy")]
+			Easy = 1,
+			/// <summary>
+			/// StringValue: Medium
+			/// </summary>
+			[StringValue("Medium")]
+			Medium = 2,
+			/// <summary>
+			/// StringValue: Hard
+			/// </summary>
+			[StringValue("Hard")]
+			Hard = 3,
+			/// <summary>
+			/// StringValue: Very Hard
+			/// </summary>
+			[StringValue("Very Hard")]
+			VeryHard = 4
+		}
+
+		/// <summary>
+		/// Defines the difficulty of the game
+		/// </summary>
+		public static GameDifficulty Difficulty { get; set; }
+
 		protected override void OnGameStarting()
 		{
+			Difficulty = GameDifficulty.VeryEasy;
+			fullscreen = DualityApp.UserData.WindowMode == ScreenMode.Fullscreen;
+			MaxWindowSize = DualityApp.AppData.ForcedRenderSize;
 			username = null;
 			LoadConfig();
 			string[] args = Environment.GetCommandLineArgs();
 			string t = "";
+			bool editor = false;
 			foreach(string a in args)
 			{
 				if (t.Length == 0)
 					t += $"'{a}'";
 				else
 					t += ", " + $"'{a}'";
+
+				if (a.ToLower().Contains("dualityeditor.exe"))
+					editor = true;
 			}
-			if(!args.Contains("D:\\Duality\\DualityEditor.exe"))
+			if(!editor)
 				LoadHosts();
-			Console.WriteLine("args = [{0}]",t);
+			//Console.WriteLine("args = [{0}]",t);
 			Logs.Core.Write("args = [{0}]",t);
 			Logs.Core.Write("CurrentDirectory = [{0}]", System.Reflection.Assembly.GetEntryAssembly().Location);
 			debug = args.Contains("--debug");

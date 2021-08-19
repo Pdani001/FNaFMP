@@ -1,5 +1,4 @@
-﻿
-using Duality;
+﻿using Duality;
 using Duality.Components;
 using Duality.Components.Renderers;
 using Duality.Drawing;
@@ -93,7 +92,7 @@ namespace FNaFMP.Office
 	[RequiredComponent(typeof(SpriteRenderer))]
 	public class VisibilityController : Component, ICmpUpdatable
 	{
-		private SpriteRenderer render;
+		[DontSerialize] private SpriteRenderer render;
 		public void OnUpdate()
 		{
 			if (render == null)
@@ -102,6 +101,11 @@ namespace FNaFMP.Office
 			}
 			else
 			{
+				if (JumpscareManager.Jumpscared)
+				{
+					render.ColorTint = render.ColorTint.WithAlpha(0);
+					return;
+				}
 				switch (render.VisibilityGroup)
 				{
 					case VisibilityFlag.Group1:
@@ -116,10 +120,35 @@ namespace FNaFMP.Office
 			}
 		}
 	}
+
+	[RequiredComponent(typeof(SpriteRenderer))]
+	public class OfficeFan : Component, ICmpUpdatable
+	{
+		[DontSerialize] private SpriteRenderer render;
+		public void OnUpdate()
+		{
+			if (render == null)
+			{
+				render = this.GameObj.GetComponent<SpriteRenderer>();
+			}
+			else
+			{
+				if (JumpscareManager.Jumpscared || CameraViewer.IsViewing || GameController.Power <= 0)
+				{
+					render.ColorTint = render.ColorTint.WithAlpha(0);
+				}
+				else
+				{
+					render.ColorTint = render.ColorTint.WithAlpha(255);
+				}
+			}
+		}
+	}
+
 	[RequiredComponent(typeof(SpriteRenderer))]
 	public class DisabledCamera : Component, ICmpUpdatable
 	{
-		private SpriteRenderer render;
+		[DontSerialize] private SpriteRenderer render;
 		public void OnUpdate()
 		{
 			if (render == null)
@@ -135,7 +164,7 @@ namespace FNaFMP.Office
 	[RequiredComponent(typeof(SpriteRenderer)), RequiredComponent(typeof(SpriteAnimator))]
 	public class BlipAnimator : Component, ICmpUpdatable
 	{
-		private static bool play = false;
+		[DontSerialize] private static bool play = false;
 		private ContentRef<Sound> sound = null;
 		public ContentRef<Sound> BlipSound
 		{
@@ -148,8 +177,8 @@ namespace FNaFMP.Office
 				return;
 			play = true;
 		}
-		private static SpriteRenderer renderer;
-		private SpriteAnimator animator;
+		[DontSerialize] private static SpriteRenderer renderer;
+		[DontSerialize] private SpriteAnimator animator;
 		public void OnUpdate()
 		{
 			if (renderer == null || animator == null)
@@ -187,12 +216,14 @@ namespace FNaFMP.Office
 	[RequiredComponent(typeof(SpriteRenderer))]
 	public class FlipButton : Component, ICmpUpdatable
 	{
-		public static bool Disabled = true;
-		private SpriteRenderer renderer;
+		public static bool Disabled { get; set; }
+		[DontSerialize] private SpriteRenderer renderer;
 		public void OnUpdate()
 		{
 			if (renderer == null)
+			{
 				renderer = this.GameObj.GetComponent<SpriteRenderer>();
+			}
 			else
 			{
 				ColorRgba color = renderer.ColorTint;
@@ -203,33 +234,34 @@ namespace FNaFMP.Office
 	}
 
 	[RequiredComponent(typeof(SpriteRenderer)),RequiredComponent(typeof(SpriteAnimator))]
-	public class CameraAnimator : Component, ICmpUpdatable
+	public class CameraAnimator : Component, ICmpUpdatable, ICmpInitializable
 	{
-		private static bool force = false;
+		[DontSerialize] private bool start = false;
+		[DontSerialize] private static bool force = false;
 		public static bool ForceCamera
 		{
 			get { return force; }
 			set { force = value; }
 		}
-		private static bool disable = false;
+		[DontSerialize] private static bool disable = false;
 		public static bool DisableCamera
 		{
 			get { return disable; }
 			set { disable = value; }
 		}
-		private static bool open;
+		[DontSerialize] private static bool open;
 		public static bool IsOpening
 		{
 			get { return open; }
 		}
-		private static bool close;
+		[DontSerialize] private static bool close;
 		public static bool IsClosing
 		{
 			get { return close; }
 		}
-		private bool hover = false;
-		private SpriteRenderer renderer;
-		private SpriteAnimator animator;
+		[DontSerialize] private bool hover = false;
+		[DontSerialize] private SpriteRenderer renderer;
+		[DontSerialize] private SpriteAnimator animator;
 		private Rect area = new Rect(0,0,0,0);
 		private ContentRef<Material> up = null;
 		public ContentRef<Material> AnimUp
@@ -268,10 +300,10 @@ namespace FNaFMP.Office
 				return;
 			up.EnsureLoaded();
 			down.EnsureLoaded();
-			if(renderer == null)
-				renderer = this.GameObj.GetComponent<SpriteRenderer>();
-			if(animator == null)
-				animator = this.GameObj.GetComponent<SpriteAnimator>();
+			if (!start)
+			{
+				return;
+			}
 			open = animator.IsAnimationRunning && renderer.SharedMaterial.Name.Equals(up.Name);
 			close = animator.IsAnimationRunning && renderer.SharedMaterial.Name.Equals(down.Name);
 			if (!animator.IsAnimationRunning && renderer.ColorTint.A == 255)
@@ -301,6 +333,10 @@ namespace FNaFMP.Office
 					renderer.ColorTint = renderer.ColorTint.WithAlpha(255);
 					animator.Paused = false;
 					CameraViewer.IsViewing = false;
+					if (down_sound != null)
+					{
+						down_source = DisplayController.SM.PlaySound(down_sound, false);
+					}
 					if (Core.SelfCharacter == Core.Character.Guard)
 					{
 						GameController.SendStatus();
@@ -351,6 +387,22 @@ namespace FNaFMP.Office
 					hover = false;
 			}
 		}
+
+		public void OnActivate()
+		{
+			if (renderer == null)
+				renderer = this.GameObj.GetComponent<SpriteRenderer>();
+			if (animator == null)
+				animator = this.GameObj.GetComponent<SpriteAnimator>();
+			if (!renderer.SharedMaterial.Name.Equals(up.Name))
+				renderer.SharedMaterial = up;
+			start = true;
+		}
+
+		public void OnDeactivate()
+		{
+			start = false;
+		}
 	}
 	public enum DoorDirection
 	{
@@ -384,17 +436,17 @@ namespace FNaFMP.Office
 			get { return direction; }
 			set { direction = value; }
 		}
-		private bool anim = false;
+		[DontSerialize] private bool anim = false;
 		/*
 		 * 0 => open
 		 * 1 => closing
 		 * 2 => closed
 		 * 3 => opening
 		 */
-		private int state = 0;
-		private Transform transform = null;
-		private SpriteRenderer renderer = null;
-		private SpriteAnimator animator = null;
+		[DontSerialize] private int state = 0;
+		[DontSerialize] private Transform transform = null;
+		[DontSerialize] private SpriteRenderer renderer = null;
+		[DontSerialize] private SpriteAnimator animator = null;
 		private ContentRef<Sound> sound = null;
 		public ContentRef<Sound> DoorSound
 		{
@@ -548,7 +600,7 @@ namespace FNaFMP.Office
 	[RequiredComponent(typeof(SpriteRenderer))]
 	public class CameraButtonText : Component, ICmpUpdatable
 	{
-		private SpriteRenderer renderer = null;
+		[DontSerialize] private SpriteRenderer renderer = null;
 		private Int32 number = -1;
 		public Int32 ViewNumber
 		{
@@ -587,9 +639,9 @@ namespace FNaFMP.Office
 	[RequiredComponent(typeof(SpriteRenderer)), RequiredComponent(typeof(SpriteAnimator)), RequiredComponent(typeof(Transform))]
 	public class CameraButton : Component, ICmpUpdatable
 	{
-		private Transform transform = null;
-		private SpriteRenderer renderer = null;
-		private SpriteAnimator animator = null;
+		[DontSerialize] private Transform transform = null;
+		[DontSerialize] private SpriteRenderer renderer = null;
+		[DontSerialize] private SpriteAnimator animator = null;
 		private Int32 number = -1;
 		public Int32 ViewNumber
 		{
@@ -635,6 +687,8 @@ namespace FNaFMP.Office
 						renderer.ColorTint = renderer.ColorTint.WithAlpha(127);
 					}
 				}
+				if (GameController.Power <= 0 || SixAM.Started)
+					return;
 				Point2 size = text.Size;
 				Vector3 pos = transform.Pos;
 				Vector2 mouse = DualityApp.Mouse.Pos;
@@ -646,7 +700,7 @@ namespace FNaFMP.Office
 						animator.AnimTime = animator.AnimDuration / 2;
 						CameraViewer.ViewNumber = ViewNumber;
 						BlipAnimator.PlayBlip();
-						Positions.SetPosition(Core.SelfCharacter, ViewNumber);
+						Positions.SetPosition(Core.SelfCharacter, Core.SelfCharacter != Core.Character.Foxy ? ViewNumber : Positions.GetPosition(Core.SelfCharacter)+1);
 						if(Core.SelfCharacter != Core.Character.Guard)
 							MovementControl.Buttons.Clear();
 						MovementControl.SelfTime = MovementControl.GetRandomMoveTime(Core.SelfCharacter);
@@ -655,7 +709,7 @@ namespace FNaFMP.Office
 							List<byte> msg = new List<byte>
 							{
 								(byte)Core.SelfCharacter,
-								(byte)ViewNumber
+								(byte)Positions.GetPosition(Core.SelfCharacter)
 							};
 							Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 25, msg.ToArray());
 							if(Core.SelfCharacter == Core.Character.Guard)
@@ -691,8 +745,7 @@ namespace FNaFMP.Office
 					CameraViewer.ViewNumber = target;
 					BlipAnimator.PlayBlip();
 					Positions.SetPosition(Core.SelfCharacter, target);
-					if (Core.SelfCharacter != Core.Character.Guard)
-						MovementControl.Buttons.Clear();
+					MovementControl.Buttons.Clear();
 					MovementControl.SelfTime = MovementControl.GetRandomMoveTime(Core.SelfCharacter);
 					if (Core.Client != null && Core.Client.IsConnected && Core.Client.joinedChannels.Count > 0)
 					{
@@ -763,25 +816,27 @@ namespace FNaFMP.Office
 			set
 			{
 				time = value;
-				nextmove = (int)(Time.MainTimer.TotalMilliseconds + (time * 1000));
+				nextmove = (int)(Time.GameTimer.TotalMilliseconds + (time * 1000));
 			}
 		}
-		private static int time = -1;
+		[DontSerialize] private static int time = -1;
 		public static int NextMove
 		{
 			get { return nextmove; }
 		}
-		private static int nextmove = -1;
-		private static Dictionary<Core.Character, List<Movement>> check = null;
-		private static Dictionary<Core.Character, MoveTime> times = null;
-		public static readonly List<int> Buttons = new List<int>();
+		[DontSerialize] private static int nextmove = -1;
+		[DontSerialize] private static Dictionary<Core.Character, List<Movement>> check = null;
+		[DontSerialize] private static Dictionary<Core.Character, MoveTime> times = null;
+		[DontSerialize] public static readonly List<int> Buttons = new List<int>();
 		public static bool IsValid(int from, int to)
 		{
 			if (Core.SelfCharacter == Core.Character.Guard)
 			{
 				return to != 21;
 			}
-			bool allow = (int)Math.Round((NextMove - Time.MainTimer.TotalMilliseconds) / 1000) <= 0;
+			bool allow = (int)Math.Round((NextMove - Time.GameTimer.TotalMilliseconds) / 1000) <= 0;
+			if (GameController.Power <= 0 || SixAM.Started)
+				allow = false;
 			if (!allow)
 			{
 				return false;
@@ -797,6 +852,8 @@ namespace FNaFMP.Office
 						{
 							foreach(Core.Character pc in m.Prevent.Keys)
 							{
+								if (pc == Core.Character.Guard && !GameController.Guard.IsViewing)
+									continue;
 								foreach (MovePrevent prev in m.Prevent[pc])
 								{
 									switch (prev.PreventOperation)
@@ -835,7 +892,7 @@ namespace FNaFMP.Office
 			}
 			return false;
 		}
-		private static Random random = null;
+		[DontSerialize] private static Random random = null;
 		public static int GetRandomMoveTime(Core.Character character)
 		{
 			if (character == Core.Character.Guard || times == null || !times.ContainsKey(character))
@@ -852,28 +909,10 @@ namespace FNaFMP.Office
 			check = movements;
 			times = mt;
 			SelfTime = GetRandomMoveTime(Core.SelfCharacter);
-			if(Core.Client != null)
-			{
-				Core.Client.Event.BinaryMessage += Event_BinaryMessage;
-			}
+			Buttons.Clear();
 			if (Core.SelfCharacter == Core.Character.Guard && Buttons.Count == 0)
 			{
 				Buttons.Add(-1);
-			}
-		}
-
-		private void Event_BinaryMessage(object sender, EventBinaryMessage e)
-		{
-			if (e.Message == null)
-				return;
-			if(e.SubChannel == 25)
-			{
-				BinaryReader reader = new BinaryReader(e.Message);
-				byte charbyte = reader.ReadByte();
-				Core.Character character = (Core.Character)charbyte;
-				byte position = reader.ReadByte();
-				Positions.SetPosition(character, position);
-				Positions.SetUser(character, e.PeerID);
 			}
 		}
 
@@ -882,10 +921,6 @@ namespace FNaFMP.Office
 			random = null;
 			check = null;
 			times = null;
-			if (Core.Client != null)
-			{
-				Core.Client.Event.BinaryMessage -= Event_BinaryMessage;
-			}
 		}
 
 		public void OnUpdate()
@@ -896,7 +931,7 @@ namespace FNaFMP.Office
 					SelfTime = 0;
 				if (!GameController.Guard.Active)
 				{
-					nextmove = (int)(Time.MainTimer.TotalMilliseconds + (time * 1000));
+					nextmove = (int)(Time.GameTimer.TotalMilliseconds + (time * 1000));
 				}
 			}
 			if (Buttons.Count == 0)
@@ -917,9 +952,9 @@ namespace FNaFMP.Office
 	}
 	public class Positions
 	{
-		private static Dictionary<Core.Character,int> pos = new Dictionary<Core.Character,int>();
-		private static Dictionary<Core.Character,int> users = new Dictionary<Core.Character,int>();
-		private static Dictionary<int, List<Core.Character>> cams = new Dictionary<int, List<Core.Character>>();
+		[DontSerialize] private static Dictionary<Core.Character,int> pos = new Dictionary<Core.Character,int>();
+		[DontSerialize] private static Dictionary<Core.Character,int> users = new Dictionary<Core.Character,int>();
+		[DontSerialize] private static Dictionary<int, List<Core.Character>> cams = new Dictionary<int, List<Core.Character>>();
 		public static List<Core.Character> GetRobots(int camera)
 		{
 			List<Core.Character> characters = new List<Core.Character>();
@@ -946,8 +981,35 @@ namespace FNaFMP.Office
 				pos[robot] = value;
 			else
 				pos.Remove(robot);
-			if (robot != Core.Character.Foxy && robot != Core.Character.Guard)
+			if (robot != Core.Character.Guard)
 			{
+				if (robot == Core.Character.Foxy)
+				{
+					switch (value)
+					{
+						case 0:
+						case 1:
+						case 2:
+							value = 2;
+							break;
+						case 3:
+						case 4:
+							value = 3;
+							break;
+					}
+					switch (old)
+					{
+						case 0:
+						case 1:
+						case 2:
+							old = 2;
+							break;
+						case 3:
+						case 4:
+							old = 3;
+							break;
+					}
+				}
 				if (value != -1)
 				{
 					if (!cams.ContainsKey(value))
@@ -1037,8 +1099,8 @@ namespace FNaFMP.Office
 	[RequiredComponent(typeof(SpriteRenderer)), RequiredComponent(typeof(Transform))]
 	public class LocationRenderer : Component, ICmpUpdatable
 	{
-		private Transform transform = null;
-		private SpriteRenderer renderer = null;
+		[DontSerialize] private Transform transform = null;
+		[DontSerialize] private SpriteRenderer renderer = null;
 		private List<ContentRef<Material>> list = new List<ContentRef<Material>>();
 		public List<ContentRef<Material>> CameraList
 		{
@@ -1084,15 +1146,15 @@ namespace FNaFMP.Office
 	[RequiredComponent(typeof(SpriteRenderer)), RequiredComponent(typeof(SpriteAnimator)), RequiredComponent(typeof(Transform))]
 	public class CameraRenderer : Component, ICmpUpdatable
 	{
-		private static bool random = false;
+		[DontSerialize] private static bool random = false;
 		public static bool IsRandom
 		{
 			get { return random; }
 		}
-		private int lastTime = 0;
-		private Transform transform = null;
-		private SpriteRenderer renderer = null;
-		private SpriteAnimator animator = null;
+		[DontSerialize] private int lastTime = 0;
+		[DontSerialize] private Transform transform = null;
+		[DontSerialize] private SpriteRenderer renderer = null;
+		[DontSerialize] private SpriteAnimator animator = null;
 		private List<List<CameraView>> list = new List<List<CameraView>>();
 		public List<List<CameraView>> CameraList
 		{
@@ -1120,7 +1182,9 @@ namespace FNaFMP.Office
 					case 3:
 						if (sub.Extra != 1)
 						{
-							if (random && foxy != 3)
+							if (sub.RobotList != null && sub.RobotList.Contains(Core.Character.Foxy) && foxy == 4)
+								continue;
+							if (random)
 							{
 								check.Remove(sub);
 								continue;
@@ -1188,9 +1252,11 @@ namespace FNaFMP.Office
 			}
 			else
 			{
+				if (Core.SelfCharacter != Core.Character.Guard && GameController.Power <= 0)
+					return;
 				TimeSpan span = Time.MainTimer;
 				int seconds = (int)span.TotalSeconds;
-				if (lastTime == seconds-1 || lastTime == 0)
+				if (lastTime <= seconds-1 || lastTime == 0)
 				{
 					random = Randomizer.Random(1) == 1;
 					lastTime = seconds;
@@ -1220,7 +1286,8 @@ namespace FNaFMP.Office
 						if(atlas != null && atlas.Count > 0)
 						{
 							animator.FrameCount = atlas.Count;
-							animator.Paused = false;
+							if(animator.AnimLoopMode != SpriteAnimator.LoopMode.Once || (animator.AnimLoopMode == SpriteAnimator.LoopMode.Once && renderer.SpriteIndex == 0))
+								animator.Paused = false;
 						} else
 						{
 							animator.Paused = true;
@@ -1236,13 +1303,14 @@ namespace FNaFMP.Office
 			}
 		}
 	}
+
 	[RequiredComponent(typeof(SpriteRenderer)), RequiredComponent(typeof(SpriteAnimator)), RequiredComponent(typeof(Transform))]
 	public class OfficeLightRenderer : Component, ICmpUpdatable
 	{
-		private bool startup = false;
-		private Transform transform = null;
-		private SpriteRenderer renderer = null;
-		private SpriteAnimator animator = null;
+		[DontSerialize] private bool startup = false;
+		[DontSerialize] private Transform transform = null;
+		[DontSerialize] private SpriteRenderer renderer = null;
+		[DontSerialize] private SpriteAnimator animator = null;
 		private ContentRef<Material> def = null;
 		public ContentRef<Material> Default
 		{
@@ -1283,6 +1351,20 @@ namespace FNaFMP.Office
 				transform = this.GameObj.Transform;
 				renderer = this.GameObj.GetComponent<SpriteRenderer>();
 				animator = this.GameObj.GetComponent<SpriteAnimator>();
+				foreach (var sub in LeftLight)
+				{
+					if (sub != null && sub.Material != null)
+					{
+						sub.Material.EnsureLoaded();
+					}
+				}
+				foreach (var sub in RightLight)
+				{
+					if (sub != null && sub.Material != null)
+					{
+						sub.Material.EnsureLoaded();
+					}
+				}
 			}
 			else
 			{
@@ -1291,13 +1373,15 @@ namespace FNaFMP.Office
 					startup = true;
 					ChangeView(def);
 				}
+				if (GameController.Power <= 0)
+					return;
 				if (Core.SelfCharacter == Core.Character.Guard && JumpscareManager.Jumpscared)
 					return;
 				if (CameraViewer.IsViewing && Positions.GetPosition(Core.SelfCharacter) < 21)
 				{
 					return;
 				}
-				DoorDirection dir = Core.SelfCharacter == Core.Character.Guard ? DoorController.LightDirection : Core.SelfCharacter == Core.Character.Bonnie ? DoorDirection.Left : DoorDirection.Right;
+				DoorDirection dir = Core.SelfCharacter == Core.Character.Guard ? DoorController.LightDirection : (Core.SelfCharacter == Core.Character.Bonnie || Core.SelfCharacter == Core.Character.Foxy) ? DoorDirection.Left : DoorDirection.Right;
 				switch (dir)
 				{
 					case DoorDirection.Left:
@@ -1367,32 +1451,32 @@ namespace FNaFMP.Office
 	}
 	public class CameraViewer : Component, ICmpUpdatable
 	{
-		private bool started = false;
-		private static bool disabled = false;
+		[DontSerialize] private bool started = false;
+		[DontSerialize] private static bool disabled = false;
 		public static bool IsDisabled
 		{
 			get { return disabled; }
 			set { disabled = value; }
 		}
-		private static bool isViewing = false;
+		[DontSerialize] private static bool isViewing = false;
 		public static bool IsViewing
 		{
 			get { return isViewing; }
 			set { isViewing = value; }
 		}
-		private static int viewNumber = 0;
+		[DontSerialize] private static int viewNumber = 0;
 		public static int ViewNumber
 		{
 			get { return viewNumber; }
 			set { viewNumber = value; }
 		}
-		private static float xPos = 0;
+		[DontSerialize] private static float xPos = 0;
 		public static float X
 		{
 			get { return xPos; }
 		}
-		private int lastTime = 0;
-		private static bool forward = true;
+		[DontSerialize] private int lastTime = 0;
+		[DontSerialize] private static bool forward = true;
 		public static bool IsForward
 		{
 			get { return forward; }
@@ -1436,26 +1520,29 @@ namespace FNaFMP.Office
 	[RequiredComponent(typeof(Camera))]
 	public class DisplayController : Component, ICmpUpdatable, ICmpInitializable
 	{
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Sound> FanSound { get; set; }
 		public static SoundManager SM { get; private set; }
-		private bool started = false;
-		private static float direction = 0;
+		[DontSerialize] private bool started = false;
+		[DontSerialize] private static float direction = 0;
 		public static float OfficeDirection
 		{
 			get { return direction; }
 		}
-		private static float defaultX = float.NaN;
+		[DontSerialize] private static float defaultX = float.NaN;
 		public static float DefaultCamX
 		{
 			get { return defaultX; }
 		}
-		public static bool movement = true;
+		[DontSerialize] public static bool movement = true;
 		private void SoundLoad(object sender, SoundManager e)
 		{
 			SM = e;
-			SM.ToggleSound("fan_sound", true);
+			if(!SM.IsPlaying(FanSound))
+				SM.PlaySound(FanSound, true);
 			SoundManager.OnLoad -= SoundLoad;
 		}
-		private static Camera camera = null;
+		[DontSerialize] private static Camera camera = null;
 		public static Camera Camera
 		{
 			get { return camera; }
@@ -1467,7 +1554,7 @@ namespace FNaFMP.Office
 			Vector2 cursorPos = DualityApp.Mouse.Pos;
 			Vector3 camPos = camera.FocusPos;
 
-			float half = DualityApp.WindowSize.X / 2;
+			float half = Core.MaxWindowSize.X / 2;
 
 			float limit = (half / 4);
 
@@ -1489,7 +1576,7 @@ namespace FNaFMP.Office
 				xPos = direction;
 			}
 
-			if (JumpscareManager.Jumpscared && Core.SelfCharacter == Core.Character.Guard)
+			if (JumpscareManager.Jumpscared && Core.SelfCharacter == Core.Character.Guard && JumpscareManager.AfterCamera)
 			{
 				xPos = JumpscareManager.Direction;
 			}
@@ -1529,6 +1616,10 @@ namespace FNaFMP.Office
 					}
 				}
 			}
+			if(xPos > 320)
+			{
+				xPos = 320;
+			}
 			Transform transform = this.GameObj.Transform;
 
 			Vector3 targetPos = new Vector3(defaultX+xPos, camPos.Y, 0.0f - camera.FocusDist);
@@ -1543,7 +1634,7 @@ namespace FNaFMP.Office
 			}
 		}
 
-		public void OnActivate()	// OFFICE STARTUP
+		public void OnActivate()	//																							<- OFFICE STARTUP
 		{
 			if(Core.SelfCharacter == Core.Character.None)
 			{
@@ -1558,16 +1649,16 @@ namespace FNaFMP.Office
 			}
 			SoundManager.OnLoad += SoundLoad;
 			direction = 0;
-			defaultX = float.NaN;
+			defaultX = Core.MaxWindowSize.X / 2;
 			DoorController.LightDirection = DoorDirection.None;
 			DoorController.LightFlicker = false;
 			CameraViewer.IsViewing = Core.SelfCharacter != Core.Character.Guard;
+			FlipButton.Disabled = Core.SelfCharacter != Core.Character.Guard;
+			CameraAnimator.DisableCamera = false;
 
 			Positions.Reset();
 			Positions.SetPosition(Core.Character.Guard, 0);
-
-			if(Core.SelfCharacter == Core.Character.Freddy)
-				Positions.SetPosition(Core.Character.Freddy, 0);
+			Positions.SetPosition(Core.Character.Freddy, 0);
 
 			if(Core.SelfCharacter == Core.Character.Bonnie)
 				Positions.SetPosition(Core.Character.Bonnie, 0);
@@ -1580,7 +1671,7 @@ namespace FNaFMP.Office
 
 			if(Core.SelfCharacter == Core.Character.Foxy)
 			{
-				CameraViewer.ViewNumber = Positions.GetPosition(Core.Character.Foxy) <= 2 ? 2 : Positions.GetPosition(Core.Character.Foxy) < 5 ? 3 : 21;
+				CameraViewer.ViewNumber = Positions.GetPosition(Core.Character.Foxy) <= 2 ? 2 : Positions.GetPosition(Core.Character.Foxy) < 21 ? 3 : 21;
 			}
 			else
 			{
@@ -1590,7 +1681,7 @@ namespace FNaFMP.Office
 			List<byte> msg = new List<byte>
 							{
 								(byte)Core.SelfCharacter,
-								(byte)CameraViewer.ViewNumber
+								(byte)Positions.GetPosition(Core.SelfCharacter)
 							};
 			if(Core.Client != null && Core.Client.joinedChannels.Count > 0)
 				Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 25, msg.ToArray());
@@ -1598,6 +1689,9 @@ namespace FNaFMP.Office
 			MovementControl.SelfTime = MovementControl.GetRandomMoveTime(Core.SelfCharacter);
 
 			camera = this.GameObj.GetComponent<Camera>();
+			VisibilityFlag flags = VisibilityFlag.AllFlags | (VisibilityFlag.AllGroups & ~VisibilityFlag.Group4);
+			camera.VisibilityMask = flags;
+			GameObj.Transform.MoveTo(new Vector3(defaultX, Core.MaxWindowSize.Y/2, 0.0f - camera.FocusDist));
 			if (Core.DRPC != null)
 			{
 				DiscordRPC.RichPresence presence = Core.DRPC.CurrentPresence;
@@ -1605,7 +1699,7 @@ namespace FNaFMP.Office
 			}
 			FlipButton.Disabled = Core.SelfCharacter != Core.Character.Guard;
 			started = true;
-		}
+		}	//																														END OF OFFICE STARTUP
 
 		public void OnDeactivate()
 		{
@@ -1615,11 +1709,11 @@ namespace FNaFMP.Office
 	[RequiredComponent(typeof(SpriteRenderer))]
 	public class OfficeController : Component, ICmpUpdatable, ICmpInitializable
 	{
-		private SoundEmitter.Source source = null;
-		private bool started = false;
-		private SpriteRenderer renderer = null;
+		[DontSerialize] private SoundEmitter.Source source = null;
+		[DontSerialize] private bool started = false;
+		[DontSerialize] private SpriteRenderer renderer = null;
 		private OfficeControllerValue control = new OfficeControllerValue();
-		private readonly Random random = new Random();
+		[DontSerialize] private readonly Random random = new Random();
 		public OfficeControllerValue ControlValue
 		{
 			get { return control; }
@@ -1654,6 +1748,11 @@ namespace FNaFMP.Office
 			}
 			else
 			{
+				if (GameController.Power <= 0)
+				{
+					renderer.ColorTint = renderer.ColorTint.WithAlpha(0);
+					return;
+				}
 				if (!started)
 				{
 					started = true;
@@ -1779,8 +1878,8 @@ namespace FNaFMP.Office
 			if (renderer == null)
 			{
 				renderer = this.GameObj.GetComponent<SpriteRenderer>();
-				
 			}
+			control.IsKilled = false;
 		}
 
 		public void OnDeactivate()
@@ -1790,7 +1889,7 @@ namespace FNaFMP.Office
 
 	public class Static : Component, ICmpUpdatable
 	{
-		private static int opacity = 0;
+		[DontSerialize] private static int opacity = 0;
 		private static int Opacity
 		{
 			get { return opacity; }
@@ -1801,9 +1900,9 @@ namespace FNaFMP.Office
 			return Opacity;
 		}
 
-		private int lastTime = 0;
-		private int dark = 0;
-		private readonly Random rnd = new Random();
+		[DontSerialize] private int lastTime = 0;
+		[DontSerialize] private int dark = 0;
+		[DontSerialize] private readonly Random rnd = new Random();
 		public void OnUpdate()
 		{
 			bool isViewing = CameraViewer.IsViewing;
@@ -1849,6 +1948,8 @@ namespace FNaFMP.Office
 		{
 			if (limit > Time.MainTimer.TotalMilliseconds)
 				return;
+			if (SixAM.Started || FreddyMusicbox.DarkenedOffice)
+				return;
 			if (MousePosition.InRect(rect))
 			{
 				if (DualityApp.Mouse.ButtonHit(Duality.Input.MouseButton.Left) && !CameraViewer.IsViewing)
@@ -1870,7 +1971,7 @@ namespace FNaFMP.Office
 		[EditorHintFlags(MemberFlags.Visible)]
 		private ContentRef<Font> TimeFont { get; set; }
 
-		private static bool isDebug = false;
+		[DontSerialize] private static bool isDebug = false;
 		public static bool IsDebug
 		{
 			get { return isDebug; }
@@ -1898,10 +1999,16 @@ namespace FNaFMP.Office
 				canvas.State.SetMaterial(DrawTechnique.Mask);
 				canvas.State.ColorTint = ColorRgba.White;
 				canvas.State.TextFont = this.TextFont;
-				int time = (int)Math.Round((MovementControl.NextMove - Time.MainTimer.TotalMilliseconds)/1000);
+				int time = (int)Math.Round((MovementControl.NextMove - Time.GameTimer.TotalMilliseconds)/1000);
+				if (GameController.Power <= 0)
+					time = 999;
 				string CharacterText = string.Format("Playing as: {0}", Core.SelfCharacter.GetStringValue());
 				Vector2 CharacterTextSize = canvas.MeasureText(CharacterText);
 				string MoveTimeText = time <= 0 ? "You can move!" : string.Format("You can move in {0} second{1}", time, time > 1 ? "s" : "");
+				if((Core.SelfCharacter != Core.Character.Foxy && Positions.GetPosition(Core.SelfCharacter) >= 21) || (Core.SelfCharacter == Core.Character.Foxy && Positions.GetPosition(Core.SelfCharacter) >= 3))
+				{
+					MoveTimeText = "Attack in progress...";
+				}
 				Vector2 MoveTimeTextSize = canvas.MeasureText(MoveTimeText);
 
 				if(time <= 0 && CameraViewer.ViewNumber == 21)
@@ -1917,8 +2024,9 @@ namespace FNaFMP.Office
 					}
 				}
 
-				canvas.DrawText(CharacterText, 24, DualityApp.WindowSize.Y - CharacterTextSize.Y - 24);
-				canvas.DrawText(MoveTimeText, 24, DualityApp.WindowSize.Y - MoveTimeTextSize.Y - 24 - 24);
+				canvas.DrawText(CharacterText, 24, Core.MaxWindowSize.Y - CharacterTextSize.Y - 24);
+				if(GameController.Power > 0)
+					canvas.DrawText(MoveTimeText, 24, Core.MaxWindowSize.Y - MoveTimeTextSize.Y - 24 - 24);
 				this.canvas.End();
 				this.canvas.Begin(device);
 			}
@@ -1929,8 +2037,8 @@ namespace FNaFMP.Office
 
 			string TimeText = string.Format("{0} AM", GameController.GameTime);
 			Vector2 TimeTextSize = canvas.MeasureText(TimeText);
-			if(!JumpscareManager.Jumpscared)
-				canvas.DrawText(TimeText, DualityApp.WindowSize.X - TimeTextSize.X - 24, 24);
+			if(!JumpscareManager.Jumpscared && GameController.Power > 0)
+				canvas.DrawText(TimeText, Core.MaxWindowSize.X - TimeTextSize.X - 24, 24);
 
 			this.canvas.End();
 		}
@@ -1978,10 +2086,10 @@ namespace FNaFMP.Office
 		[EditorHintFlags(MemberFlags.Visible)]
 		private ContentRef<Font> TextFont { get; set; }
 
-		private SpriteRenderer renderer;
-		private Transform transform;
+		[DontSerialize] private SpriteRenderer renderer;
+		[DontSerialize] private Transform transform;
 
-		private static bool isDebug = false;
+		[DontSerialize] private static bool isDebug = false;
 		public static bool IsDebug
 		{
 			get { return isDebug; }
@@ -2003,7 +2111,7 @@ namespace FNaFMP.Office
 			if (renderer == null || transform == null)
 				return;
 
-			if (Core.SelfCharacter == Core.Character.Guard && !JumpscareManager.Jumpscared && !SixAM.Started)
+			if (Core.SelfCharacter == Core.Character.Guard && !JumpscareManager.Jumpscared && !SixAM.Started && GameController.Power > 0)
 			{
 				renderer.ColorTint = renderer.ColorTint.WithAlpha(255);
 				canvas.Begin(device);
@@ -2051,17 +2159,21 @@ namespace FNaFMP.Office
 
 		[EditorHintFlags(MemberFlags.Visible)]
 		private ContentRef<Scene> AfterJump { get; set; }
+		
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Sound> JumpscareSound { get; set; }
 
-		private SpriteRenderer renderer;
-		private Transform transform;
-		private SpriteAnimator animator;
+		[DontSerialize] private SpriteRenderer renderer;
+		[DontSerialize] private Transform transform;
+		[DontSerialize] private SpriteAnimator animator;
 
-		private Core.Character killer = Core.Character.None;
+		[DontSerialize] private Core.Character killer = Core.Character.None;
 
-		private bool finished = false;
-		private bool start = false;
-		private static int jumped = -1;
+		[DontSerialize] private bool finished = false;
+		[DontSerialize] private bool start = false;
+		[DontSerialize] private static int jumped = -1;
 		public static bool Jumpscared { get { return jumped > -1; } }
+		public static bool AfterCamera { get; private set; }
 
 		public static int Direction { get; private set; }
 
@@ -2073,6 +2185,7 @@ namespace FNaFMP.Office
 			{
 				Core.Client.Event.NumberMessage += Event_NumberMessage;
 			}
+			AfterCamera = false;
 			finished = false;
 			start = false;
 			jumped = -1;
@@ -2086,39 +2199,23 @@ namespace FNaFMP.Office
 
 		private void Event_NumberMessage(object sender, EventNumberMessage e)
 		{
-			if(e.SubChannel == 27 && Core.SelfCharacter == Core.Character.Guard)
+			if(e.SubChannel == 27)
 			{
-				if (CameraViewer.IsViewing)
-				{
-					CameraAnimator.ForceCamera = true;
-				}
-				CameraAnimator.DisableCamera = true;
-				jumped = (int)Time.MainTimer.TotalMilliseconds;
 				killer = (Core.Character)e.Message;
-				if (!jumpscare.ContainsKey(killer))
+				jumped = (int)Time.MainTimer.TotalMilliseconds;
+				if (Core.SelfCharacter == Core.Character.Guard)
 				{
-					Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 28, (int)killer);
-					if(AfterJump != null)
+					if (CameraViewer.IsViewing)
 					{
-						Scene.SwitchTo(AfterJump);
+						AfterCamera = true;
+						CameraAnimator.ForceCamera = true;
 					}
+					CameraAnimator.DisableCamera = true;
+					BeginJumpscare(killer);
 				}
 				else
 				{
-					CameraView view = jumpscare[killer];
-					renderer.SharedMaterial = view.Material;
-					if(view.Extra > -1)
-					{
-						Direction = view.Extra;
-					}
-					else
-					{
-						Direction = 0;
-					}
-					animator.AnimLoopMode = view.AnimLoopMode;
-					animator.AnimDuration = view.AnimDuration;
-					animator.AnimTime = 0;
-					animator.Paused = false;
+					DisplayController.SM.PlaySound(JumpscareSound);
 				}
 			}
 			if(e.SubChannel == 28 && Core.SelfCharacter != Core.Character.Guard)
@@ -2137,6 +2234,40 @@ namespace FNaFMP.Office
 			{
 				Core.Client.Event.NumberMessage -= Event_NumberMessage;
 			}
+		}
+
+		private void BeginJumpscare(Core.Character killer)
+		{
+			if (!jumpscare.ContainsKey(killer))
+			{
+				finished = true;
+				Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 28, (int)killer);
+				if (AfterJump != null)
+				{
+					Scene.SwitchTo(AfterJump);
+				}
+			}
+			else
+			{
+				CameraView view = jumpscare[killer];
+				DisplayController.SM.PlaySound(JumpscareSound);
+				if (view.Extra > -1)
+				{
+					Direction = view.Extra;
+				}
+				else
+				{
+					Direction = 0;
+				}
+				renderer.SpriteIndex = 0;
+				animator.FrameCount = view.Material.Res.MainTexture.Res.BasePixmap.Res.Atlas.Count;
+				animator.AnimLoopMode = view.AnimLoopMode;
+				animator.AnimDuration = view.AnimDuration;
+				animator.AnimTime = 0;
+				animator.Paused = false;
+			}
+			if(!CameraViewer.IsViewing)
+				FlipButton.Disabled = true;
 		}
 
 		public void OnUpdate()
@@ -2167,8 +2298,39 @@ namespace FNaFMP.Office
 			}
 			else
 			{
+				if (GameController.Power <= 0)
+					return;
+				if (!Jumpscared)
+				{
+					if (Positions.GetPosition(Core.Character.Freddy) == 21 && !CameraViewer.IsViewing)
+					{
+						killer = Core.Character.Freddy;
+						jumped = (int)Time.MainTimer.TotalMilliseconds;
+						CameraAnimator.DisableCamera = true;
+						BeginJumpscare(killer);
+					}
+					if (Positions.GetPosition(Core.Character.Foxy) == 21)
+					{
+						if (CameraViewer.IsViewing)
+						{
+							CameraAnimator.ForceCamera = true;
+							AfterCamera = true;
+						}
+						killer = Core.Character.Foxy;
+						jumped = (int)Time.MainTimer.TotalMilliseconds;
+						CameraAnimator.DisableCamera = true;
+						BeginJumpscare(killer);
+					}
+				}
 				if (Jumpscared && !finished)
 				{
+					if (!CameraViewer.IsViewing)
+						FlipButton.Disabled = true;
+					if (jumpscare.ContainsKey(killer))
+					{
+						CameraView view = jumpscare[killer];
+						renderer.SharedMaterial = view.Material;
+					}
 					if (jumpscaretime.ContainsKey(killer))
 					{
 						int time = jumpscaretime[killer];
@@ -2195,26 +2357,188 @@ namespace FNaFMP.Office
 		}
 	}
 
-	public class FreddyMusicbox : Component, ICmpInitializable, ICmpUpdatable
+	public class FoxyListener : Component, ICmpUpdatable, ICmpInitializable
 	{
 		[EditorHintFlags(MemberFlags.Visible)]
-		private ContentRef<Sound> MusicBox { get; set; }
-		private SoundEmitter.Source source { get; set; }
+		private ContentRef<Sound> FoxyRun { get; set; }
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Sound> FoxyDoorBang { get; set; }
 
 		public void OnActivate()
 		{
-			
+			if (Core.Client != null)
+			{
+				Core.Client.Event.NumberMessage += Event_NumberMessage;
+			}
+		}
+
+		private void Event_NumberMessage(object sender, EventNumberMessage e)
+		{
+			if (e.SubChannel == 29 && Core.SelfCharacter != Core.Character.Guard)
+			{
+				Positions.SetPosition(Core.Character.Foxy, e.Message);
+				if(e.Message == 4)
+				{
+					if (FoxyRun != null)
+						DisplayController.SM.PlaySound(FoxyRun);
+				}
+				if(e.Message < 4)
+				{
+					if (FoxyDoorBang != null)
+						DisplayController.SM.PlaySound(FoxyDoorBang).Volume = (40 + Randomizer.Random(50)) / 100f;
+				}
+				if(Core.SelfCharacter == Core.Character.Foxy)
+				{
+					CameraViewer.ViewNumber = Positions.GetPosition(Core.Character.Foxy) <= 2 ? 2 : Positions.GetPosition(Core.Character.Foxy) < 21 ? 3 : 21;
+				}
+			}
 		}
 
 		public void OnDeactivate()
 		{
-			
+			if (Core.Client != null)
+			{
+				Core.Client.Event.NumberMessage -= Event_NumberMessage;
+			}
 		}
+
+		private int attack = -1;
 
 		public void OnUpdate()
 		{
-			if (MusicBox == null)
+			if (Core.SelfCharacter != Core.Character.Guard)
 				return;
+			int foxy = Positions.GetPosition(Core.Character.Foxy);
+			if(foxy > -1)
+			{
+				switch (foxy)
+				{
+					case 3:
+						if(CameraViewer.ViewNumber == 3)
+						{
+							BlipAnimator.PlayBlip();
+							attack = (int)Time.MainTimer.TotalMilliseconds;
+							Positions.SetPosition(Core.Character.Foxy, 4);
+							Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 29, 4);
+							if (FoxyRun != null)
+								DisplayController.SM.PlaySound(FoxyRun);
+							break;
+						}
+						if(attack == -1)
+						{
+							attack = (int)Time.MainTimer.TotalMilliseconds;
+						}
+						if(attack + 10000 <= Time.MainTimer.TotalMilliseconds)
+						{
+							attack = -1;
+							Positions.SetPosition(Core.Character.Foxy, DoorController.LeftDoor.IsOpen() ? 21 : Randomizer.Random(2));
+							Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 29, Positions.GetPosition(Core.Character.Foxy));
+							if(!DoorController.LeftDoor.IsOpen() && FoxyDoorBang != null)
+								DisplayController.SM.PlaySound(FoxyDoorBang).Volume = (40 + Randomizer.Random(50)) / 100f;
+						}
+						break;
+					case 4:
+						if(attack + 1700 <= Time.MainTimer.TotalMilliseconds)
+						{
+							attack = -1;
+							Positions.SetPosition(Core.Character.Foxy, DoorController.LeftDoor.IsOpen() ? 21 : Randomizer.Random(2));
+							Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 29, Positions.GetPosition(Core.Character.Foxy));
+							if (!DoorController.LeftDoor.IsOpen() && FoxyDoorBang != null)
+								DisplayController.SM.PlaySound(FoxyDoorBang).Volume = (40 + Randomizer.Random(50)) / 100f;
+						}
+						break;
+				}
+			}
+		}
+	}
+
+	[RequiredComponent(typeof(SpriteRenderer)), RequiredComponent(typeof(SpriteAnimator)), RequiredComponent(typeof(Transform))]
+	public class FreddyMusicbox : Component, ICmpInitializable, ICmpUpdatable
+	{
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Sound> MusicBox { get; set; }
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Sound> LightSound { get; set; }
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Sound> PowerDownSound { get; set; }
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Sound> DeepSteps { get; set; }
+
+		private SoundEmitter.Source source { get; set; }
+		[DontSerialize] private bool FreddyInOffice = false;
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Material> DarkOffice { get; set; }
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Material> DarkOfficeFreddy { get; set; }
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Material> BlackScreen { get; set; }
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Scene> FreddyScene { get; set; }
+
+
+		[DontSerialize] private SpriteRenderer renderer;
+		[DontSerialize] private Transform transform;
+		[DontSerialize] private SpriteAnimator animator;
+
+		public void OnActivate()
+		{
+			DarkenedOffice = false;
+			FreddyInOffice = false;
+			state = 0;
+			PowerDown = -1;
+			flash = -1;
+			jump = 0;
+			if(Core.Client != null)
+			{
+				Core.Client.Event.NumberMessage += Event_NumberMessage;
+			}
+			if (renderer == null || transform == null || animator == null)
+			{
+				transform = this.GameObj.Transform;
+				renderer = this.GameObj.GetComponent<SpriteRenderer>();
+				animator = this.GameObj.GetComponent<SpriteAnimator>();
+			}
+		}
+
+		private void Event_NumberMessage(object sender, EventNumberMessage e)
+		{
+			if(e.SubChannel == 30 && Core.SelfCharacter != Core.Character.Guard)
+			{
+				PowerDown = -1;
+				state = e.Message;
+				FreddyInOffice = true;
+			}
+		}
+
+		public void OnDeactivate()
+		{
+			if (Core.Client != null)
+			{
+				Core.Client.Event.NumberMessage -= Event_NumberMessage;
+			}
+		}
+
+		[DontSerialize] private int state = 0;
+		[DontSerialize] private int PowerDown = -1;
+		[DontSerialize] private int flash = -1;
+		[DontSerialize] private int jump = 0;
+		public static bool DarkenedOffice { get; private set; }
+		public void OnUpdate()
+		{
+			if (MusicBox == null || DarkOffice == null || DarkOfficeFreddy == null || LightSound == null || FreddyScene == null || PowerDownSound == null || BlackScreen == null || DeepSteps == null)
+				return;
+			MusicBox.EnsureLoaded();
+			LightSound.EnsureLoaded();
+			PowerDownSound.EnsureLoaded();
+			DeepSteps.EnsureLoaded();
+			DarkOffice.EnsureLoaded();
+			DarkOfficeFreddy.EnsureLoaded();
+			BlackScreen.EnsureLoaded();
 			if (GameController.Power > 0)
 			{
 				if (Positions.GetPosition(Core.Character.Freddy) == -1)
@@ -2234,7 +2558,7 @@ namespace FNaFMP.Office
 					}
 					source = null;
 				}
-				if(source != null && Core.SelfCharacter == Core.Character.Guard)
+				if(source != null)
 				{
 					if (CameraViewer.IsViewing)
 					{
@@ -2246,6 +2570,193 @@ namespace FNaFMP.Office
 					else
 					{
 						source.Volume = 0.3f;
+					}
+				}
+			}
+			else
+			{
+				if(!FreddyInOffice)
+				{
+					if (Core.SelfCharacter == Core.Character.Guard)
+					{
+						if (PowerDown == -1)
+						{
+							renderer.SharedMaterial = DarkOffice;
+							PowerDown = (int)Time.MainTimer.TotalMilliseconds;
+							Timer mb = new Timer(5000);
+							mb.Elapsed += (object sender, ElapsedEventArgs e) =>
+							{
+								if (FreddyInOffice)
+								{
+									mb.Stop();
+									mb.Close();
+									return;
+								}
+								FreddyInOffice = Randomizer.Random(5) + 1 == 1;
+							};
+							mb.AutoReset = true;
+							mb.Enabled = true;
+							DisplayController.SM.StopAllSounds();
+							DisplayController.SM.PlaySound(PowerDownSound);
+							if (CameraViewer.IsViewing)
+							{
+								CameraAnimator.ForceCamera = true;
+							}
+							if (!DoorController.LeftDoor.IsOpen())
+								DoorController.LeftDoor.ToggleDoor();
+							if (!DoorController.RightDoor.IsOpen())
+								DoorController.RightDoor.ToggleDoor();
+							DoorController.LightDirection = DoorDirection.None;
+						}
+						if (!CameraViewer.IsViewing)
+						{
+							FlipButton.Disabled = true;
+						}
+						if (PowerDown > -1 && PowerDown + 20000 <= Time.MainTimer.TotalMilliseconds)
+						{
+							FreddyInOffice = true;
+						}
+					}
+					else
+					{
+						if(PowerDown == -1)
+						{
+							renderer.SharedMaterial = DarkOffice;
+							PowerDown = (int)Time.MainTimer.TotalMilliseconds;
+							DisplayController.SM.PlaySound(PowerDownSound);
+						}
+					}
+					if (DisplayController.SM.IsPlaying(source))
+					{
+						DisplayController.SM.StopSound(source);
+					}
+					source = null;
+				}
+				else
+				{
+					switch (state)
+					{
+						case 0:
+							PowerDown = -1;
+							state++;
+							if(Core.Client != null && Core.Client.IsConnected)
+								Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 30, state);
+							break;
+						case 1:
+							if (PowerDown == -1)
+							{
+								DisplayController.SM.PlaySound(MusicBox);
+								PowerDown = (int)Time.MainTimer.TotalMilliseconds;
+								if (Core.SelfCharacter == Core.Character.Guard)
+								{
+									Timer mb = new Timer(5000);
+									mb.Elapsed += (object sender, ElapsedEventArgs e) =>
+									{
+										if (state != 1)
+										{
+											mb.Stop();
+											mb.Close();
+											return;
+										}
+										if (Randomizer.Random(5) + 1 == 1)
+										{
+											state++;
+											if (Core.Client != null && Core.Client.IsConnected)
+												Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 30, state);
+											PowerDown = -1;
+										}
+									};
+									mb.AutoReset = true;
+									mb.Enabled = true;
+								}
+
+							}
+							if(flash + 50 <= Time.MainTimer.TotalMilliseconds)
+							{
+								flash = (int)Time.MainTimer.TotalMilliseconds;
+								if(Randomizer.Random(4) + 1 == 1)
+								{
+									renderer.SharedMaterial = DarkOffice;
+								}
+								else
+								{
+									renderer.SharedMaterial = DarkOfficeFreddy;
+								}
+							}
+							if (PowerDown > -1 && PowerDown + 20000 <= Time.MainTimer.TotalMilliseconds && Core.SelfCharacter == Core.Character.Guard)
+							{
+								state++;
+								if (Core.Client != null && Core.Client.IsConnected)
+									Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 30, state);
+								PowerDown = -1;
+							}
+							break;
+						case 2:
+							if(PowerDown == -1)
+							{
+								PowerDown = (int)Time.MainTimer.TotalMilliseconds;
+								DisplayController.SM.StopAllSounds();
+								source = DisplayController.SM.PlaySound(LightSound);
+							}
+							if(Randomizer.Random(2)+1 == 1)
+							{
+								if (source != null)
+									source.Volume = 0.25f;
+								renderer.SharedMaterial = DarkOffice;
+							}
+							else
+							{
+								if (source != null)
+									source.Volume = 0f;
+								renderer.SharedMaterial = BlackScreen;
+							}
+							jump--;
+							if(jump < -20)
+							{
+								PowerDown = -1;
+								state++;
+								source = null;
+								DisplayController.SM.StopAllSounds();
+							}
+							break;
+						case 3:
+							if (PowerDown == -1)
+							{
+								DarkenedOffice = true;
+								renderer.SharedMaterial = BlackScreen;
+								PowerDown = (int)Time.MainTimer.TotalMilliseconds;
+								DisplayController.SM.PlaySound(DeepSteps);
+								if(Core.SelfCharacter == Core.Character.Guard)
+								{
+									Timer mb = new Timer(5000);
+									mb.Elapsed += (object sender, ElapsedEventArgs e) =>
+									{
+										if (state != 3)
+										{
+											mb.Stop();
+											mb.Close();
+											return;
+										}
+										if (Randomizer.Random(5) + 1 == 1)
+											state++;
+									};
+									mb.AutoReset = true;
+									mb.Enabled = true;
+								}
+							}
+							if (PowerDown > -1 && PowerDown + 20000 <= Time.MainTimer.TotalMilliseconds && Core.SelfCharacter == Core.Character.Guard)
+							{
+								state++;
+								PowerDown = -1;
+							}
+							break;
+						case 4:
+							if (PowerDown == -1)
+							{
+								PowerDown = 1;
+								Scene.SwitchTo(FreddyScene);
+							}
+							break;
 					}
 				}
 			}
@@ -2282,13 +2793,19 @@ namespace FNaFMP.Office
 		[EditorHintFlags(MemberFlags.Visible)]
 		private ContentRef<Scene> Menu { get; set; }
 
-		private static int usage = 1;
-		private static int power = 999;
-		private Timer GameTimer;
-		private Timer PowerTimer;
-		private Timer RobotTimer;
-		private static int time = 12;
-		private static bool finished = false;
+		[EditorHintFlags(MemberFlags.Visible)]
+		private List<ContentRef<Sound>> MoveSounds { get; set; }
+
+		[DontSerialize] private static int usage = 1;
+		[DontSerialize] private static int power = 999;
+		[DontSerialize] private Timer GuardTimer;
+		[DontSerialize] private Timer PowerTimer;
+		[DontSerialize] private Timer RobotTimer;
+
+		[DontSerialize] private readonly List<int> Players = new List<int>();
+
+		[DontSerialize] private static int time = 12;
+		[DontSerialize] private static bool finished = false;
 		public static bool IsFinished
 		{
 			get { return finished; }
@@ -2379,11 +2896,13 @@ namespace FNaFMP.Office
 
 		public void OnActivate()
 		{
+			lastmove = -1;
 			finished = false;
 			power = 999;
 			usage = 1;
 			time = 12;
 			Guard = new GuardStatus();
+			Players.Clear();
 			if (Core.Client != null)
 			{
 				Core.Client.Event.BinaryMessage += Event_BinaryMessage;
@@ -2392,10 +2911,10 @@ namespace FNaFMP.Office
 				Core.Client.Event.Disconnect += Event_Disconnect;
 				if (Core.SelfCharacter == Core.Character.Guard)
 				{
-					GameTimer = new Timer(85*1000);
-					GameTimer.Elapsed += Guard_Timer;
-					GameTimer.AutoReset = true;
-					GameTimer.Enabled = true;
+					GuardTimer = new Timer(85*1000);
+					GuardTimer.Elapsed += Guard_Timer;
+					GuardTimer.AutoReset = true;
+					GuardTimer.Enabled = true;
 					PowerTimer = new Timer(1000);
 					PowerTimer.Elapsed += Power_Timer;
 					PowerTimer.AutoReset = true;
@@ -2429,7 +2948,7 @@ namespace FNaFMP.Office
 			}
 		}
 
-		private bool disconnected = false;
+		[DontSerialize] private bool disconnected = false;
 		private void Event_Disconnect(object sender, EventDisconnect e)
 		{
 			disconnected = true;
@@ -2461,9 +2980,10 @@ namespace FNaFMP.Office
 					return;
 				if(c != Core.Character.Guard)
 				{
+					Players.Remove(e.PeerID);
 					Positions.SetUser(c, -1);
 					Positions.SetPosition(c, -1);
-					if(Core.Client.joinedChannels[0].Count == 1)
+					if(Players.Count == 0)
 					{
 						finished = true;
 						Core.LeaveReason = "Game ended due to all players leaving";
@@ -2487,27 +3007,23 @@ namespace FNaFMP.Office
 		{
 			if (finished)
 			{
+				List<byte> m = new List<byte>();
+				m.Add(0);
+				m.AddRange(BinaryData.GetData(power));
+				Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 26, m.ToArray());
 				PowerTimer.Enabled = false;
 				return;
 			}
 			if(power > 0)
 				power -= usage;
-			else
+			
+			if(power <= 0)
 			{
 				finished = true;
-				if (!DoorController.LeftDoor.IsOpen())
-					DoorController.LeftDoor.ToggleDoor();
-				if (!DoorController.RightDoor.IsOpen())
-					DoorController.RightDoor.ToggleDoor();
-				DoorController.LightDirection = DoorDirection.None;
-				if (CameraViewer.IsViewing)
-				{
-					CameraAnimator.ForceCamera = true;
-				}
 			}
 			List<byte> msg = new List<byte>();
+			msg.Add(0);
 			msg.AddRange(BinaryData.GetData(power));
-			msg.Add((byte)time);
 			Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 26, msg.ToArray(),true);
 		}
 
@@ -2521,14 +3037,14 @@ namespace FNaFMP.Office
 				case 5:
 					finished = true;
 					time++;
-					GameTimer.Enabled = false;
+					GuardTimer.Enabled = false;
 					break;
 				default:
 					time++;
 					break;
 			}
 			List<byte> msg = new List<byte>();
-			msg.AddRange(BinaryData.GetData(power));
+			msg.Add(1);
 			msg.Add((byte)time);
 			Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 26, msg.ToArray());
 		}
@@ -2537,6 +3053,7 @@ namespace FNaFMP.Office
 		{
 			if(e.SubChannel == 23)
 			{
+				Players.Add(e.PeerID);
 				if(Core.SelfCharacter == Core.Character.Guard)
 					SendStatus();
 				else
@@ -2544,12 +3061,21 @@ namespace FNaFMP.Office
 					List<byte> msg = new List<byte>
 							{
 								(byte)Core.SelfCharacter,
-								(byte)CameraViewer.ViewNumber
+								(byte)Positions.GetPosition(Core.SelfCharacter)
 							};
 					Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 25, msg.ToArray());
 					Positions.SetUser((Core.Character)e.Message, e.PeerID);
 				}
 			}
+		}
+
+		[DontSerialize] private int lastmove = -1;
+		[DontSerialize] private SoundEmitter.Source movesource = null;
+
+		private bool IsViewingFoxy()
+		{
+			int foxy = Positions.GetPosition(Core.Character.Foxy);
+			return foxy <= 2 ? CameraViewer.ViewNumber == 2 : foxy < 21 && CameraViewer.ViewNumber == 3;
 		}
 
 		private void Event_BinaryMessage(object sender, EventBinaryMessage e)
@@ -2568,7 +3094,7 @@ namespace FNaFMP.Office
 					List<byte> msg = new List<byte>
 							{
 								(byte)Core.SelfCharacter,
-								(byte)CameraViewer.ViewNumber
+								(byte)Positions.GetPosition(Core.SelfCharacter)
 							};
 					Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 25, msg.ToArray());
 				}
@@ -2577,26 +3103,54 @@ namespace FNaFMP.Office
 			if(e.SubChannel == 26 && Core.SelfCharacter != Core.Character.Guard)
 			{
 				BinaryReader reader = new BinaryReader(e.Message);
-				power = reader.ReadInt();
-				time = reader.ReadByte();
+				byte type = reader.ReadByte();
+				switch (type)
+				{
+					case 0:
+						power = reader.ReadInt();
+						break;
+					case 1:
+						time = reader.ReadByte();
+						break;
+				}
 				if(power <= 0)
 				{
 					finished = true;
-					Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
-					if (Menu != null)
-						Scene.SwitchTo(Menu);
 				}
 				if(time == 6)
 				{
 					finished = true;
 				}
 			}
+			if (e.SubChannel == 25)
+			{
+				BinaryReader reader = new BinaryReader(e.Message);
+				byte charbyte = reader.ReadByte();
+				Core.Character character = (Core.Character)charbyte;
+				byte position = reader.ReadByte();
+				if (Core.SelfCharacter == Core.Character.Guard && CameraViewer.IsViewing && lastmove == -1)
+				{
+					if(position == CameraViewer.ViewNumber || (character != Core.Character.Foxy && Positions.GetPosition(character) == CameraViewer.ViewNumber) || (character == Core.Character.Foxy && IsViewingFoxy()))
+					{
+						CameraViewer.IsDisabled = true;
+						lastmove = (int)Time.MainTimer.TotalMilliseconds;
+						if(MoveSounds != null && MoveSounds.Count > 0)
+						{
+							movesource = DisplayController.SM.PlaySound(MoveSounds[new Random().Next(MoveSounds.Count)]);
+						}
+					}
+				}
+				Positions.SetPosition(character, position);
+				Positions.SetUser(character, e.PeerID);
+				if (!Players.Contains(e.PeerID))
+					Players.Add(e.PeerID);
+			}
 		}
 
 		public void OnDeactivate()
 		{
-			if (GameTimer != null)
-				GameTimer.Close();
+			if (GuardTimer != null)
+				GuardTimer.Close();
 
 			if (PowerTimer != null)
 				PowerTimer.Close();
@@ -2622,35 +3176,68 @@ namespace FNaFMP.Office
 		{
 			if (Core.SelfCharacter == Core.Character.Guard)
 			{
-				if (DualityApp.Keyboard.KeyPressed(Duality.Input.Key.C) && DualityApp.Keyboard.KeyPressed(Duality.Input.Key.T))
+				if (JumpscareManager.Jumpscared)
+					finished = true;
+				if (DualityApp.Keyboard.KeyPressed(Duality.Input.Key.C))
 				{
-					if (DualityApp.Keyboard.KeyHit(Duality.Input.Key.Number1))
+					if (DualityApp.Keyboard.KeyPressed(Duality.Input.Key.T))
 					{
-						if (time == 5)
-							return;
-						GameTimer.Stop();
-						GameTimer.Start();
-						if (time == 12)
-							time = 1;
-						else
-							time++;
+						if (DualityApp.Keyboard.KeyHit(Duality.Input.Key.Number1))
+						{
+							if (time == 5)
+								return;
+							GuardTimer.Stop();
+							GuardTimer.Start();
+							if (time == 12)
+								time = 1;
+							else
+								time++;
+							List<byte> msg = new List<byte>();
+							msg.Add(1);
+							msg.Add((byte)time);
+							Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 26, msg.ToArray());
+						}
+						if (DualityApp.Keyboard.KeyHit(Duality.Input.Key.Number2))
+						{
+							if (time == 12)
+								return;
+							GuardTimer.Stop();
+							GuardTimer.Start();
+							if (time == 1)
+								time = 12;
+							else
+								time--;
+							List<byte> msg = new List<byte>();
+							msg.Add(1);
+							msg.Add((byte)time);
+							Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 26, msg.ToArray());
+						}
+						if (DualityApp.Keyboard.KeyHit(Duality.Input.Key.N))
+						{
+							GuardTimer.Stop();
+							GuardTimer.Interval = 1000;
+							GuardTimer.Start();
+						}
 					}
-					if (DualityApp.Keyboard.KeyHit(Duality.Input.Key.Number2))
+					if (DualityApp.Keyboard.KeyPressed(Duality.Input.Key.P))
 					{
-						if (time == 12)
-							return;
-						GameTimer.Stop();
-						GameTimer.Start();
-						if (time == 1)
-							time = 12;
-						else
-							time--;
+						if (DualityApp.Keyboard.KeyHit(Duality.Input.Key.N))
+						{
+							power = 5;
+						}
 					}
-					if (DualityApp.Keyboard.KeyHit(Duality.Input.Key.N))
+				}
+				if(lastmove > -1)
+				{
+					if(movesource != null)
 					{
-						GameTimer.Stop();
-						GameTimer.Interval = 1000;
-						GameTimer.Start();
+						if (!DisplayController.SM.IsPlaying(movesource))
+							movesource = null;
+					}
+					else
+					{
+						CameraViewer.IsDisabled = false;
+						lastmove = -1;
 					}
 				}
 			}
@@ -2686,16 +3273,18 @@ namespace FNaFMP.Office
 		private ContentRef<Sound> SixAMSound { get; set; }
 		[EditorHintFlags(MemberFlags.Visible)]
 		private ContentRef<Sound> ChildrenSound { get; set; }
+		[DontSerialize] private bool children = false;
 
-		private GameObjectData BG = null;
-		private GameObjectData NumFive = null;
-		private GameObjectData NumSix = null;
-		private GameObjectData BlackUp = null;
-		private GameObjectData BlackDown = null;
-		private GameObjectData AM = null;
-		private int alpha = 0;
-		private int next = 0;
-		private static bool begin = false;
+		[DontSerialize] private GameObjectData BG = null;
+		[DontSerialize] private GameObjectData NumFive = null;
+		[DontSerialize] private GameObjectData NumSix = null;
+		[DontSerialize] private GameObjectData BlackUp = null;
+		[DontSerialize] private GameObjectData BlackDown = null;
+		[DontSerialize] private GameObjectData AM = null;
+		[DontSerialize] private int alpha = 0;
+		[DontSerialize] private int next = 0;
+		[DontSerialize] private static bool begin = false;
+		[DontSerialize] private bool docheck = true;
 
 		private void DataCheck()
 		{
@@ -2705,8 +3294,11 @@ namespace FNaFMP.Office
 				{
 					BG = new GameObjectData(GameObj.GetChildByName("BG"));
 					BG.Renderer.ColorTint = BG.Renderer.ColorTint.WithAlpha(0);
+					docheck = false;
 				}
-				catch (Exception) { }
+				catch (Exception) {
+					docheck = true;
+				}
 			}
 			if (NumFive == null)
 			{
@@ -2714,8 +3306,12 @@ namespace FNaFMP.Office
 				{
 					NumFive = new GameObjectData(GameObj.GetChildByName("5"));
 					NumFive.Renderer.ColorTint = NumFive.Renderer.ColorTint.WithAlpha(0);
+					docheck = false;
 				}
-				catch (Exception) { }
+				catch (Exception)
+				{
+					docheck = true;
+				}
 			}
 			if (NumSix == null)
 			{
@@ -2723,8 +3319,12 @@ namespace FNaFMP.Office
 				{
 					NumSix = new GameObjectData(GameObj.GetChildByName("6"));
 					NumSix.Renderer.ColorTint = NumSix.Renderer.ColorTint.WithAlpha(0);
+					docheck = false;
 				}
-				catch (Exception) { }
+				catch (Exception)
+				{
+					docheck = true;
+				}
 			}
 			if (BlackUp == null)
 			{
@@ -2732,8 +3332,12 @@ namespace FNaFMP.Office
 				{
 					BlackUp = new GameObjectData(GameObj.GetChildByName("BlackUp"));
 					BlackUp.Renderer.ColorTint = BlackUp.Renderer.ColorTint.WithAlpha(0);
+					docheck = false;
 				}
-				catch (Exception) { }
+				catch (Exception)
+				{
+					docheck = true;
+				}
 			}
 			if (BlackDown == null)
 			{
@@ -2741,8 +3345,12 @@ namespace FNaFMP.Office
 				{
 					BlackDown = new GameObjectData(GameObj.GetChildByName("BlackDown"));
 					BlackDown.Renderer.ColorTint = BlackDown.Renderer.ColorTint.WithAlpha(0);
+					docheck = false;
 				}
-				catch (Exception) { }
+				catch (Exception)
+				{
+					docheck = true;
+				}
 			}
 			if (AM == null)
 			{
@@ -2750,23 +3358,29 @@ namespace FNaFMP.Office
 				{
 					AM = new GameObjectData(GameObj.GetChildByName("AM"));
 					AM.Renderer.ColorTint = AM.Renderer.ColorTint.WithAlpha(0);
+					docheck = false;
 				}
-				catch (Exception) { }
+				catch (Exception)
+				{
+					docheck = true;
+				}
 			}
 		}
 
 		public void OnActivate()
 		{
-			DataCheck();
+			docheck = true;
 			Visible = false;
 			Finished = false;
 			begin = false;
+			children = false;
 			alpha = 0;
 			next = 0;
 		}
 
 		public void OnDeactivate()
 		{
+			AM = null;
 			BG = null;
 			NumFive = null;
 			NumSix = null;
@@ -2776,9 +3390,10 @@ namespace FNaFMP.Office
 
 		public void OnUpdate()
 		{
-			DataCheck();
 			if(GameController.GameTime == 6)
 			{
+				if (docheck)
+					DataCheck();
 				if (Finished)
 					return;
 				if(AM.Renderer.ColorTint.A < 255)
@@ -2792,6 +3407,10 @@ namespace FNaFMP.Office
 							DisplayController.SM.PlaySound(SixAMSound);
 						}
 						CameraAnimator.DisableCamera = true;
+						Vector3 pos = NumFive.GameObj.Transform.Pos;
+						pos.Y = 0;
+						NumFive.GameObj.Transform.MoveTo(pos);
+						NumSix.GameObj.Transform.MoveTo(pos);
 					}
 					if (next == 0)
 					{
@@ -2827,17 +3446,18 @@ namespace FNaFMP.Office
 					}
 					else
 					{
-						if (next < 600)
+						if (next < 200)
 						{
-							if (ChildrenSound != null)
-								DisplayController.SM.PlaySound(ChildrenSound);
-							NumFive.Renderer.ColorTint = NumFive.Renderer.ColorTint.WithAlpha(0);
-							BlackUp.Renderer.ColorTint = BlackUp.Renderer.ColorTint.WithAlpha(0);
-							BlackDown.Renderer.ColorTint = BlackDown.Renderer.ColorTint.WithAlpha(0);
-							while (next < 600)
+							if (!children)
 							{
-								next++;
+								if (ChildrenSound != null)
+									DisplayController.SM.PlaySound(ChildrenSound);
+								NumFive.Renderer.ColorTint = NumFive.Renderer.ColorTint.WithAlpha(0);
+								BlackUp.Renderer.ColorTint = BlackUp.Renderer.ColorTint.WithAlpha(0);
+								BlackDown.Renderer.ColorTint = BlackDown.Renderer.ColorTint.WithAlpha(0);
+								children = true;
 							}
+							next++;
 						}
 						else
 						{

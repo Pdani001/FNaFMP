@@ -1,7 +1,7 @@
 ﻿<root dataType="Struct" type="Duality.DualityAppData" id="129723834">
   <appName dataType="String">FNAF MP (WIP)</appName>
   <customData />
-  <forcedRenderResizeMode dataType="Enum" type="Duality.TargetResize" name="None" value="0" />
+  <forcedRenderResizeMode dataType="Enum" type="Duality.TargetResize" name="Stretch" value="1" />
   <forcedRenderSize dataType="Struct" type="Duality.Point2">
     <X dataType="Int">1280</X>
     <Y dataType="Int">720</Y>
@@ -18,6 +18,6 @@
   <startScene dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Scene]]">
     <contentPath dataType="String">Data\Scenes\Splash.Scene.res</contentPath>
   </startScene>
-  <version dataType="UInt">1169</version>
+  <version dataType="UInt">1376</version>
 </root>
 <!-- XmlFormatterBase Document Separator -->

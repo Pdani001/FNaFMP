@@ -12,6 +12,7 @@ using Alzaitu.Lacewing.Client.Packet;
 using Alzaitu.Lacewing.Client;
 using FNaFMP.Utility;
 using FNaFMP.Alzaitu.Lacewing.Client.Packet;
+using System.Text;
 
 namespace FNaFMP.Select
 {
@@ -21,9 +22,9 @@ namespace FNaFMP.Select
 		private List<int> Players = new List<int>();
 		public ContentRef<Scene> LobbyScene { get; set; }
 		public ContentRef<Scene> LoadingScene { get; set; }
-		private static Dictionary<Core.Character, Checkmark> Checkmarks = new Dictionary<Core.Character, Checkmark>();
-		private static Dictionary<int, Core.Character> Peers = new Dictionary<int, Core.Character>();
-		private static List<Core.Character> Ready = new List<Core.Character>();
+		[DontSerialize] private static Dictionary<Core.Character, Checkmark> Checkmarks = new Dictionary<Core.Character, Checkmark>();
+		[DontSerialize] private static Dictionary<int, Core.Character> Peers = new Dictionary<int, Core.Character>();
+		[DontSerialize] private static List<Core.Character> Ready = new List<Core.Character>();
 		public static void LoadCheckmark(Checkmark mark)
 		{
 			if (mark == null || mark.Character == Core.Character.None)
@@ -61,6 +62,9 @@ namespace FNaFMP.Select
 				DiscordRPC.RichPresence presence = Core.DRPC.CurrentPresence;
 				Core.DRPC.SetPresence(Core.BuildPresence("In Lobby","Selecting",presence.Party.ID,5,presence.Party.Size));
 			}
+			AllowReady = true;
+			countdown = -1;
+			nextcount = -1;
 			Ready.Clear();
 			Peers.Clear();
 			Players.Clear();
@@ -68,7 +72,7 @@ namespace FNaFMP.Select
 			{
 				if (!Core.Client.IsConnected)
 				{
-					Utilities.Logger.Write(Utility.DualityLogger.LogLevel.ERROR, "Connection the the server was interrupted, returning to lobby...");
+					Utilities.Logger.Write(DualityLogger.LogLevel.ERROR, "Connection the the server was interrupted, returning to lobby...");
 					Scene.SwitchTo(LobbyScene);
 					return;
 				}
@@ -320,19 +324,20 @@ namespace FNaFMP.Select
 				Core.Client.Event.Disconnect -= Event_Disconnect;
 			}
 		}
-		private int countdown = -1;
-		private int nextcount = -1;
-		private bool leaveing = false;
+		public static bool AllowReady { get; private set; }
+		[DontSerialize] private int countdown = -1;
+		[DontSerialize] private int nextcount = -1;
+		[DontSerialize] private bool leaving = false;
 		public void OnUpdate()
 		{
 			if(Core.Client != null)
 			{
 				if (!Core.Client.IsConnected)
 				{
-					if (!leaveing)
+					if (!leaving)
 					{
 						Core.SelfCharacter = Core.Character.None;
-						leaveing = true;
+						leaving = true;
 						if (LobbyScene != null)
 						{
 							Scene.SwitchTo(LobbyScene);
@@ -350,10 +355,15 @@ namespace FNaFMP.Select
 					{
 						countdown = 6;
 					}
+					if (nextcount > -1 && countdown == 0)
+						AllowReady = false;
 					if (nextcount > -1 && countdown == (Core.Client.IsMaster ? -1 : 0))
 					{
 						if (LoadingScene != null)
 						{
+							nextcount = -1;
+							countdown = -1;
+							Ready.Clear();
 							Scene.SwitchTo(LoadingScene);
 						}
 						else
@@ -362,10 +372,10 @@ namespace FNaFMP.Select
 							Scene.SwitchTo(DualityApp.AppData.StartScene);
 						}
 					}
-					if(nextcount <= Time.MainTimer.TotalSeconds)
+					if(nextcount <= Time.MainTimer.TotalMilliseconds)
 					{
 						ChatBox.AddChat($"[Game] Starting in {countdown} second(s)...", ColorRgba.Red);
-						nextcount = (int)(Time.MainTimer.TotalSeconds + 1);
+						nextcount = (int)(Time.MainTimer.TotalMilliseconds + 1000);
 						countdown--;
 					}
 				} else
@@ -374,6 +384,7 @@ namespace FNaFMP.Select
 					{
 						ChatBox.AddChat($"[Game] Starting aborted.", ColorRgba.Red);
 					}
+					AllowReady = true;
 					countdown = -1;
 					nextcount = -1;
 				}
@@ -456,10 +467,11 @@ namespace FNaFMP.Select
 					bool onbox = (mouse.X > pos.X && mouse.X < pos.X + Size.X && mouse.Y > pos.Y && mouse.Y < pos.Y + Size.Y);
 					if (onbox)
 					{
-						if(Character == Core.Character.Foxy)	// TEMPORARY, UNTIL FOXY IS IMPLEMENTED PROPERLY
+						/*if(Character == Core.Character.Foxy)	// TEMPORARY, UNTIL FOXY IS IMPLEMENTED PROPERLY
 						{
+							ChatBox.AddChat("Foxy is not yet playable.", new ColorRgba(143, 9, 9));
 							return;
-						}
+						}*/
 						if (nextclick > Time.MainTimer.TotalMilliseconds)
 							return;
 						nextclick = (uint)(Time.MainTimer.TotalMilliseconds + 500);
@@ -605,7 +617,7 @@ namespace FNaFMP.Select
 				if (DualityApp.Mouse.ButtonHit(MouseButton.Left))
 				{
 					bool onbox = (mouse.X > pos.X && mouse.X < pos.X + Size.X && mouse.Y > pos.Y && mouse.Y < pos.Y + Size.Y);
-					if (onbox)
+					if (onbox && BGTasks.AllowReady)
 					{
 						if (nextclick > Time.MainTimer.TotalMilliseconds)
 							return;
@@ -676,7 +688,7 @@ namespace FNaFMP.Select
 	{
 		[DontSerialize] private readonly Canvas canvas = new Canvas();
 
-		private static List<ChatLine> Chat = new List<ChatLine>();
+		[DontSerialize] private static List<ChatLine> Chat = new List<ChatLine>();
 
 		private ContentRef<Font> font = null;
 		public ContentRef<Font> Font
@@ -783,6 +795,17 @@ namespace FNaFMP.Select
 						Text = "Playing as: " + Core.Client.UserName,
 						Color = new ColorRgba(255, 208, 0)
 					});
+					if (!Core.Client.IsMaster)
+					{
+						StringBuilder builder = new StringBuilder();
+						foreach(ClientPeer peer in Core.Client.joinedChannels[0])
+						{
+							if (builder.Length > 0)
+								builder.Append(", ");
+							builder.Append(peer.Name);
+						}
+						AddChat("Current players: " + builder.ToString(), new ColorRgba(255, 208, 0));
+					}
 				}
 			}
 
@@ -1006,6 +1029,7 @@ namespace FNaFMP.Select
 
 		public void OnDeactivate()
 		{
+			Chat.Clear();
 			DualityApp.Keyboard.KeyDown -= KeyDown;
 			DualityApp.Keyboard.KeyUp -= KeyUp;
 			if (Core.Client != null)

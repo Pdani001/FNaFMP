@@ -105,9 +105,47 @@
             Defines a Duality core plugin.
             </summary>
         </member>
+        <member name="T:FNaFMP.Core.Character">
+            <summary>
+            List of characters, starting with None (0)
+            </summary>
+        </member>
         <member name="P:FNaFMP.Core.DEBUG">
             <summary>
             If true, more information will be available to the user
+            </summary>
+        </member>
+        <member name="T:FNaFMP.Core.GameDifficulty">
+            <summary>List of game difficulties</summary>
+        </member>
+        <member name="F:FNaFMP.Core.GameDifficulty.VeryEasy">
+            <summary>
+            StringValue: Very Easy
+            </summary>
+        </member>
+        <member name="F:FNaFMP.Core.GameDifficulty.Easy">
+            <summary>
+            StringValue: Easy
+            </summary>
+        </member>
+        <member name="F:FNaFMP.Core.GameDifficulty.Medium">
+            <summary>
+            StringValue: Medium
+            </summary>
+        </member>
+        <member name="F:FNaFMP.Core.GameDifficulty.Hard">
+            <summary>
+            StringValue: Hard
+            </summary>
+        </member>
+        <member name="F:FNaFMP.Core.GameDifficulty.VeryHard">
+            <summary>
+            StringValue: Very Hard
+            </summary>
+        </member>
+        <member name="P:FNaFMP.Core.Difficulty">
+            <summary>
+            Defines the difficulty of the game
             </summary>
         </member>
     </members>

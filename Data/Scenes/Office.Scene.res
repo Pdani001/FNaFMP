@@ -69,19 +69,11 @@
           <item dataType="Struct" type="FNaFMP.Office.CameraViewer" id="1065128514">
             <active dataType="Bool">true</active>
             <gameobj dataType="ObjectRef">1256118317</gameobj>
-            <lastTime dataType="Int">0</lastTime>
-            <started dataType="Bool">false</started>
           </item>
           <item dataType="Struct" type="FNaFMP.Office.DisplayController" id="459163443">
-            <active dataType="Bool">true</active>
-            <gameobj dataType="ObjectRef">1256118317</gameobj>
-            <started dataType="Bool">true</started>
-          </item>
-          <item dataType="Struct" type="FNaFMP.Office.FreddyMusicbox" id="3953352185">
-            <_x003C_MusicBox_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
-              <contentPath dataType="String">Data\Office\music box.Sound.res</contentPath>
-            </_x003C_MusicBox_x003E_k__BackingField>
-            <_x003C_source_x003E_k__BackingField />
+            <_x003C_FanSound_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+              <contentPath dataType="String">Data\fan\fan_sound.Sound.res</contentPath>
+            </_x003C_FanSound_x003E_k__BackingField>
             <active dataType="Bool">true</active>
             <gameobj dataType="ObjectRef">1256118317</gameobj>
           </item>
@@ -101,7 +93,7 @@
             <gameobj dataType="ObjectRef">1256118317</gameobj>
           </item>
         </_items>
-        <_size dataType="Int">9</_size>
+        <_size dataType="Int">8</_size>
       </compList>
       <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="2827722272" surrogate="true">
         <header />
@@ -115,7 +107,6 @@
             <item dataType="Type" id="3404768858" value="FNaFMP.Office.DisplayController" />
             <item dataType="Type" id="1108852182" value="FNaFMP.Utility.HudRenderer" />
             <item dataType="Type" id="2960480314" value="FNaFMP.Office.ScreenText" />
-            <item dataType="Type" id="2012839670" value="FNaFMP.Office.FreddyMusicbox" />
           </keys>
           <values dataType="Array" type="System.Object[]" id="2244243144">
             <item dataType="ObjectRef">1313395535</item>
@@ -126,7 +117,6 @@
             <item dataType="ObjectRef">459163443</item>
             <item dataType="ObjectRef">737527849</item>
             <item dataType="ObjectRef">261733984</item>
-            <item dataType="ObjectRef">3953352185</item>
           </values>
         </body>
       </compMap>
@@ -200,9 +190,7 @@
           </item>
           <item dataType="Struct" type="FNaFMP.Office.CameraRenderer" id="3780257928">
             <active dataType="Bool">true</active>
-            <animator />
             <gameobj dataType="ObjectRef">194760272</gameobj>
-            <lastTime dataType="Int">0</lastTime>
             <list dataType="Struct" type="System.Collections.Generic.List`1[[System.Collections.Generic.List`1[[FNaFMP.Office.CameraView]]]]" id="86207104">
               <_items dataType="Array" type="System.Collections.Generic.List`1[[FNaFMP.Office.CameraView]][]" id="2129012124" length="16">
                 <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.CameraView]]" id="1927433668">
@@ -770,8 +758,46 @@
               </_items>
               <_size dataType="Int">11</_size>
             </list>
-            <renderer />
-            <transform />
+          </item>
+          <item dataType="Struct" type="FNaFMP.Office.FoxyListener" id="3963297672">
+            <_x003C_FoxyDoorBang_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+              <contentPath dataType="String">Data\Camera\knock.Sound.res</contentPath>
+            </_x003C_FoxyDoorBang_x003E_k__BackingField>
+            <_x003C_FoxyRun_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+              <contentPath dataType="String">Data\Camera\run.Sound.res</contentPath>
+            </_x003C_FoxyRun_x003E_k__BackingField>
+            <active dataType="Bool">true</active>
+            <attack dataType="Int">-1</attack>
+            <gameobj dataType="ObjectRef">194760272</gameobj>
+          </item>
+          <item dataType="Struct" type="FNaFMP.Office.FreddyMusicbox" id="2891994140">
+            <_x003C_BlackScreen_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
+              <contentPath dataType="String">Data\Office\office-black.Material.res</contentPath>
+            </_x003C_BlackScreen_x003E_k__BackingField>
+            <_x003C_DarkOffice_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
+              <contentPath dataType="String">Data\Office\office-nopower.Material.res</contentPath>
+            </_x003C_DarkOffice_x003E_k__BackingField>
+            <_x003C_DarkOfficeFreddy_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
+              <contentPath dataType="String">Data\Office\office-nopower+freddy.Material.res</contentPath>
+            </_x003C_DarkOfficeFreddy_x003E_k__BackingField>
+            <_x003C_DeepSteps_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+              <contentPath dataType="String">Data\Office\deep steps.Sound.res</contentPath>
+            </_x003C_DeepSteps_x003E_k__BackingField>
+            <_x003C_FreddyScene_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Scene]]">
+              <contentPath dataType="String">Data\Scenes\Freddy.Scene.res</contentPath>
+            </_x003C_FreddyScene_x003E_k__BackingField>
+            <_x003C_LightSound_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+              <contentPath dataType="String">Data\Doors\light.Sound.res</contentPath>
+            </_x003C_LightSound_x003E_k__BackingField>
+            <_x003C_MusicBox_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+              <contentPath dataType="String">Data\Office\music box.Sound.res</contentPath>
+            </_x003C_MusicBox_x003E_k__BackingField>
+            <_x003C_PowerDownSound_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+              <contentPath dataType="String">Data\Office\powerdown.Sound.res</contentPath>
+            </_x003C_PowerDownSound_x003E_k__BackingField>
+            <_x003C_source_x003E_k__BackingField />
+            <active dataType="Bool">true</active>
+            <gameobj dataType="ObjectRef">194760272</gameobj>
           </item>
           <item dataType="Struct" type="FNaFMP.Office.FreddyPoster" id="3461982009">
             <active dataType="Bool">true</active>
@@ -791,25 +817,98 @@
             <_x003C_Menu_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Scene]]">
               <contentPath dataType="String">Data\Scenes\Lobbies.Scene.res</contentPath>
             </_x003C_Menu_x003E_k__BackingField>
+            <_x003C_MoveSounds_x003E_k__BackingField dataType="Struct" type="System.Collections.Generic.List`1[[Duality.ContentRef`1[[Duality.Resources.Sound]]]]" id="1353139626">
+              <_items dataType="Array" type="Duality.ContentRef`1[[Duality.Resources.Sound]][]" id="447772704" length="4">
+                <item dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+                  <contentPath dataType="String">Data\Camera\sound\garble1.Sound.res</contentPath>
+                </item>
+                <item dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+                  <contentPath dataType="String">Data\Camera\sound\garble2.Sound.res</contentPath>
+                </item>
+                <item dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+                  <contentPath dataType="String">Data\Camera\sound\garble3.Sound.res</contentPath>
+                </item>
+              </_items>
+              <_size dataType="Int">3</_size>
+            </_x003C_MoveSounds_x003E_k__BackingField>
             <active dataType="Bool">true</active>
-            <disconnected dataType="Bool">false</disconnected>
             <gameobj dataType="ObjectRef">194760272</gameobj>
-            <GameTimer />
-            <PowerTimer />
-            <RobotTimer />
           </item>
           <item dataType="Struct" type="FNaFMP.Office.JumpscareManager" id="3043278311">
-            <_x003C_AfterJump_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Scene]]" />
-            <_x003C_jumpscare_x003E_k__BackingField />
-            <_x003C_jumpscaretime_x003E_k__BackingField />
+            <_x003C_AfterJump_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Scene]]">
+              <contentPath dataType="String">Data\Scenes\Died.Scene.res</contentPath>
+            </_x003C_AfterJump_x003E_k__BackingField>
+            <_x003C_jumpscare_x003E_k__BackingField dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[FNaFMP.Office.CameraView]]" id="578746395" surrogate="true">
+              <header />
+              <body>
+                <keys dataType="Array" type="System.Object[]" id="149427862">
+                  <item dataType="Enum" type="FNaFMP.Core+Character" name="Freddy" value="1" />
+                  <item dataType="Enum" type="FNaFMP.Core+Character" name="Bonnie" value="2" />
+                  <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
+                  <item dataType="Enum" type="FNaFMP.Core+Character" name="Foxy" value="4" />
+                </keys>
+                <values dataType="Array" type="System.Object[]" id="3870096602">
+                  <item dataType="Struct" type="FNaFMP.Office.CameraView" id="667310692">
+                    <duration dataType="Float">0.6</duration>
+                    <extra dataType="Int">160</extra>
+                    <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
+                      <contentPath dataType="String">Data\Jumpscare\jump-freddy.Material.res</contentPath>
+                    </mat>
+                    <mode dataType="Enum" type="Duality.Components.Renderers.SpriteAnimator+LoopMode" name="Once" value="0" />
+                    <move dataType="Bool">false</move>
+                    <robots />
+                  </item>
+                  <item dataType="Struct" type="FNaFMP.Office.CameraView" id="4136060950">
+                    <duration dataType="Float">0.35</duration>
+                    <extra dataType="Int">160</extra>
+                    <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
+                      <contentPath dataType="String">Data\Jumpscare\jump-bonnie.Material.res</contentPath>
+                    </mat>
+                    <mode dataType="Enum" type="Duality.Components.Renderers.SpriteAnimator+LoopMode" name="Loop" value="1" />
+                    <move dataType="Bool">false</move>
+                    <robots />
+                  </item>
+                  <item dataType="Struct" type="FNaFMP.Office.CameraView" id="1682173792">
+                    <duration dataType="Float">0.11</duration>
+                    <extra dataType="Int">160</extra>
+                    <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
+                      <contentPath dataType="String">Data\Jumpscare\jump-chica.Material.res</contentPath>
+                    </mat>
+                    <mode dataType="Enum" type="Duality.Components.Renderers.SpriteAnimator+LoopMode" name="Loop" value="1" />
+                    <move dataType="Bool">false</move>
+                    <robots />
+                  </item>
+                  <item dataType="Struct" type="FNaFMP.Office.CameraView" id="3972292450">
+                    <duration dataType="Float">0.6</duration>
+                    <extra dataType="Int">-1</extra>
+                    <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
+                      <contentPath dataType="String">Data\Jumpscare\jump-foxy.Material.res</contentPath>
+                    </mat>
+                    <mode dataType="Enum" type="Duality.Components.Renderers.SpriteAnimator+LoopMode" name="Once" value="0" />
+                    <move dataType="Bool">false</move>
+                    <robots />
+                  </item>
+                </values>
+              </body>
+            </_x003C_jumpscare_x003E_k__BackingField>
+            <_x003C_JumpscareSound_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+              <contentPath dataType="String">Data\Jumpscare\XSCREAM.Sound.res</contentPath>
+            </_x003C_JumpscareSound_x003E_k__BackingField>
+            <_x003C_jumpscaretime_x003E_k__BackingField dataType="Struct" type="System.Collections.Generic.Dictionary`2[[FNaFMP.Core+Character],[System.Int32]]" id="3696683368" surrogate="true">
+              <header />
+              <body>
+                <keys dataType="Array" type="System.Object[]" id="3901545841">
+                  <item dataType="Enum" type="FNaFMP.Core+Character" name="Bonnie" value="2" />
+                  <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
+                </keys>
+                <values dataType="Array" type="System.Object[]" id="753197280">
+                  <item dataType="Int">2</item>
+                  <item dataType="Int">2</item>
+                </values>
+              </body>
+            </_x003C_jumpscaretime_x003E_k__BackingField>
             <active dataType="Bool">true</active>
-            <animator dataType="ObjectRef">4229924108</animator>
-            <finished dataType="Bool">false</finished>
             <gameobj dataType="ObjectRef">194760272</gameobj>
-            <killer dataType="Enum" type="FNaFMP.Core+Character" name="None" value="0" />
-            <renderer dataType="ObjectRef">1663379552</renderer>
-            <start dataType="Bool">false</start>
-            <transform dataType="ObjectRef">252037490</transform>
           </item>
           <item dataType="Struct" type="FNaFMP.Office.MovementControl" id="1895485408">
             <active dataType="Bool">true</active>
@@ -1076,6 +1175,7 @@
                               <item dataType="Enum" type="FNaFMP.Core+Character" name="Bonnie" value="2" />
                               <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
                               <item dataType="Enum" type="FNaFMP.Core+Character" name="Foxy" value="4" />
+                              <item dataType="Enum" type="FNaFMP.Core+Character" name="Guard" value="5" />
                             </keys>
                             <values dataType="Array" type="System.Object[]" id="2076166166">
                               <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="1830731054">
@@ -1101,6 +1201,15 @@
                                   <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="220697564">
                                     <_x003C_Position_x003E_k__BackingField dataType="Int">2</_x003C_Position_x003E_k__BackingField>
                                     <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Higher" value="4" />
+                                  </item>
+                                </_items>
+                                <_size dataType="Int">1</_size>
+                              </item>
+                              <item dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.MovePrevent]]" id="4237264090">
+                                <_items dataType="Array" type="FNaFMP.Office.MovePrevent[]" id="1556045468" length="4">
+                                  <item dataType="Struct" type="FNaFMP.Office.MovePrevent" id="1880701892">
+                                    <_x003C_Position_x003E_k__BackingField dataType="Int">7</_x003C_Position_x003E_k__BackingField>
+                                    <op dataType="Enum" type="FNaFMP.Office.MovePrevent+Operation" name="Equal" value="0" />
                                   </item>
                                 </_items>
                                 <_size dataType="Int">1</_size>
@@ -1792,7 +1901,6 @@
           </item>
           <item dataType="Struct" type="FNaFMP.Office.OfficeLightRenderer" id="2953169281">
             <active dataType="Bool">true</active>
-            <animator />
             <def dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
               <contentPath dataType="String">Data\Office\office_def.Material.res</contentPath>
             </def>
@@ -1827,7 +1935,6 @@
               </_items>
               <_size dataType="Int">2</_size>
             </left>
-            <renderer />
             <right dataType="Struct" type="System.Collections.Generic.List`1[[FNaFMP.Office.CameraView]]" id="2133841656">
               <_items dataType="Array" type="FNaFMP.Office.CameraView[]" id="1164822391" length="4">
                 <item dataType="Struct" type="FNaFMP.Office.CameraView" id="4234420110">
@@ -1858,11 +1965,9 @@
               </_items>
               <_size dataType="Int">2</_size>
             </right>
-            <startup dataType="Bool">false</startup>
-            <transform />
           </item>
         </_items>
-        <_size dataType="Int">9</_size>
+        <_size dataType="Int">11</_size>
       </compList>
       <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="1548074518" surrogate="true">
         <header />
@@ -1877,6 +1982,8 @@
             <item dataType="Type" id="3293687950" value="FNaFMP.Office.MovementControl" />
             <item dataType="Type" id="670388800" value="FNaFMP.Office.GameController" />
             <item dataType="Type" id="1600618506" value="FNaFMP.Office.JumpscareManager" />
+            <item dataType="Type" id="3246530316" value="FNaFMP.Office.FoxyListener" />
+            <item dataType="Type" id="131219686" value="FNaFMP.Office.FreddyMusicbox" />
           </keys>
           <values dataType="Array" type="System.Object[]" id="2117106766">
             <item dataType="ObjectRef">252037490</item>
@@ -1888,6 +1995,8 @@
             <item dataType="ObjectRef">1895485408</item>
             <item dataType="ObjectRef">1677696842</item>
             <item dataType="ObjectRef">3043278311</item>
+            <item dataType="ObjectRef">3963297672</item>
+            <item dataType="ObjectRef">2891994140</item>
           </values>
         </body>
       </compMap>
@@ -1958,14 +2067,7 @@
           </item>
           <item dataType="Struct" type="FNaFMP.Office.Static" id="1102931415">
             <active dataType="Bool">true</active>
-            <dark dataType="Int">0</dark>
             <gameobj dataType="ObjectRef">1623135267</gameobj>
-            <lastTime dataType="Int">0</lastTime>
-            <rnd dataType="Struct" type="System.Random" id="3324508583">
-              <inext dataType="Int">0</inext>
-              <inextp dataType="Int">21</inextp>
-              <SeedArray dataType="Array" type="System.Int32[]" id="3921513422">0, 90793558, 953079675, 1199634286, 1603037885, 513619741, 485524611, 204975276, 1932277061, 1433855577, 877077343, 1739985958, 382418377, 2001437569, 596503276, 13753412, 14135104, 1036829049, 1794143826, 360118856, 1718949841, 701802116, 601299138, 1466566892, 691722001, 30189946, 612323199, 61358857, 927698208, 656729141, 31023558, 360788697, 1720682233, 1799821520, 982093778, 1756989437, 1132578150, 1845787846, 1863356329, 1708334406, 1129934582, 847882197, 961041244, 376507634, 236192859, 219542485, 1468836720, 994109302, 674504481, 9776401, 781316774, 1314432063, 887599120, 1633785636, 1137373604, 722292405</SeedArray>
-            </rnd>
           </item>
         </_items>
         <_size dataType="Int">4</_size>
@@ -2064,10 +2166,9 @@
             <gameobj dataType="ObjectRef">2142513618</gameobj>
             <paused dataType="Bool">false</paused>
           </item>
-          <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="1738189146">
+          <item dataType="Struct" type="FNaFMP.Office.OfficeFan" id="121217701">
             <active dataType="Bool">true</active>
             <gameobj dataType="ObjectRef">2142513618</gameobj>
-            <render />
           </item>
         </_items>
         <_size dataType="Int">5</_size>
@@ -2080,14 +2181,14 @@
             <item dataType="ObjectRef">1240285980</item>
             <item dataType="ObjectRef">1128967702</item>
             <item dataType="ObjectRef">264927126</item>
-            <item dataType="Type" id="1180528928" value="FNaFMP.Office.VisibilityController" />
+            <item dataType="Type" id="1180528928" value="FNaFMP.Office.OfficeFan" />
           </keys>
           <values dataType="Array" type="System.Object[]" id="4221866970">
             <item dataType="ObjectRef">2199790836</item>
             <item dataType="ObjectRef">3611132898</item>
             <item dataType="ObjectRef">1882710158</item>
             <item dataType="ObjectRef">4213648085</item>
-            <item dataType="ObjectRef">1738189146</item>
+            <item dataType="ObjectRef">121217701</item>
           </values>
         </body>
       </compMap>
@@ -2148,7 +2249,6 @@
           <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="4007358689">
             <active dataType="Bool">true</active>
             <gameobj dataType="ObjectRef">116715865</gameobj>
-            <render />
           </item>
         </_items>
         <_size dataType="Int">3</_size>
@@ -2159,7 +2259,7 @@
           <keys dataType="Array" type="System.Object[]" id="2765595153">
             <item dataType="ObjectRef">3757206646</item>
             <item dataType="ObjectRef">1240285980</item>
-            <item dataType="ObjectRef">1180528928</item>
+            <item dataType="Type" id="1743461614" value="FNaFMP.Office.VisibilityController" />
           </keys>
           <values dataType="Array" type="System.Object[]" id="1101713824">
             <item dataType="ObjectRef">173993083</item>
@@ -2236,7 +2336,6 @@
           <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="672371021">
             <active dataType="Bool">true</active>
             <gameobj dataType="ObjectRef">1076695493</gameobj>
-            <render />
           </item>
         </_items>
         <_size dataType="Int">4</_size>
@@ -2248,7 +2347,7 @@
             <item dataType="ObjectRef">3757206646</item>
             <item dataType="ObjectRef">1240285980</item>
             <item dataType="ObjectRef">1128967702</item>
-            <item dataType="ObjectRef">1180528928</item>
+            <item dataType="ObjectRef">1743461614</item>
           </keys>
           <values dataType="Array" type="System.Object[]" id="2738089912">
             <item dataType="ObjectRef">1133972711</item>
@@ -2419,7 +2518,6 @@
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">2586317313</gameobj>
                               <number dataType="Int">0</number>
-                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -2514,11 +2612,8 @@
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.CameraButton" id="2585921855">
                         <active dataType="Bool">true</active>
-                        <animator />
                         <gameobj dataType="ObjectRef">4075703128</gameobj>
                         <number dataType="Int">0</number>
-                        <renderer />
-                        <transform />
                       </item>
                     </_items>
                     <_size dataType="Int">4</_size>
@@ -2610,7 +2705,6 @@
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">525618244</gameobj>
                               <number dataType="Int">1</number>
-                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -2705,11 +2799,8 @@
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.CameraButton" id="1138793221">
                         <active dataType="Bool">true</active>
-                        <animator />
                         <gameobj dataType="ObjectRef">2628574494</gameobj>
                         <number dataType="Int">1</number>
-                        <renderer />
-                        <transform />
                       </item>
                     </_items>
                     <_size dataType="Int">4</_size>
@@ -2801,7 +2892,6 @@
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">1706951847</gameobj>
                               <number dataType="Int">9</number>
-                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -2896,11 +2986,8 @@
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.CameraButton" id="1780227121">
                         <active dataType="Bool">true</active>
-                        <animator />
                         <gameobj dataType="ObjectRef">3270008394</gameobj>
                         <number dataType="Int">9</number>
-                        <renderer />
-                        <transform />
                       </item>
                     </_items>
                     <_size dataType="Int">4</_size>
@@ -2992,7 +3079,6 @@
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">2183099095</gameobj>
                               <number dataType="Int">2</number>
-                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -3087,11 +3173,8 @@
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.CameraButton" id="423164577">
                         <active dataType="Bool">true</active>
-                        <animator />
                         <gameobj dataType="ObjectRef">1912945850</gameobj>
                         <number dataType="Int">2</number>
-                        <renderer />
-                        <transform />
                       </item>
                     </_items>
                     <_size dataType="Int">4</_size>
@@ -3183,7 +3266,6 @@
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">1605021198</gameobj>
                               <number dataType="Int">3</number>
-                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -3278,11 +3360,8 @@
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.CameraButton" id="650145688">
                         <active dataType="Bool">true</active>
-                        <animator />
                         <gameobj dataType="ObjectRef">2139926961</gameobj>
                         <number dataType="Int">3</number>
-                        <renderer />
-                        <transform />
                       </item>
                     </_items>
                     <_size dataType="Int">4</_size>
@@ -3374,7 +3453,6 @@
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">2085367654</gameobj>
                               <number dataType="Int">4</number>
-                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -3469,11 +3547,8 @@
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.CameraButton" id="3611177389">
                         <active dataType="Bool">true</active>
-                        <animator />
                         <gameobj dataType="ObjectRef">805991366</gameobj>
                         <number dataType="Int">4</number>
-                        <renderer />
-                        <transform />
                       </item>
                     </_items>
                     <_size dataType="Int">4</_size>
@@ -3565,7 +3640,6 @@
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">1377852436</gameobj>
                               <number dataType="Int">5</number>
-                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -3660,11 +3734,8 @@
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.CameraButton" id="1156165724">
                         <active dataType="Bool">true</active>
-                        <animator />
                         <gameobj dataType="ObjectRef">2645946997</gameobj>
                         <number dataType="Int">5</number>
-                        <renderer />
-                        <transform />
                       </item>
                     </_items>
                     <_size dataType="Int">4</_size>
@@ -3756,7 +3827,6 @@
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">3697224140</gameobj>
                               <number dataType="Int">6</number>
-                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -3851,11 +3921,8 @@
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.CameraButton" id="1536288058">
                         <active dataType="Bool">true</active>
-                        <animator />
                         <gameobj dataType="ObjectRef">3026069331</gameobj>
                         <number dataType="Int">6</number>
-                        <renderer />
-                        <transform />
                       </item>
                     </_items>
                     <_size dataType="Int">4</_size>
@@ -3947,7 +4014,6 @@
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">3657089679</gameobj>
                               <number dataType="Int">7</number>
-                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -4042,11 +4108,8 @@
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.CameraButton" id="3878317610">
                         <active dataType="Bool">true</active>
-                        <animator />
                         <gameobj dataType="ObjectRef">1073131587</gameobj>
                         <number dataType="Int">7</number>
-                        <renderer />
-                        <transform />
                       </item>
                     </_items>
                     <_size dataType="Int">4</_size>
@@ -4138,7 +4201,6 @@
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">4239293993</gameobj>
                               <number dataType="Int">8</number>
-                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -4233,11 +4295,8 @@
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.CameraButton" id="990803953">
                         <active dataType="Bool">true</active>
-                        <animator />
                         <gameobj dataType="ObjectRef">2480585226</gameobj>
                         <number dataType="Int">8</number>
-                        <renderer />
-                        <transform />
                       </item>
                     </_items>
                     <_size dataType="Int">4</_size>
@@ -4329,7 +4388,6 @@
                               <active dataType="Bool">true</active>
                               <gameobj dataType="ObjectRef">4139811160</gameobj>
                               <number dataType="Int">10</number>
-                              <renderer />
                             </item>
                           </_items>
                           <_size dataType="Int">3</_size>
@@ -4424,11 +4482,8 @@
                       </item>
                       <item dataType="Struct" type="FNaFMP.Office.CameraButton" id="2117330591">
                         <active dataType="Bool">true</active>
-                        <animator />
                         <gameobj dataType="ObjectRef">3607111864</gameobj>
                         <number dataType="Int">10</number>
-                        <renderer />
-                        <transform />
                       </item>
                     </_items>
                     <_size dataType="Int">4</_size>
@@ -4593,7 +4648,6 @@
           <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="3150766468">
             <active dataType="Bool">true</active>
             <gameobj dataType="ObjectRef">3555090940</gameobj>
-            <render />
           </item>
         </_items>
         <_size dataType="Int">4</_size>
@@ -4605,7 +4659,7 @@
             <item dataType="ObjectRef">3757206646</item>
             <item dataType="ObjectRef">1240285980</item>
             <item dataType="ObjectRef">1128967702</item>
-            <item dataType="ObjectRef">1180528928</item>
+            <item dataType="ObjectRef">1743461614</item>
           </keys>
           <values dataType="Array" type="System.Object[]" id="359453838">
             <item dataType="ObjectRef">3612368158</item>
@@ -4680,7 +4734,6 @@
           <item dataType="Struct" type="FNaFMP.Office.FlipButton" id="4220880902">
             <active dataType="Bool">true</active>
             <gameobj dataType="ObjectRef">2786225269</gameobj>
-            <renderer />
           </item>
         </_items>
         <_size dataType="Int">3</_size>
@@ -4767,7 +4820,6 @@
           </item>
           <item dataType="Struct" type="FNaFMP.Office.CameraAnimator" id="1135260394">
             <active dataType="Bool">true</active>
-            <animator />
             <area dataType="Struct" type="Duality.Rect">
               <H dataType="Float">60</H>
               <W dataType="Float">610</W>
@@ -4782,8 +4834,6 @@
             </down_sound>
             <down_source />
             <gameobj dataType="ObjectRef">3573152774</gameobj>
-            <hover dataType="Bool">false</hover>
-            <renderer />
             <up dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
               <contentPath dataType="String">Data\Camera\animation\cam_up.Material.res</contentPath>
             </up>
@@ -4879,7 +4929,6 @@
           </item>
           <item dataType="Struct" type="FNaFMP.Office.BlipAnimator" id="1580661164">
             <active dataType="Bool">true</active>
-            <animator />
             <gameobj dataType="ObjectRef">1044058778</gameobj>
             <sound dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
               <contentPath dataType="String">Data\blip\blip.Sound.res</contentPath>
@@ -4925,7 +4974,7 @@
             <active dataType="Bool">true</active>
             <children />
             <compList dataType="Struct" type="System.Collections.Generic.List`1[[Duality.Component]]" id="2943829692">
-              <_items dataType="Array" type="Duality.Component[]" id="1453490756">
+              <_items dataType="Array" type="Duality.Component[]" id="1453490756" length="4">
                 <item dataType="Struct" type="Duality.Components.Transform" id="681232150">
                   <active dataType="Bool">true</active>
                   <angle dataType="Float">0</angle>
@@ -4988,7 +5037,9 @@
                       <Y dataType="Float">252</Y>
                     </door>
                     <killed dataType="Bool">false</killed>
-                    <killedSound dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]" />
+                    <killedSound dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+                      <contentPath dataType="String">Data\Camera\error.Sound.res</contentPath>
+                    </killedSound>
                     <light dataType="Struct" type="Duality.Rect">
                       <H dataType="Float">120</H>
                       <W dataType="Float">62</W>
@@ -5006,22 +5057,9 @@
                     </open_nolight>
                   </control>
                   <gameobj dataType="ObjectRef">623954932</gameobj>
-                  <random dataType="Struct" type="System.Random" id="2827153462">
-                    <inext dataType="Int">0</inext>
-                    <inextp dataType="Int">21</inextp>
-                    <SeedArray dataType="Array" type="System.Int32[]" id="3319982142">0, 1997300952, 2106566580, 209244923, 1378759132, 1339194957, 147773207, 1346011034, 1037875007, 416011793, 1857175024, 1022297027, 365866202, 11028385, 204882631, 1114748273, 2734503, 771177825, 25200602, 408553370, 913507528, 1958705737, 196339461, 1761591373, 1932650762, 1849279461, 662850010, 1520298576, 2095192997, 1400691484, 1230672668, 1076341719, 2041718212, 1145822183, 425422702, 1219511464, 1076488565, 1035226962, 253181395, 1963109962, 543200486, 1953043242, 1971701055, 1319624869, 348898054, 1621571622, 1178950099, 387862157, 1191547448, 830295259, 1246852033, 33660062, 1763897576, 1659947838, 103141762, 1286965610</SeedArray>
-                  </random>
-                  <renderer dataType="ObjectRef">2092574212</renderer>
-                  <source />
-                  <started dataType="Bool">false</started>
-                </item>
-                <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="219630460">
-                  <active dataType="Bool">true</active>
-                  <gameobj dataType="ObjectRef">623954932</gameobj>
-                  <render />
                 </item>
               </_items>
-              <_size dataType="Int">4</_size>
+              <_size dataType="Int">3</_size>
             </compList>
             <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="332759702" surrogate="true">
               <header />
@@ -5029,13 +5067,11 @@
                 <keys dataType="Array" type="System.Object[]" id="1939877782">
                   <item dataType="ObjectRef">3757206646</item>
                   <item dataType="ObjectRef">1240285980</item>
-                  <item dataType="ObjectRef">1180528928</item>
                   <item dataType="Type" id="3822350368" value="FNaFMP.Office.OfficeController" />
                 </keys>
                 <values dataType="Array" type="System.Object[]" id="1431506650">
                   <item dataType="ObjectRef">681232150</item>
                   <item dataType="ObjectRef">2092574212</item>
-                  <item dataType="ObjectRef">219630460</item>
                   <item dataType="ObjectRef">959204500</item>
                 </values>
               </body>
@@ -5115,8 +5151,6 @@
           </item>
           <item dataType="Struct" type="FNaFMP.Office.DoorAnimator" id="2832897389">
             <active dataType="Bool">true</active>
-            <anim dataType="Bool">false</anim>
-            <animator dataType="ObjectRef">2625962916</animator>
             <close dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
               <contentPath dataType="String">Data\Doors\Left\left-closed.Material.res</contentPath>
             </close>
@@ -5131,17 +5165,13 @@
             <opening dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
               <contentPath dataType="String">Data\Doors\Left\left-opening.Material.res</contentPath>
             </opening>
-            <renderer dataType="ObjectRef">59418360</renderer>
             <sound dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
               <contentPath dataType="String">Data\Doors\door.Sound.res</contentPath>
             </sound>
-            <state dataType="Int">0</state>
-            <transform dataType="ObjectRef">2943043594</transform>
           </item>
           <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="2481441904">
             <active dataType="Bool">true</active>
             <gameobj dataType="ObjectRef">2885766376</gameobj>
-            <render />
           </item>
         </_items>
         <_size dataType="Int">5</_size>
@@ -5153,7 +5183,7 @@
             <item dataType="ObjectRef">3757206646</item>
             <item dataType="ObjectRef">1240285980</item>
             <item dataType="ObjectRef">1128967702</item>
-            <item dataType="ObjectRef">1180528928</item>
+            <item dataType="ObjectRef">1743461614</item>
             <item dataType="Type" id="3448165340" value="FNaFMP.Office.DoorAnimator" />
           </keys>
           <values dataType="Array" type="System.Object[]" id="3779320718">
@@ -5230,7 +5260,6 @@
           <item dataType="Struct" type="FNaFMP.Office.DisabledCamera" id="2254648712">
             <active dataType="Bool">true</active>
             <gameobj dataType="ObjectRef">2127599329</gameobj>
-            <render />
           </item>
         </_items>
         <_size dataType="Int">3</_size>
@@ -5270,7 +5299,7 @@
             <active dataType="Bool">true</active>
             <children />
             <compList dataType="Struct" type="System.Collections.Generic.List`1[[Duality.Component]]" id="3873837435">
-              <_items dataType="Array" type="Duality.Component[]" id="463649622">
+              <_items dataType="Array" type="Duality.Component[]" id="463649622" length="4">
                 <item dataType="Struct" type="Duality.Components.Transform" id="3460662945">
                   <active dataType="Bool">true</active>
                   <angle dataType="Float">0</angle>
@@ -5333,7 +5362,9 @@
                       <Y dataType="Float">268</Y>
                     </door>
                     <killed dataType="Bool">false</killed>
-                    <killedSound dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]" />
+                    <killedSound dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+                      <contentPath dataType="String">Data\Camera\error.Sound.res</contentPath>
+                    </killedSound>
                     <light dataType="Struct" type="Duality.Rect">
                       <H dataType="Float">120</H>
                       <W dataType="Float">62</W>
@@ -5351,22 +5382,9 @@
                     </open_nolight>
                   </control>
                   <gameobj dataType="ObjectRef">3403385727</gameobj>
-                  <random dataType="Struct" type="System.Random" id="4270342624">
-                    <inext dataType="Int">0</inext>
-                    <inextp dataType="Int">21</inextp>
-                    <SeedArray dataType="Array" type="System.Int32[]" id="3393095541">0, 1804333697, 1574772088, 979189224, 1137385959, 1062103584, 1137049447, 1068833102, 1444058137, 1946686768, 1234847232, 1320860139, 827406209, 1181240601, 300478969, 912182049, 1445838914, 1536764271, 832244490, 1783054171, 1854357001, 722381299, 1285528986, 1146500787, 610509999, 1443864644, 1426365320, 1137574211, 1945186645, 880094867, 1845219508, 1203738405, 1711165899, 721581206, 1897935589, 1024704393, 791655130, 265086281, 1910666329, 1024985805, 798443296, 1539308805, 1419186744, 1815678965, 526557426, 1387650272, 1591288998, 680149204, 254417028, 94759651, 886615780, 849913867, 1709717451, 196272889, 1359366760, 859283020</SeedArray>
-                  </random>
-                  <renderer dataType="ObjectRef">577037711</renderer>
-                  <source />
-                  <started dataType="Bool">false</started>
-                </item>
-                <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="2999061255">
-                  <active dataType="Bool">true</active>
-                  <gameobj dataType="ObjectRef">3403385727</gameobj>
-                  <render />
                 </item>
               </_items>
-              <_size dataType="Int">4</_size>
+              <_size dataType="Int">3</_size>
             </compList>
             <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="3960023208" surrogate="true">
               <header />
@@ -5375,13 +5393,11 @@
                   <item dataType="ObjectRef">3757206646</item>
                   <item dataType="ObjectRef">1240285980</item>
                   <item dataType="ObjectRef">3822350368</item>
-                  <item dataType="ObjectRef">1180528928</item>
                 </keys>
                 <values dataType="Array" type="System.Object[]" id="694356640">
                   <item dataType="ObjectRef">3460662945</item>
                   <item dataType="ObjectRef">577037711</item>
                   <item dataType="ObjectRef">3738635295</item>
-                  <item dataType="ObjectRef">2999061255</item>
                 </values>
               </body>
             </compMap>
@@ -5460,8 +5476,6 @@
           </item>
           <item dataType="Struct" type="FNaFMP.Office.DoorAnimator" id="3759225133">
             <active dataType="Bool">true</active>
-            <anim dataType="Bool">false</anim>
-            <animator dataType="ObjectRef">3552290660</animator>
             <close dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
               <contentPath dataType="String">Data\Doors\Right\right-closed.Material.res</contentPath>
             </close>
@@ -5476,17 +5490,13 @@
             <opening dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
               <contentPath dataType="String">Data\Doors\Right\right-opening.Material.res</contentPath>
             </opening>
-            <renderer dataType="ObjectRef">985746104</renderer>
             <sound dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
               <contentPath dataType="String">Data\Doors\door.Sound.res</contentPath>
             </sound>
-            <state dataType="Int">0</state>
-            <transform dataType="ObjectRef">3869371338</transform>
           </item>
           <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="3407769648">
             <active dataType="Bool">true</active>
             <gameobj dataType="ObjectRef">3812094120</gameobj>
-            <render />
           </item>
         </_items>
         <_size dataType="Int">5</_size>
@@ -5499,7 +5509,7 @@
             <item dataType="ObjectRef">1240285980</item>
             <item dataType="ObjectRef">1128967702</item>
             <item dataType="ObjectRef">3448165340</item>
-            <item dataType="ObjectRef">1180528928</item>
+            <item dataType="ObjectRef">1743461614</item>
           </keys>
           <values dataType="Array" type="System.Object[]" id="3979433102">
             <item dataType="ObjectRef">3869371338</item>
@@ -5613,13 +5623,10 @@
               </_items>
               <_size dataType="Int">11</_size>
             </list>
-            <renderer />
-            <transform />
           </item>
           <item dataType="Struct" type="FNaFMP.Office.VisibilityController" id="2390826459">
             <active dataType="Bool">true</active>
             <gameobj dataType="ObjectRef">2795150931</gameobj>
-            <render />
           </item>
         </_items>
         <_size dataType="Int">4</_size>
@@ -5631,7 +5638,7 @@
             <item dataType="ObjectRef">3757206646</item>
             <item dataType="ObjectRef">1240285980</item>
             <item dataType="Type" id="2223736950" value="FNaFMP.Office.LocationRenderer" />
-            <item dataType="ObjectRef">1180528928</item>
+            <item dataType="ObjectRef">1743461614</item>
           </keys>
           <values dataType="Array" type="System.Object[]" id="3776551624">
             <item dataType="ObjectRef">2852428149</item>
@@ -5709,8 +5716,6 @@
             </_x003C_TextFont_x003E_k__BackingField>
             <active dataType="Bool">true</active>
             <gameobj dataType="ObjectRef">419825610</gameobj>
-            <renderer dataType="ObjectRef">1888444890</renderer>
-            <transform dataType="ObjectRef">477102828</transform>
           </item>
         </_items>
         <_size dataType="Int">3</_size>
@@ -6179,33 +6184,7 @@
               <contentPath dataType="String">Data\SixAM\chimes.Sound.res</contentPath>
             </_x003C_SixAMSound_x003E_k__BackingField>
             <active dataType="Bool">true</active>
-            <alpha dataType="Int">0</alpha>
-            <AM dataType="Struct" type="FNaFMP.Office.GameObjectData" id="1418779062">
-              <_x003C_GameObj_x003E_k__BackingField dataType="ObjectRef">1511192840</_x003C_GameObj_x003E_k__BackingField>
-              <_x003C_Renderer_x003E_k__BackingField dataType="ObjectRef">2979812120</_x003C_Renderer_x003E_k__BackingField>
-            </AM>
-            <BG dataType="Struct" type="FNaFMP.Office.GameObjectData" id="2637727898">
-              <_x003C_GameObj_x003E_k__BackingField dataType="ObjectRef">3286489344</_x003C_GameObj_x003E_k__BackingField>
-              <_x003C_Renderer_x003E_k__BackingField dataType="ObjectRef">460141328</_x003C_Renderer_x003E_k__BackingField>
-            </BG>
-            <BlackDown dataType="Struct" type="FNaFMP.Office.GameObjectData" id="634011734">
-              <_x003C_GameObj_x003E_k__BackingField dataType="ObjectRef">2427814520</_x003C_GameObj_x003E_k__BackingField>
-              <_x003C_Renderer_x003E_k__BackingField dataType="ObjectRef">3896433800</_x003C_Renderer_x003E_k__BackingField>
-            </BlackDown>
-            <BlackUp dataType="Struct" type="FNaFMP.Office.GameObjectData" id="2342168954">
-              <_x003C_GameObj_x003E_k__BackingField dataType="ObjectRef">686348111</_x003C_GameObj_x003E_k__BackingField>
-              <_x003C_Renderer_x003E_k__BackingField dataType="ObjectRef">2154967391</_x003C_Renderer_x003E_k__BackingField>
-            </BlackUp>
             <gameobj dataType="ObjectRef">286730872</gameobj>
-            <next dataType="Int">0</next>
-            <NumFive dataType="Struct" type="FNaFMP.Office.GameObjectData" id="2969146358">
-              <_x003C_GameObj_x003E_k__BackingField dataType="ObjectRef">3953700022</_x003C_GameObj_x003E_k__BackingField>
-              <_x003C_Renderer_x003E_k__BackingField dataType="ObjectRef">1127352006</_x003C_Renderer_x003E_k__BackingField>
-            </NumFive>
-            <NumSix dataType="Struct" type="FNaFMP.Office.GameObjectData" id="1896430426">
-              <_x003C_GameObj_x003E_k__BackingField dataType="ObjectRef">1945264438</_x003C_GameObj_x003E_k__BackingField>
-              <_x003C_Renderer_x003E_k__BackingField dataType="ObjectRef">3413883718</_x003C_Renderer_x003E_k__BackingField>
-            </NumSix>
           </item>
         </_items>
         <_size dataType="Int">1</_size>

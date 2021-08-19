@@ -5,13 +5,14 @@ Door: Left 223x720; Right 248x720
 Panel: 92x247
 Its Me: 1280x720
 Button: 60x40
-Jumpscare (Fazbear): 1600x720 / 31 frames / 50 speed
-Jumpscare (Bonnie): 1600x720 / 11 frames / 75 speed
-Jumpscare (Chica): 1600x720 / 16 frames / 99 speed
-Jumpscare (Foxy): 1600x720 / 25 frames / 50 speed
+Jumpscare (Freddy 2): 1600x720 / 31 frames / 60 speed (0.50)
+Jumpscare (Fazbear): 1600x720 / 31 frames / 50 speed (0.60)
+Jumpscare (Bonnie): 1600x720 / 11 frames / 75 speed (0.35)
+Jumpscare (Chica): 1600x720 / 16 frames / 99 speed (0.11)
+Jumpscare (Foxy): 1600x720 / 25 frames / 50 speed (0.60)
 (Note: this is not all of the images, only the ones I documented /Pdani)
 ============
-
+640
 == CHARACTERS ==
 1: Freddy
 2: Bonnie
@@ -51,7 +52,9 @@ Game info: *3* (text) -> .game code.
 Robot join: *23* (number) -> .character.
 Guard status: *24* -> .light (0 off/1 left/2 right). .left door (0/1). .right door (0/1). .camera status (0/1). .camera position.
 Movement: *25* -> .character. .position. .magic value, can be left out.
-Power & Time *26* -> .power. .time.
+Power & Time *26* -> .type (0=power,1=time). .value.
 Animatronic requests jumpscare *27* (number) -> .character.
 Guard jumpscared *28* (number) -> .robot.
+Foxy office enter response *29* (number) -> .new state (0-2/21).
+Freddy InOffice Musicbox *30* (number) -> .state.
 ==============
