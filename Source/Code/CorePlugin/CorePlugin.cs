@@ -255,27 +255,27 @@ namespace FNaFMP
 		public enum GameDifficulty
 		{
 			/// <summary>
-			/// StringValue: Very Easy
+			/// Default move times, extra slow power drain
 			/// </summary>
 			[StringValue("Very Easy")]
 			VeryEasy = 0,
 			/// <summary>
-			/// StringValue: Easy
+			/// Couple seconds faster move times, slow power drain
 			/// </summary>
 			[StringValue("Easy")]
 			Easy = 1,
 			/// <summary>
-			/// StringValue: Medium
+			/// Significantly faster move times, noticably faster power drain
 			/// </summary>
 			[StringValue("Medium")]
 			Medium = 2,
 			/// <summary>
-			/// StringValue: Hard
+			/// Faster move times, faster power drain
 			/// </summary>
 			[StringValue("Hard")]
 			Hard = 3,
 			/// <summary>
-			/// StringValue: Very Hard
+			/// Extra fast move times, extra fast power drain
 			/// </summary>
 			[StringValue("Very Hard")]
 			VeryHard = 4
@@ -283,6 +283,8 @@ namespace FNaFMP
 
 		/// <summary>
 		/// Defines the difficulty of the game
+		/// <br/>
+		/// <b>For now this will always be Very Easy</b>
 		/// </summary>
 		public static GameDifficulty Difficulty { get; set; }
 

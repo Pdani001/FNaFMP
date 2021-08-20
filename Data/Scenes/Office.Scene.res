@@ -869,7 +869,7 @@
                     <robots />
                   </item>
                   <item dataType="Struct" type="FNaFMP.Office.CameraView" id="1682173792">
-                    <duration dataType="Float">0.11</duration>
+                    <duration dataType="Float">0.25</duration>
                     <extra dataType="Int">160</extra>
                     <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
                       <contentPath dataType="String">Data\Jumpscare\jump-chica.Material.res</contentPath>
@@ -902,11 +902,28 @@
                   <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
                 </keys>
                 <values dataType="Array" type="System.Object[]" id="753197280">
-                  <item dataType="Int">2</item>
-                  <item dataType="Int">2</item>
+                  <item dataType="Int">1</item>
+                  <item dataType="Int">1</item>
                 </values>
               </body>
             </_x003C_jumpscaretime_x003E_k__BackingField>
+            <_x003C_VoiceSounds_x003E_k__BackingField dataType="Struct" type="System.Collections.Generic.List`1[[Duality.ContentRef`1[[Duality.Resources.Sound]]]]" id="2319678161">
+              <_items dataType="Array" type="Duality.ContentRef`1[[Duality.Resources.Sound]][]" id="3261751524">
+                <item dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+                  <contentPath dataType="String">Data\Jumpscare\vocal1.Sound.res</contentPath>
+                </item>
+                <item dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+                  <contentPath dataType="String">Data\Jumpscare\vocal2.Sound.res</contentPath>
+                </item>
+                <item dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+                  <contentPath dataType="String">Data\Jumpscare\vocal3.Sound.res</contentPath>
+                </item>
+                <item dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+                  <contentPath dataType="String">Data\Jumpscare\vocal4.Sound.res</contentPath>
+                </item>
+              </_items>
+              <_size dataType="Int">4</_size>
+            </_x003C_VoiceSounds_x003E_k__BackingField>
             <active dataType="Bool">true</active>
             <gameobj dataType="ObjectRef">194760272</gameobj>
           </item>
@@ -1900,6 +1917,9 @@
             </mt>
           </item>
           <item dataType="Struct" type="FNaFMP.Office.OfficeLightRenderer" id="2953169281">
+            <_x003C_ScareSound_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+              <contentPath dataType="String">Data\Office\windowscare.Sound.res</contentPath>
+            </_x003C_ScareSound_x003E_k__BackingField>
             <active dataType="Bool">true</active>
             <def dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
               <contentPath dataType="String">Data\Office\office_def.Material.res</contentPath>

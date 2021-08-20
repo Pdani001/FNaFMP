@@ -120,33 +120,82 @@
         </member>
         <member name="F:FNaFMP.Core.GameDifficulty.VeryEasy">
             <summary>
-            StringValue: Very Easy
+            Default move times, extra slow power drain
             </summary>
         </member>
         <member name="F:FNaFMP.Core.GameDifficulty.Easy">
             <summary>
-            StringValue: Easy
+            Couple seconds faster move times, slow power drain
             </summary>
         </member>
         <member name="F:FNaFMP.Core.GameDifficulty.Medium">
             <summary>
-            StringValue: Medium
+            Significantly faster move times, noticably faster power drain
             </summary>
         </member>
         <member name="F:FNaFMP.Core.GameDifficulty.Hard">
             <summary>
-            StringValue: Hard
+            Faster move times, faster power drain
             </summary>
         </member>
         <member name="F:FNaFMP.Core.GameDifficulty.VeryHard">
             <summary>
-            StringValue: Very Hard
+            Extra fast move times, extra fast power drain
             </summary>
         </member>
         <member name="P:FNaFMP.Core.Difficulty">
             <summary>
             Defines the difficulty of the game
+            <br/>
+            <b>For now this will always be Very Easy</b>
             </summary>
+        </member>
+        <member name="P:FNaFMP.Office.GuardStatus.Light">
+            <summary>
+            Returns the guards current light direction
+            <br/>
+            0 = not using lights, 1 = left, 2 = right
+            </summary>
+        </member>
+        <member name="P:FNaFMP.Office.GuardStatus.LeftDoorClosed">
+            <summary>
+            Returns wether the left door is closed
+            </summary>
+            <returns>
+            true if the left door is closed, false otherwise
+            </returns>
+        </member>
+        <member name="P:FNaFMP.Office.GuardStatus.RightDoorClosed">
+            <summary>
+            Returns wether the right door is closed
+            </summary>
+            <returns>
+            true if the right door is closed, false otherwise
+            </returns>
+        </member>
+        <member name="P:FNaFMP.Office.GuardStatus.IsViewing">
+            <summary>
+            Returns wether the guard is looking at the camera
+            </summary>
+            <returns>
+            true if the guard is viewing the camera, false otherwise
+            </returns>
+        </member>
+        <member name="P:FNaFMP.Office.GuardStatus.Position">
+            <summary>
+            Returns the current camera position of the guard
+            </summary>
+            <remarks>
+            This should be used while also checking if the guard is viewing the camera or not. <see cref="P:FNaFMP.Office.GuardStatus.IsViewing"/>
+            </remarks>
+        </member>
+        <member name="P:FNaFMP.Office.GuardStatus.Active">
+            <summary>
+            Returns wether the guard is active or not
+            </summary>
+            <returns>
+            true if the guard is active, false otherwise
+            </returns>
         </member>
     </members>
 </doc>
