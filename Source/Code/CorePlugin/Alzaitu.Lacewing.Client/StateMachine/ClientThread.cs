@@ -18,7 +18,7 @@ namespace Alzaitu.Lacewing.Client.StateMachine
 		protected override void RunThread()
 		{
 			Packet.Packet packet;
-			while (!client.Disposed)
+			while (!client.Disposed && !client.IsDisconnect)
 			{
 				if (!client.IsConnected)
 				{
@@ -32,7 +32,8 @@ namespace Alzaitu.Lacewing.Client.StateMachine
 					}
 					catch (Exception e)
 					{
-						client.logger.Write("Exception: {0}",e);
+						if(client.debug)
+							client.logger.Write("Exception: {0}",e);
 						if (e.GetType() == typeof(IOException))
 						{
 							client.Event.OnDisconnect(new EventDisconnect
@@ -48,7 +49,7 @@ namespace Alzaitu.Lacewing.Client.StateMachine
 					PacketHandler.Handle(packet,client);
 				}
 			}
-			if(!client.Disposed)
+			if(!client.Disposed && !client.IsDisconnect)
 				client.Dispose();
 		}
 	}

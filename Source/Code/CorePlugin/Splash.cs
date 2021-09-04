@@ -1,18 +1,68 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Duality;
 using Duality.Components;
 using Duality.Components.Renderers;
 using Duality.Drawing;
+using Duality.Editor;
 using Duality.Input;
 using Duality.Resources;
 
 namespace FNaFMP.Startup
 {
+	public class LoadTest : Component, ICmpInitializable, ICmpUpdatable
+	{
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Scene> Continue { get; set; }
+		[DontSerialize] private bool finished = false;
+		[DontSerialize] private bool printed = false;
+		[DontSerialize] private int count = 0;
+		[DontSerialize] private int load = 0;
+		[DontSerialize] private string[] files = null;
+		public void OnActivate()
+		{
+			finished = false;
+			printed = false;
+			count = 0;
+			load = 0;
+			files = Directory.GetFiles(Environment.CurrentDirectory + "\\Data", "*.res", SearchOption.AllDirectories);
+		}
+
+		public void OnDeactivate()
+		{
+			
+		}
+
+		public void OnUpdate()
+		{
+			if (files.Length > count)
+			{
+				var file = files[count++];
+				var content = ContentProvider.RequestContent(file);
+				if (content != null)
+				{
+					content.EnsureLoaded();
+					load++;
+				}
+			}
+			else
+			{
+				finished = true;
+			}
+			if (finished && !printed)
+			{
+				printed = true;
+				Logs.Core.Write("Loading {0} resources finished!",load);
+				Scene.SwitchTo(Continue);
+			}
+		}
+	}
 	[RequiredComponent(typeof(Renderer))]
 	public class Splash : Component, ICmpUpdatable, ICmpInitializable
 	{
@@ -59,7 +109,6 @@ namespace FNaFMP.Startup
 			ContentRef<Material> next = renderers[count];
 			if (!render.SharedMaterial.Name.Equals(next.Name))
 			{
-				time = (int)Time.MainTimer.TotalSeconds;
 				render.SharedMaterial = next;
 				ColorRgba color = render.ColorTint;
 				color.A = (byte)((count == 0) ? 255 : 0);
@@ -92,6 +141,10 @@ namespace FNaFMP.Startup
 					}
 				}
 				render.Rect = new Rect(-(w / 2), -(h / 2), w, h);
+			}
+			if(time == 0)
+			{
+				time = (int)Time.MainTimer.TotalSeconds;
 			}
 			if (forward)
 			{
@@ -136,6 +189,9 @@ namespace FNaFMP.Startup
 
 		public void OnActivate()
 		{
+			count = 0;
+			forward = true;
+			time = 0;
 			DualityApp.Keyboard.KeyDown += Keyboard_KeyDown;
 			if(Core.Client != null && Core.Client.IsConnected)
 			{
@@ -171,6 +227,7 @@ namespace FNaFMP.Startup
 			}
 		}
 		private string display = null;
+		private string[] lines = null;
 		private static bool islast = false;
 		public static bool IsLast
 		{
@@ -192,10 +249,64 @@ namespace FNaFMP.Startup
 			canvas.State.TextFont = this.font;
 
 			Point2 window = Core.MaxWindowSize;
+			if (window.X == 0 || window.Y == 0)
+			{
+				canvas.End();
+				return;
+			}
 			if (display != null)
 			{
 				Vector2 size = canvas.MeasureText(display);
-				canvas.DrawText(display,(window.X/2)-(size.X/2),window.Y-size.Y);
+				float height = size.Y;
+				if (size.X > window.X)
+				{
+					if (lines == null)
+					{
+						List<string> build = new List<string>();
+						List<string> list = new List<string>();
+						size = new Vector2(0, 0);
+						int i = 0;
+						string[] split = display.Split(' ');
+						while (i < split.Length)
+						{
+							while (size.X < window.X)
+							{
+								build.Add(split[i]);
+								i++;
+								size = canvas.MeasureText(string.Join(" ", build.ToArray()));
+								if (i == split.Length)
+									break;
+							}
+							if (i < split.Length)
+							{
+								i -= 2;
+								if (build.Count > 0)
+								{
+									build.RemoveAt(build.Count - 1);
+									build.RemoveAt(build.Count - 1);
+								}
+							}
+							list.Add(string.Join(" ", build.ToArray()));
+							size = new Vector2(0, 0);
+							build.Clear();
+						}
+						lines = list.ToArray();
+					}
+					else
+					{
+						height = lines.Length * size.Y;
+						for(int i = 0; i < lines.Length; i++)
+						{
+							size = canvas.MeasureText(lines[i]);
+							canvas.DrawText(lines[i], (window.X / 2) - (size.X / 2), window.Y - height);
+							height -= size.Y;
+						}
+					}
+				}
+				else
+				{
+					canvas.DrawText(display, (window.X / 2) - (size.X / 2), window.Y - height);
+				}
 			}
 			
 
@@ -204,6 +315,7 @@ namespace FNaFMP.Startup
 
 		public void OnActivate()
 		{
+			lines = null;
 			islast = false;
 			if (texts.Count > 0)
 			{
@@ -217,6 +329,7 @@ namespace FNaFMP.Startup
 		public void OnDeactivate()
 		{
 			display = null;
+			lines = null;
 		}
 	}
 }

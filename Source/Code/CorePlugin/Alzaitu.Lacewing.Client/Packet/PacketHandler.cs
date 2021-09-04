@@ -152,9 +152,9 @@ namespace Alzaitu.Lacewing.Client.Packet
 					case PacketBinaryPeerMessage packetBinaryPeer:
 						if (client.debug)
 							client.logger.Write("Binary peer packet received");
-						bool hasClient = client.clientsByID.TryGetValue(packetBinaryPeer.Peer, out ClientPeer c);
+						bool hasClient = client.clientsByID.TryGetValue(packetBinaryPeer.Peer, out _);
 						ClientChannel ch = ClientChannel.GetChannelByID(client, packetBinaryPeer.Channel);
-						if (ch != null)
+						if (ch != null && hasClient)
 						{
 							switch (packet.Variant)
 							{

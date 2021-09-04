@@ -16,9 +16,12 @@ using Alzaitu.Lacewing.Client;
 using Duality.Editor;
 using Alzaitu.Lacewing.Client.Packet;
 using FNaFMP.Alzaitu.Lacewing.Client.Packet;
+using System.Threading;
+using Duality.Audio;
 
 namespace FNaFMP.Menu
 {
+	#region Global Menu
 	[RequiredComponent(typeof(SpriteRenderer))]
 	public class Logo : Component, ICmpInitializable
 	{
@@ -35,7 +38,7 @@ namespace FNaFMP.Menu
 
 		public void OnDeactivate()
 		{
-			SplashText.IsLast = false;
+			//SplashText.IsLast = false;
 		}
 	}
 	[RequiredComponent(typeof(SpriteRenderer))]
@@ -86,7 +89,7 @@ namespace FNaFMP.Menu
 		private int lastSprite = 0;
 		private readonly Random rnd = new Random();
 		private SpriteRenderer render = null;
-		private SoundEmitter.Source source = null;
+		private SoundInstance source = null;
 		private bool nosound = false;
 		public void OnUpdate()
 		{
@@ -113,19 +116,25 @@ namespace FNaFMP.Menu
 						break;
 					case 1:
 						if (RareMusic != null)
-							source = SM.PlaySound(RareMusic, true);
+						{
+							source = SM.PlayGlobalSound(RareMusic, true);
+						}
 						else
 							nosound = true;
 						break;
 					case 5:
 						if (ThemeTune != null)
-							source = SM.PlaySound(ThemeTune, false);
+						{
+							source = SM.PlayGlobalSound(ThemeTune, false);
+						}
 						else
 							nosound = true;
 						break;
 					default:
 						if (Ambience != null)
-							source = SM.PlaySound(Ambience, false);
+						{
+							source = SM.PlayGlobalSound(Ambience, false);
+						}
 						else
 							nosound = true;
 						break;
@@ -138,14 +147,14 @@ namespace FNaFMP.Menu
 					case 1:
 						break;
 					case 5:
-						if (!SM.IsPlaying(source))
+						if (!SM.IsPlaying(ThemeTune,true))
 						{
 							music = Randomizer.Random(2, 4);
 							source = null;
 						}
 						break;
 					default:
-						if (!SM.IsPlaying(source))
+						if (!SM.IsPlaying(Ambience,true))
 						{
 							music = Randomizer.Random(2, 5);
 							source = null;
@@ -183,6 +192,11 @@ namespace FNaFMP.Menu
 
 		public void OnActivate()
 		{
+			if (Core.MenuBGM != null)
+			{
+				source = Core.MenuBGM;
+				music = SplashText.IsLast ? 1 : source.Sound.Name == Ambience.Name ? 2 : 5;
+			}
 			SoundManager.OnLoad += SoundManager_OnLoad;
 			if (Core.DRPC != null)
 			{
@@ -199,7 +213,7 @@ namespace FNaFMP.Menu
 		public void OnDeactivate()
 		{
 			music = 0;
-			SM.StopSound(source);
+			Core.MenuBGM = source;
 			SM = null;
 		}
 	}
@@ -239,6 +253,888 @@ namespace FNaFMP.Menu
 		}
 	}
 
+	public class MenuBackButton : Component, ICmpRenderer
+	{
+		[DontSerialize] private readonly Canvas canvas = new Canvas();
+
+		private ContentRef<Font> font = null;
+		public ContentRef<Font> Font
+		{
+			get { return font; }
+			set { font = value; }
+		}
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Scene> BackScene { get; set; }
+
+		private Point2 location = new Point2(0, 0);
+		public Point2 ButtonLocation
+		{
+			get { return location; }
+			set { location = value; }
+		}
+
+		void ICmpRenderer.GetCullingInfo(out CullingInfo info)
+		{
+			info.Position = Vector3.Zero;
+			info.Radius = float.MaxValue;
+			info.Visibility = VisibilityFlag.AllGroups | VisibilityFlag.ScreenOverlay;
+		}
+		void ICmpRenderer.Draw(IDrawDevice device)
+		{
+			canvas.Begin(device);
+
+			canvas.State.SetMaterial(DrawTechnique.Mask);
+			canvas.State.ColorTint = ColorRgba.White;
+			canvas.State.TextFont = font;
+
+			string display = "Back";
+			Vector2 size = canvas.MeasureText(display);
+			canvas.DrawText(display, location.X - (size.X / 2), location.Y - (size.Y / 2));
+
+			canvas.End();
+
+			Vector2 mouse = DualityApp.Mouse.Pos;
+			if (DualityApp.Mouse.ButtonHit(MouseButton.Left))
+			{
+				if (mouse.X > location.X - (size.X / 2) && mouse.X < location.X + size.X + (size.X / 2) && mouse.Y > location.Y - (size.Y / 2) && mouse.Y < location.X + size.Y + (size.Y / 2))
+				{
+					if(BackScene != null)
+					{
+						Scene.SwitchTo(BackScene);
+					}
+				}
+			}
+
+		}
+	}
+	#endregion
+
+	#region Main Menu
+	internal class MenuButton
+	{
+		private readonly string Text;
+		private readonly ContentRef<Scene> Scene;
+		public MenuButton(string text, ContentRef<Scene> scene)
+		{
+			Text = text;
+			Scene = scene;
+		}
+		public string GetText()
+		{
+			return Text;
+		}
+
+		public ContentRef<Scene> GetScene()
+		{
+			return Scene;
+		}
+	}
+	public class MenuButtonDisplay : Component, ICmpInitializable, ICmpRenderer
+	{
+		[DontSerialize] private readonly Canvas canvas = new Canvas();
+		[DontSerialize] private readonly List<MenuButton> Buttons = new List<MenuButton>();
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Font> Font { get; set; }
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Scene> PlayScene { get; set; }
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Scene> Settings { get; set; }
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Scene> Credits { get; set; }
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private Point2 Position { get; set; }
+
+		void ICmpRenderer.GetCullingInfo(out CullingInfo info)
+		{
+			info.Position = Vector3.Zero;
+			info.Radius = float.MaxValue;
+			info.Visibility = VisibilityFlag.AllGroups | VisibilityFlag.ScreenOverlay;
+		}
+		void ICmpRenderer.Draw(IDrawDevice device)
+		{
+			canvas.Begin(device);
+			canvas.State.SetMaterial(DrawTechnique.Mask);
+			canvas.State.ColorTint = ColorRgba.White;
+			canvas.State.TextFont = Font;
+
+			string Selected = ">> ";
+			Vector2 SelectedLength = canvas.MeasureText(Selected);
+
+			int i = 0;
+			foreach(MenuButton button in Buttons)
+			{
+				Vector2 ZoneStart = new Vector2(Position.X + SelectedLength.X, Position.Y + (i * SelectedLength.Y * 2));
+				Vector2 TextSize = canvas.MeasureText(button.GetText());
+				Vector2 MPos = DualityApp.Mouse.Pos;
+				bool IsSelected = MPos.X > ZoneStart.X && MPos.X < ZoneStart.X + TextSize.X && MPos.Y > ZoneStart.Y && MPos.Y < ZoneStart.Y + TextSize.Y;
+				canvas.DrawText((IsSelected ? Selected : "") + button.GetText(), Position.X + (IsSelected ? 0 : SelectedLength.X), Position.Y + (i * SelectedLength.Y * 2));
+				if (IsSelected && DualityApp.Mouse.ButtonHit(MouseButton.Left))
+				{
+					if(button.GetScene() != null)
+						Scene.SwitchTo(button.GetScene());
+				}
+				i++;
+			}
+
+			canvas.End();
+		}
+
+		public void OnActivate()
+		{
+			Buttons.Add(new MenuButton("Play Online",PlayScene));
+			Buttons.Add(new MenuButton("Settings",Settings));
+			Buttons.Add(new MenuButton("Credits",Credits));
+			if (Core.Client != null && Core.Client.IsConnected)
+			{
+				Core.Client.Disconnect();
+			}
+		}
+
+		public void OnDeactivate()
+		{
+			Buttons.Clear();
+		}
+	}
+	public class CreditsDisplay : Component, ICmpRenderer
+	{
+		[DontSerialize] private readonly Canvas canvas = new Canvas();
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Font> Font { get; set; }
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private Point2 Position { get; set; }
+
+		void ICmpRenderer.GetCullingInfo(out CullingInfo info)
+		{
+			info.Position = Vector3.Zero;
+			info.Radius = float.MaxValue;
+			info.Visibility = VisibilityFlag.AllGroups | VisibilityFlag.ScreenOverlay;
+		}
+		void ICmpRenderer.Draw(IDrawDevice device)
+		{
+			canvas.Begin(device);
+			canvas.State.SetMaterial(DrawTechnique.Mask);
+			canvas.State.ColorTint = ColorRgba.White;
+			canvas.State.TextFont = Font;
+
+			Vector2 step = canvas.MeasureText("[]");
+
+			canvas.DrawText("Five Nights at Freddy's created by and Copyright", Position.X, Position.Y);
+			canvas.DrawText("    Scott Cawthon", Position.X, Position.Y + step.Y);
+			canvas.DrawText("This multiplayer game was created by", Position.X, Position.Y + (step.Y * 3));
+			canvas.DrawText("    Dániel 'Pdani' Pécsi", Position.X, Position.Y + (step.Y * 4));
+			canvas.DrawText("    Brawlbox", Position.X, Position.Y + (step.Y * 5));
+
+			canvas.End();
+		}
+	}
+	#endregion
+
+	#region Settings
+	public class SettingsDisplay : Component, ICmpInitializable, ICmpRenderer
+	{
+		[DontSerialize] private readonly Canvas canvas = new Canvas();
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Font> Font { get; set; }
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Scene> GamejoltScene { get; set; }
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private Point2 Position { get; set; }
+
+		private int Selecting = -1;
+
+		private Action<int> change = null;
+
+		void ICmpRenderer.GetCullingInfo(out CullingInfo info)
+		{
+			info.Position = Vector3.Zero;
+			info.Radius = float.MaxValue;
+			info.Visibility = VisibilityFlag.AllGroups | VisibilityFlag.ScreenOverlay;
+		}
+		void ICmpRenderer.Draw(IDrawDevice device)
+		{
+			canvas.Begin(device);
+			canvas.State.SetMaterial(DrawTechnique.Mask);
+			canvas.State.ColorTint = ColorRgba.White;
+			canvas.State.TextFont = Font;
+
+			if(Selecting != -1)
+			{
+				string display = "Press a key, or press ESC to cancel!";
+				Vector2 size = canvas.MeasureText(display);
+				canvas.DrawText(display, DualityApp.WindowSize.X - size.X, 0);
+			}
+
+			int i = 0;
+			AddText(i, out i, "Gamejolt Login", ()=>{
+				if (GamejoltScene != null)
+					Scene.SwitchTo(GamejoltScene);
+			});
+			i++;
+			AddText(i, out i, "Fullscreen: "+(Selecting == i ? "..." : ((Key)Core.Config.Settings.FullscreenButton).ToString()), ()=>{
+				if (Selecting != -1)
+					return;
+				Selecting = i;
+				change = (k) =>
+				{
+					if (Core.PreventKeys.Contains(k))
+						return;
+					if (Core.Config.Settings.FullscreenButton == k)
+						Core.PreventButtonPress();
+					if(k != 50)
+						Core.Config.Settings.FullscreenButton = k;
+					change = null;
+					Selecting = -1;
+				};
+			});
+
+			canvas.End();
+		}
+
+		private void AddText(int i, out int o, string text, Action action = null)
+		{
+			string Selected = ">> ";
+			Vector2 SelectedLength = canvas.MeasureText(Selected);
+			Vector2 ZoneStart = new Vector2(Position.X + SelectedLength.X, Position.Y + (i * SelectedLength.Y * 2));
+			Vector2 TextSize = canvas.MeasureText(text);
+			Vector2 MPos = DualityApp.Mouse.Pos;
+			bool IsSelected = MPos.X > ZoneStart.X && MPos.X < ZoneStart.X + TextSize.X && MPos.Y > ZoneStart.Y && MPos.Y < ZoneStart.Y + TextSize.Y;
+			canvas.DrawText((IsSelected ? Selected : "") + text, Position.X + (IsSelected ? 0 : SelectedLength.X), Position.Y + (i * SelectedLength.Y * 2));
+			if (IsSelected && DualityApp.Mouse.ButtonHit(MouseButton.Left))
+			{
+				if (action != null)
+					action.Invoke();
+			}
+			i++;
+			o = i;
+		}
+
+		public void OnActivate()
+		{
+			DualityApp.Keyboard.KeyDown += KeyDown;
+		}
+
+		private void KeyDown(object sender, KeyboardKeyEventArgs e)
+		{
+			if(Selecting != -1)
+			{
+				if(change != null)
+				{
+					change.Invoke((int)e.Key);
+				}
+				else
+				{
+					Selecting = -1;
+				}
+			}
+		}
+
+		public void OnDeactivate()
+		{
+			DualityApp.Keyboard.KeyDown -= KeyDown;
+		}
+	}
+
+	public enum GamejoltEventType
+	{
+		Login,
+		Logout
+	}
+
+	public class GamejoltEventData
+	{
+		public GamejoltEventType type { get; set; }
+		public string username { get; set; }
+	}
+
+	public class GamejoltMenu : Component, ICmpRenderer, ICmpInitializable
+	{
+		[DontSerialize] private readonly Canvas canvas = new Canvas();
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Font> Font { get; set; }
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private Point2 ButtonPosition { get; set; }
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private Point2 InfoPosition { get; set; }
+
+		public static string Username { get; set; }
+		public static string Token { get; set; }
+
+		private static string Status = "";
+
+		/// <summary>
+		/// Returns wether a login is in progress at the moment
+		/// </summary>
+		/// <returns><b>true</b> if a login is in progress, <b>false</b> otherwise</returns>
+		public static bool Login { get; private set; }
+
+		void ICmpRenderer.GetCullingInfo(out CullingInfo info)
+		{
+			info.Position = Vector3.Zero;
+			info.Radius = float.MaxValue;
+			info.Visibility = VisibilityFlag.AllGroups | VisibilityFlag.ScreenOverlay;
+		}
+		void ICmpRenderer.Draw(IDrawDevice device)
+		{
+			canvas.Begin(device);
+			canvas.State.SetMaterial(DrawTechnique.Mask);
+			canvas.State.ColorTint = ColorRgba.White;
+			canvas.State.TextFont = Font;
+
+			string selected = "> ";
+			Vector2 selectedLength = canvas.MeasureText(selected);
+			string text = "";
+			Vector2 MPos = DualityApp.Mouse.Pos;
+			if (Core.LoggedIn)
+			{
+				text = "Logout";
+			}
+			else
+			{
+				text = "Login";
+				if (Login)
+					text = "Logging in...";
+			}
+			Vector2 textLength = canvas.MeasureText(text);
+			bool IsSelected = MPos.X > ButtonPosition.X + selectedLength.X && MPos.X < ButtonPosition.X + textLength.X + selectedLength.X && MPos.Y > ButtonPosition.Y && MPos.Y < ButtonPosition.Y + textLength.Y;
+			if (IsSelected)
+			{
+				if (DualityApp.Mouse.ButtonHit(MouseButton.Left))
+				{
+					if (Core.LoggedIn)
+					{
+						Username = "";
+						Token = "";
+						Core.Config.Gamejolt = new Configuration.Gamejolt();
+						Core.LoggedIn = false;
+						GamejoltEvent?.Invoke(instance, new GamejoltEventData
+						{
+							type = GamejoltEventType.Logout
+						});
+						Status = "";
+					}
+					else
+					{
+						if (!Login)
+						{
+							DoLogin();
+						}
+					}
+				}
+			}
+			canvas.DrawText((IsSelected && !Login ? selected : "") + text,ButtonPosition.X + (IsSelected && !Login ? 0 : selectedLength.X),ButtonPosition.Y);
+			canvas.End();
+
+			canvas.Begin(device);
+			canvas.State.SetMaterial(DrawTechnique.Mask);
+			canvas.State.ColorTint = ColorRgba.White;
+			canvas.State.TextFont = null;
+
+			canvas.DrawText(Status, InfoPosition.X, InfoPosition.Y);
+
+			canvas.End();
+		}
+
+		private static Thread thread = null;
+
+		public static void DoLogin()
+		{
+			if (Username != null && Username.Length > 0 && Token != null && Token.Length > 0)
+			{
+				Login = true;
+				Status = "";
+				thread = new Thread(() => {
+					GamejoltAuth auth = SuperSecret.gamejoltAuth;
+					AuthResponse response = auth.Login(Username, Token);
+					FetchResponse fetch = auth.GetData(Username);
+					if (response.response.success)
+					{
+						if(fetch.response.success)
+							Username = fetch.response.users[0].username;
+						Core.Config.Gamejolt = new Configuration.Gamejolt
+						{
+							UserName = Username,
+							Token = Base64.Encode(Token)
+						};
+						Status = "Successful login!";
+						Core.LoggedIn = true;
+						Core.Client.UserName = Username;
+						GamejoltEvent?.Invoke(instance, new GamejoltEventData
+						{
+							type = GamejoltEventType.Login,
+							username = Username
+						});
+					}
+					else
+					{
+						Status = "Login failed: " + response.response.message;
+					}
+					Login = false;
+				});
+				thread.Start();
+			}
+			else
+			{
+				Status = "Please fill out all the fields!";
+			}
+		}
+
+		public static EventHandler<GamejoltEventData> GamejoltEvent;
+		private static GamejoltMenu instance;
+
+		public void OnActivate()
+		{
+			instance = this;
+			Status = "";
+			Login = false;
+			if (Core.Config != null && Core.Config.Gamejolt != null)
+			{
+				Username = Core.Config.Gamejolt.UserName;
+				if (Username == null)
+					Username = "";
+				Token = Core.Config.Gamejolt.Token;
+				if (Token == null)
+					Token = "";
+				else
+					Token = Base64.Decode(Token);
+			}
+		}
+
+		public void OnDeactivate()
+		{
+			if(thread != null)
+				thread.Abort();
+			thread = null;
+		}
+	}
+	[RequiredComponent(typeof(SpriteRenderer)), RequiredComponent(typeof(Transform))]
+	public class GamejoltNameText : Component, ICmpRenderer, ICmpInitializable
+	{
+		[DontSerialize] private readonly Canvas canvas = new Canvas();
+
+		private ContentRef<Font> font = null;
+		public ContentRef<Font> Font
+		{
+			get { return font; }
+			set { font = value; }
+		}
+
+		private Transform transform = null;
+		private SpriteRenderer renderer = null;
+
+		private string Name = "";
+		private string extra = "";
+
+		void ICmpRenderer.GetCullingInfo(out CullingInfo info)
+		{
+			info.Position = Vector3.Zero;
+			info.Radius = float.MaxValue;
+			info.Visibility = VisibilityFlag.AllGroups;
+		}
+		void ICmpRenderer.Draw(IDrawDevice device)
+		{
+			this.canvas.Begin(device);
+
+			canvas.State.SetMaterial(DrawTechnique.Mask);
+			canvas.State.ColorTint = ColorRgba.Black;
+			canvas.State.TextFont = this.font;
+
+			if (input > -1 && input <= Time.MainTimer.TotalMilliseconds)
+			{
+				if (extra == "")
+					extra = "|";
+				else
+					extra = "";
+				input = (int)Time.MainTimer.TotalMilliseconds + 500;
+			}
+
+			if (transform != null)
+				canvas.DrawText(Name + extra, transform.Pos.X + 5, transform.Pos.Y + 3);
+
+			this.canvas.End();
+
+			if (backspace > -1 && backspace < Time.MainTimer.TotalMilliseconds)
+			{
+				backspace = (int)Time.MainTimer.TotalMilliseconds + 50;
+				if (Name.Length > 0)
+				{
+					Name = Name.Substring(0, Name.Length - 1);
+				}
+			}
+			if (repeat > -1 && repeat < Time.MainTimer.TotalMilliseconds)
+			{
+				repeat = (int)Time.MainTimer.TotalMilliseconds + 50;
+				Name += c;
+			}
+
+			// NAME BOX
+			if (renderer == null || transform == null)
+			{
+				transform = GameObj.Transform;
+				renderer = GameObj.GetComponent<SpriteRenderer>();
+			}
+			else
+			{
+				Material mat = renderer.SharedMaterial.Res;
+				if (mat == null)
+				{
+					return;
+				}
+				Texture text = mat.MainTexture.Res;
+				if (text == null)
+				{
+					return;
+				}
+				Point2 size = text.Size;
+				Vector3 pos = transform.Pos;
+				Vector2 mouse = DualityApp.Mouse.Pos;
+				if (DualityApp.Mouse.ButtonHit(MouseButton.Left))
+				{
+					if (!Core.LoggedIn && !GamejoltMenu.Login)
+					{
+						bool onbox = (mouse.X > pos.X && mouse.X < pos.X + size.X && mouse.Y > pos.Y && mouse.Y < pos.Y + size.Y);
+						input = onbox ? (int)Time.MainTimer.TotalMilliseconds + 500 : -1;
+						extra = onbox ? "|" : "";
+					}
+					else
+					{
+						input = -1;
+						extra = "";
+					}
+				}
+
+				if (input > -1)
+				{
+					GamejoltMenu.Username = Name;
+				}
+
+				this.canvas.Begin(device);
+
+				canvas.State.SetMaterial(DrawTechnique.Mask);
+				canvas.State.ColorTint = ColorRgba.White;
+				canvas.State.TextFont = this.font;
+
+				Vector2 textSize = canvas.MeasureText("Username:");
+				canvas.DrawText("Username:",transform.Pos.X - 2 - textSize.X, transform.Pos.Y);
+
+				this.canvas.End();
+			}
+		}
+
+		private int input = -1;
+		private int backspace = -1;
+		private int repeat = -1;
+		private string c = "";
+		private void KeyDown(object sender, KeyboardKeyEventArgs args)
+		{
+			if (input == -1)
+				return;
+			if (args.Key == Key.BackSpace)
+			{
+				backspace = (int)Time.MainTimer.TotalMilliseconds + 500;
+				if (Name.Length > 0)
+				{
+					Name = Name.Substring(0, Name.Length - 1);
+				}
+			}
+			else if (args.Key == Key.Enter || args.Key == Key.KeypadEnter)
+			{
+				if (input > -1)
+				{
+					if (Name.Replace(" ", "").Length > 0)
+					{
+						input = -1;
+						extra = "";
+						GamejoltMenu.DoLogin();
+					}
+				}
+			}
+			else if (args.Key == Key.Escape)
+			{
+				input = -1;
+				extra = "";
+			}
+			else
+			{
+				c = DualityApp.Keyboard.CharInput;
+				if (!c.Equals(""))
+				{
+					Name += c;
+					repeat = (int)Time.MainTimer.TotalMilliseconds + 500;
+				}
+				else
+				{
+					repeat = -1;
+				}
+			}
+		}
+		private void KeyUp(object sender, KeyboardKeyEventArgs args)
+		{
+			if (args.Key == Key.Enter || args.Key == Key.KeypadEnter)
+				return;
+			if (args.Key == Key.BackSpace)
+				backspace = -1;
+			else
+				repeat = -1;
+		}
+
+		private void GamejoltEvent(object sender, GamejoltEventData data)
+		{
+			if(data.type == GamejoltEventType.Logout)
+			{
+				Name = "";
+			}
+			else
+			{
+				Name = data.username;
+			}
+		}
+
+		public void OnActivate()
+		{
+			if(Core.Config != null && Core.Config.Gamejolt != null)
+				Name = Core.Config.Gamejolt.UserName;
+			if (Name == null)
+				Name = "";
+			extra = "";
+			input = -1;
+			backspace = -1;
+			repeat = -1;
+			DualityApp.Keyboard.KeyDown += KeyDown;
+			DualityApp.Keyboard.KeyUp += KeyUp;
+			GamejoltMenu.GamejoltEvent += GamejoltEvent;
+		}
+
+		public void OnDeactivate()
+		{
+			DualityApp.Keyboard.KeyDown -= KeyDown;
+			DualityApp.Keyboard.KeyUp -= KeyUp;
+			GamejoltMenu.GamejoltEvent -= GamejoltEvent;
+		}
+	}
+	[RequiredComponent(typeof(SpriteRenderer)), RequiredComponent(typeof(Transform))]
+	public class GamejoltTokenText : Component, ICmpRenderer, ICmpInitializable
+	{
+		[DontSerialize] private readonly Canvas canvas = new Canvas();
+
+		private ContentRef<Font> font = null;
+		public ContentRef<Font> Font
+		{
+			get { return font; }
+			set { font = value; }
+		}
+
+		private Transform transform = null;
+		private SpriteRenderer renderer = null;
+
+		private string Name = "";
+		private string extra = "";
+
+		void ICmpRenderer.GetCullingInfo(out CullingInfo info)
+		{
+			info.Position = Vector3.Zero;
+			info.Radius = float.MaxValue;
+			info.Visibility = VisibilityFlag.AllGroups;
+		}
+		void ICmpRenderer.Draw(IDrawDevice device)
+		{
+			this.canvas.Begin(device);
+
+			canvas.State.SetMaterial(DrawTechnique.Mask);
+			canvas.State.ColorTint = ColorRgba.Black;
+			canvas.State.TextFont = this.font;
+
+			if (input > -1 && input <= Time.MainTimer.TotalMilliseconds)
+			{
+				if (extra == "")
+					extra = "|";
+				else
+					extra = "";
+				input = (int)Time.MainTimer.TotalMilliseconds + 500;
+			}
+
+			string display = "";
+			for(int i = 0; i < Name.Length; i++)
+			{
+				display += "*";
+			}
+
+			if (transform != null)
+				canvas.DrawText(display + extra, transform.Pos.X + 5, transform.Pos.Y + 3);
+
+			this.canvas.End();
+
+			if (backspace > -1 && backspace < Time.MainTimer.TotalMilliseconds)
+			{
+				backspace = (int)Time.MainTimer.TotalMilliseconds + 50;
+				if (Name.Length > 0)
+				{
+					Name = Name.Substring(0, Name.Length - 1);
+				}
+			}
+			if (repeat > -1 && repeat < Time.MainTimer.TotalMilliseconds)
+			{
+				repeat = (int)Time.MainTimer.TotalMilliseconds + 50;
+				Name += c;
+			}
+
+			// NAME BOX
+			if (renderer == null || transform == null)
+			{
+				transform = GameObj.Transform;
+				renderer = GameObj.GetComponent<SpriteRenderer>();
+			}
+			else
+			{
+				Material mat = renderer.SharedMaterial.Res;
+				if (mat == null)
+				{
+					return;
+				}
+				Texture text = mat.MainTexture.Res;
+				if (text == null)
+				{
+					return;
+				}
+				Point2 size = text.Size;
+				Vector3 pos = transform.Pos;
+				Vector2 mouse = DualityApp.Mouse.Pos;
+				if (DualityApp.Mouse.ButtonHit(MouseButton.Left))
+				{
+					if (!Core.LoggedIn && !GamejoltMenu.Login)
+					{
+						bool onbox = (mouse.X > pos.X && mouse.X < pos.X + size.X && mouse.Y > pos.Y && mouse.Y < pos.Y + size.Y);
+						input = onbox ? (int)Time.MainTimer.TotalMilliseconds + 500 : -1;
+						extra = onbox ? "|" : "";
+					}
+					else
+					{
+						input = -1;
+						extra = "";
+					}
+				}
+
+				if (input > -1)
+				{
+					GamejoltMenu.Token = Name;
+				}
+
+				this.canvas.Begin(device);
+
+				canvas.State.SetMaterial(DrawTechnique.Mask);
+				canvas.State.ColorTint = ColorRgba.White;
+				canvas.State.TextFont = this.font;
+
+				Vector2 textSize = canvas.MeasureText("Token:");
+				canvas.DrawText("Token:", transform.Pos.X - 2 - textSize.X, transform.Pos.Y);
+
+				this.canvas.End();
+			}
+		}
+
+		private int input = -1;
+		private int backspace = -1;
+		private int repeat = -1;
+		private string c = "";
+		private void KeyDown(object sender, KeyboardKeyEventArgs args)
+		{
+			if (input == -1)
+				return;
+			if (args.Key == Key.BackSpace)
+			{
+				backspace = (int)Time.MainTimer.TotalMilliseconds + 500;
+				if (Name.Length > 0)
+				{
+					Name = Name.Substring(0, Name.Length - 1);
+				}
+			}
+			else if (args.Key == Key.Enter || args.Key == Key.KeypadEnter)
+			{
+				if (input > -1)
+				{
+					if (Name.Replace(" ", "").Length > 0)
+					{
+						input = -1;
+						extra = "";
+						GamejoltMenu.DoLogin();
+					}
+				}
+			}
+			else if (args.Key == Key.Escape)
+			{
+				input = -1;
+				extra = "";
+			}
+			else
+			{
+				c = DualityApp.Keyboard.CharInput;
+				if (!c.Equals(""))
+				{
+					Name += c;
+					repeat = (int)Time.MainTimer.TotalMilliseconds + 500;
+				}
+				else
+				{
+					repeat = -1;
+				}
+			}
+		}
+		private void KeyUp(object sender, KeyboardKeyEventArgs args)
+		{
+			if (args.Key == Key.Enter || args.Key == Key.KeypadEnter)
+				return;
+			if (args.Key == Key.BackSpace)
+				backspace = -1;
+			else
+				repeat = -1;
+		}
+
+		private void GamejoltEvent(object sender, GamejoltEventData data)
+		{
+			if (data.type == GamejoltEventType.Logout)
+			{
+				Name = "";
+			}
+		}
+
+		public void OnActivate()
+		{
+			if (Core.Config != null && Core.Config.Gamejolt != null && Core.Config.Gamejolt.Token != null)
+				Name = Base64.Decode(Core.Config.Gamejolt.Token);
+			if (Name == null)
+				Name = "";
+			extra = "";
+			input = -1;
+			backspace = -1;
+			repeat = -1;
+			DualityApp.Keyboard.KeyDown += KeyDown;
+			DualityApp.Keyboard.KeyUp += KeyUp;
+			GamejoltMenu.GamejoltEvent += GamejoltEvent;
+		}
+
+		public void OnDeactivate()
+		{
+			DualityApp.Keyboard.KeyDown -= KeyDown;
+			DualityApp.Keyboard.KeyUp -= KeyUp;
+			GamejoltMenu.GamejoltEvent -= GamejoltEvent;
+		}
+	}
+	#endregion
+
+	#region Lobby List
 	public class LobbyStatusText : Component, ICmpRenderer, ICmpInitializable
 	{
 		[DontSerialize] private readonly Canvas canvas = new Canvas();
@@ -394,13 +1290,13 @@ namespace FNaFMP.Menu
 			get { return font; }
 			set { font = value; }
 		}
-		
-		private ContentRef<Scene> scene = null;
-		public ContentRef<Scene> NextScene
-		{
-			get { return scene; }
-			set { scene = value; }
-		}
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Scene> SelectScene { get; set; }
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Scene> PasswordScene { get; set; }
+
 
 		private LobbyListSettings settings = new LobbyListSettings();
 		public LobbyListSettings Settings
@@ -666,8 +1562,7 @@ namespace FNaFMP.Menu
 						LobbyStatusText.Status = "Join successful, switching to character selection...";
 						Utilities.Logger.Write("Join successful, switching to next scene");
 						int count = reader.ReadByte();
-						bool password = reader.ReadByte() == 1;	// NOT IMPLEMENTED YET (2021-06-30) ~Pdani
-						// TODO: Create the password Scene! (But make the lobby chat first lol)
+						bool password = reader.ReadByte() == 1;
 						int party_length = reader.ReadInt();
 						string party = reader.ReadText(party_length);
 						Core.DRPC.UpdateParty(new DiscordRPC.Party()
@@ -677,8 +1572,16 @@ namespace FNaFMP.Menu
 							Size = count,
 							Privacy = DiscordRPC.Party.PrivacySetting.Public
 						});
-						if (scene != null)
-							Scene.SwitchTo(scene);
+						if (!password)
+						{
+							if (SelectScene != null)
+								Scene.SwitchTo(SelectScene);
+						}
+						else
+						{
+							if (PasswordScene != null)
+								Scene.SwitchTo(PasswordScene);
+						}
 					}
 				}
 			}
@@ -708,7 +1611,7 @@ namespace FNaFMP.Menu
 						srv = Core.Config.Settings.Server;
 					}
 					if (srv == null)
-						Core.Client.Connect("lekkit.hopto.org", 6121);
+						connect("lekkit.hopto.org");
 					else
 					{
 						connect(srv);
@@ -1023,7 +1926,9 @@ namespace FNaFMP.Menu
 			}
 		}
 	}
+	#endregion
 
+	#region InGame
 	public class LoadToGame : Component, ICmpInitializable, ICmpUpdatable
 	{
 		private bool hascode = false;
@@ -1277,4 +2182,253 @@ namespace FNaFMP.Menu
 			}
 		}
 	}
+	#endregion
+
+	#region Pre-Login state
+	public class PasswordMenu : Component, ICmpInitializable, ICmpRenderer
+	{
+		[DontSerialize] private readonly Canvas canvas = new Canvas();
+
+		private ContentRef<Font> font = null;
+		public ContentRef<Font> Font
+		{
+			get { return font; }
+			set { font = value; }
+		}
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Scene> LobbyScene { get; set; }
+		
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Scene> SelectScene { get; set; }
+
+		private Transform transform = null;
+		private SpriteRenderer renderer = null;
+
+		private string Name = "";
+		private string extra = "";
+
+		private bool Sending = false;
+
+		void ICmpRenderer.GetCullingInfo(out CullingInfo info)
+		{
+			info.Position = Vector3.Zero;
+			info.Radius = float.MaxValue;
+			info.Visibility = VisibilityFlag.AllGroups;
+		}
+		void ICmpRenderer.Draw(IDrawDevice device)
+		{
+			this.canvas.Begin(device);
+
+			canvas.State.SetMaterial(DrawTechnique.Mask);
+			canvas.State.ColorTint = ColorRgba.Black;
+			canvas.State.TextFont = this.font;
+
+			if (input > -1 && input <= Time.MainTimer.TotalMilliseconds)
+			{
+				if (extra == "")
+					extra = "|";
+				else
+					extra = "";
+				input = (int)Time.MainTimer.TotalMilliseconds + 500;
+			}
+
+			string display = "";
+			for (int i = 0; i < Name.Length; i++)
+			{
+				display += "*";
+			}
+
+			if (transform != null)
+				canvas.DrawText(display + extra, transform.Pos.X + 5, transform.Pos.Y + 3);
+
+			this.canvas.End();
+
+			if (backspace > -1 && backspace < Time.MainTimer.TotalMilliseconds)
+			{
+				backspace = (int)Time.MainTimer.TotalMilliseconds + 50;
+				if (Name.Length > 0)
+				{
+					Name = Name.Substring(0, Name.Length - 1);
+				}
+			}
+			if (repeat > -1 && repeat < Time.MainTimer.TotalMilliseconds)
+			{
+				repeat = (int)Time.MainTimer.TotalMilliseconds + 50;
+				Name += c;
+			}
+
+			// NAME BOX
+			if (renderer == null || transform == null)
+			{
+				transform = GameObj.Transform;
+				renderer = GameObj.GetComponent<SpriteRenderer>();
+			}
+			else
+			{
+				Material mat = renderer.SharedMaterial.Res;
+				if (mat == null)
+				{
+					return;
+				}
+				Texture text = mat.MainTexture.Res;
+				if (text == null)
+				{
+					return;
+				}
+				Point2 size = text.Size;
+				Vector3 pos = transform.Pos;
+				Vector2 mouse = DualityApp.Mouse.Pos;
+				if (DualityApp.Mouse.ButtonHit(MouseButton.Left))
+				{
+					if (!Sending)
+					{
+						bool onbox = (mouse.X > pos.X && mouse.X < pos.X + size.X && mouse.Y > pos.Y && mouse.Y < pos.Y + size.Y);
+						input = onbox ? (int)Time.MainTimer.TotalMilliseconds + 500 : -1;
+						extra = onbox ? "|" : "";
+					}
+					else
+					{
+						input = -1;
+						extra = "";
+					}
+				}
+
+
+				this.canvas.Begin(device);
+
+				canvas.State.SetMaterial(DrawTechnique.Mask);
+				canvas.State.ColorTint = ColorRgba.White;
+				canvas.State.TextFont = this.font;
+
+				if (input > -1)
+				{
+					string create = "Press enter!";
+					Vector2 createSize = canvas.MeasureText(create);
+
+					canvas.DrawText(create, pos.X + size.X - createSize.X, pos.Y + size.Y);
+				}
+				
+				if (Sending)
+				{
+					string create = "Communicating...";
+					Vector2 createSize = canvas.MeasureText(create);
+
+					canvas.DrawText(create, pos.X + size.X - createSize.X, pos.Y + size.Y);
+				}
+
+				Vector2 textSize = canvas.MeasureText("Password:");
+				canvas.DrawText("Password:", transform.Pos.X, transform.Pos.Y - 2 - textSize.Y);
+
+				this.canvas.End();
+			}
+		}
+
+		private int input = -1;
+		private int backspace = -1;
+		private int repeat = -1;
+		private string c = "";
+		private void KeyDown(object sender, KeyboardKeyEventArgs args)
+		{
+			if (input == -1)
+				return;
+			if (args.Key == Key.BackSpace)
+			{
+				backspace = (int)Time.MainTimer.TotalMilliseconds + 500;
+				if (Name.Length > 0)
+				{
+					Name = Name.Substring(0, Name.Length - 1);
+				}
+			}
+			else if (args.Key == Key.Enter || args.Key == Key.KeypadEnter)
+			{
+				if (input > -1)
+				{
+					if (Name.Replace(" ", "").Length > 0)
+					{
+						input = -1;
+						extra = "";
+						Sending = true;
+						Core.Client.joinedChannels[0].ChannelMaster.SendTextMessage(Core.Client, 13, Core.Client.joinedChannels[0], Name);
+					}
+				}
+			}
+			else if (args.Key == Key.Escape)
+			{
+				input = -1;
+				extra = "";
+			}
+			else
+			{
+				c = DualityApp.Keyboard.CharInput;
+				if (!c.Equals(""))
+				{
+					Name += c;
+					repeat = (int)Time.MainTimer.TotalMilliseconds + 500;
+				}
+				else
+				{
+					repeat = -1;
+				}
+			}
+		}
+		private void KeyUp(object sender, KeyboardKeyEventArgs args)
+		{
+			if (args.Key == Key.Enter || args.Key == Key.KeypadEnter)
+				return;
+			if (args.Key == Key.BackSpace)
+				backspace = -1;
+			else
+				repeat = -1;
+		}
+
+		public void OnActivate()
+		{
+			Sending = false;
+			Name = "";
+			extra = "|";
+			input = (int)Time.MainTimer.TotalMilliseconds + 500;
+			backspace = -1;
+			repeat = -1;
+			DualityApp.Keyboard.KeyDown += KeyDown;
+			DualityApp.Keyboard.KeyUp += KeyUp;
+			if (Core.Client != null)
+			{
+				Core.Client.Event.NumberMessage += Event_NumberMessage;
+				if (!Core.Client.IsConnected && LobbyScene != null)
+					Scene.SwitchTo(LobbyScene);
+			}
+		}
+
+		private void Event_NumberMessage(object sender, EventNumberMessage e)
+		{
+			if(e.Type == MessageEventType.Peer && e.SubChannel == 13)
+			{
+				if(e.PeerID == Core.Client.joinedChannels[0].ChannelMaster.Id)
+				{
+					if(e.Message == 0)
+					{
+						Core.LeaveReason = "Invalid password.";
+						Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
+						if (LobbyScene != null)
+							Scene.SwitchTo(LobbyScene);
+					}
+					else
+					{
+						if (SelectScene != null)
+							Scene.SwitchTo(SelectScene);
+					}
+				}
+			}
+		}
+
+		public void OnDeactivate()
+		{
+			DualityApp.Keyboard.KeyDown -= KeyDown;
+			DualityApp.Keyboard.KeyUp -= KeyUp;
+			if (Core.Client != null)
+				Core.Client.Event.NumberMessage -= Event_NumberMessage;
+		}
+	}
+	#endregion
 }

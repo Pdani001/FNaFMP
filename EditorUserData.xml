@@ -5,7 +5,7 @@
     <Autosaves>ThirtyMinutes</Autosaves>
     <FirstSession>false</FirstSession>
     <ActiveDocumentIndex>1</ActiveDocumentIndex>
-    <LastOpenScene>Data\Scenes\Lobbies.Scene.res</LastOpenScene>
+    <LastOpenScene>Data\Scenes\MainMenu.Scene.res</LastOpenScene>
     <StartWithLastScene>true</StartWithLastScene>
   </EditorApp>
   <Plugins>
@@ -148,8 +148,7 @@
             <NodeID>PropertiesDuality.Resources.AudioData/Import / Export SettingsDuality.Resources.AudioData/</NodeID>
             <NodeID>PropertiesDuality.Resources.Sound/SoundDuality.Resources.Sound/</NodeID>
             <NodeID>PropertiesDuality.GameObject/SoundListenerDuality.Components.SoundListener/</NodeID>
-            <NodeID>PropertiesDuality.GameObject/FreddyMusicboxFNaFMP.Office.FreddyMusicbox/</NodeID>
-            <NodeID>PropertiesDuality.GameObject/SoundEmitterDuality.Components.SoundEmitter/Sources[0]Duality.Components.SoundEmitter+Source/</NodeID>
+            <NodeID>PropertiesDuality.GameObject/JumpscareManagerFNaFMP.Office.JumpscareManager/jumpscareSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,FNaFMP.Office.CameraView]/[Foxy]FNaFMP.Office.CameraView/</NodeID>
             <NodeID>PropertiesDuality.GameObject/SplashStartup.Splash/</NodeID>
             <NodeID>PropertiesDuality.GameObject/SplashStartup.Splash/RenderersSystem.Collections.Generic.List`1[Duality.ContentRef`1[Duality.Resources.Material]]/</NodeID>
             <NodeID>PropertiesDuality.GameObject/CameraAnimatorOffice.CameraAnimator/</NodeID>
@@ -191,7 +190,7 @@
             <NodeID>PropertiesDuality.GameObject/DoorAnimatorFNaFMP.Office.DoorAnimator/</NodeID>
             <NodeID>PropertiesDuality.GameObject/OfficeControllerFNaFMP.Office.OfficeController/</NodeID>
             <NodeID>PropertiesDuality.GameObject/OfficeControllerFNaFMP.Office.OfficeController/ControlValueFNaFMP.Office.OfficeControllerValue/</NodeID>
-            <NodeID>PropertiesDuality.GameObject/OfficeLightRendererFNaFMP.Office.OfficeLightRenderer/LeftLightSystem.Collections.Generic.List`1[FNaFMP.Office.CameraView]/[1]FNaFMP.Office.CameraView/RobotListSystem.Collections.Generic.List`1[FNaFMP.Core+Character]/</NodeID>
+            <NodeID>PropertiesDuality.GameObject/DisplayControllerFNaFMP.Office.DisplayController/</NodeID>
             <NodeID>PropertiesDuality.GameObject/CameraButtonTextFNaFMP.Office.CameraButtonText/</NodeID>
             <NodeID>PropertiesDuality.GameObject/SplashTextFNaFMP.Startup.SplashText/</NodeID>
             <NodeID>PropertiesDuality.GameObject/SplashFNaFMP.Startup.Splash/</NodeID>
@@ -213,7 +212,6 @@
             <NodeID>PropertiesDuality.GameObject/BGTasksFNaFMP.Select.BGTasks/</NodeID>
             <NodeID>PropertiesDuality.GameObject/BackButtonFNaFMP.Select.BackButton/</NodeID>
             <NodeID>PropertiesDuality.GameObject/CharacterTextFNaFMP.Select.CharacterText/</NodeID>
-            <NodeID>PropertiesDuality.GameObject/CameraRendererFNaFMP.Office.CameraRenderer/CameraListSystem.Collections.Generic.List`1[System.Collections.Generic.List`1[FNaFMP.Office.CameraView]]/[3]System.Collections.Generic.List`1[FNaFMP.Office.CameraView]/</NodeID>
             <NodeID>PropertiesDuality.GameObject/LocationRendererFNaFMP.Office.LocationRenderer/CameraListSystem.Collections.Generic.List`1[Duality.ContentRef`1[Duality.Resources.Material]]/</NodeID>
             <NodeID>PropertiesDuality.GameObject/MovementControlFNaFMP.Office.MovementControl/MovementsSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.Movement]]/[Freddy]System.Collections.Generic.List`1[FNaFMP.Office.Movement]/[0]FNaFMP.Office.Movement/PreventSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,FNaFMP.Office.MovePrevent]/</NodeID>
             <NodeID>PropertiesDuality.GameObject/MovementControlFNaFMP.Office.MovementControl/MovementsSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.Movement]]/[Freddy]System.Collections.Generic.List`1[FNaFMP.Office.Movement]/[0]FNaFMP.Office.Movement/PreventSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,FNaFMP.Office.MovePrevent]/[Bonnie]FNaFMP.Office.MovePrevent/</NodeID>
@@ -240,7 +238,6 @@
             <NodeID>PropertiesDuality.GameObject/MovementControlFNaFMP.Office.MovementControl/MovementsSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.Movement]]/[Foxy]System.Collections.Generic.List`1[FNaFMP.Office.Movement]/[1]FNaFMP.Office.Movement/PreventSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.MovePrevent]]/[Bonnie]System.Collections.Generic.List`1[FNaFMP.Office.MovePrevent]/[1]FNaFMP.Office.MovePrevent/</NodeID>
             <NodeID>PropertiesDuality.GameObject/CameraRendererFNaFMP.Office.CameraRenderer/CameraListSystem.Collections.Generic.List`1[System.Collections.Generic.List`1[FNaFMP.Office.CameraView]]/[3]System.Collections.Generic.List`1[FNaFMP.Office.CameraView]/[3]FNaFMP.Office.CameraView/RobotListSystem.Collections.Generic.List`1[FNaFMP.Core+Character]/</NodeID>
             <NodeID>PropertiesDuality.GameObject/MovementControlFNaFMP.Office.MovementControl/MovementsSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.Movement]]/[Foxy]System.Collections.Generic.List`1[FNaFMP.Office.Movement]/[1]FNaFMP.Office.Movement/PreventSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.MovePrevent]]/[Chica]System.Collections.Generic.List`1[FNaFMP.Office.MovePrevent]/[0]FNaFMP.Office.MovePrevent/</NodeID>
-            <NodeID>PropertiesDuality.GameObject/CameraRendererFNaFMP.Office.CameraRenderer/</NodeID>
             <NodeID>PropertiesDuality.GameObject/MovementControlFNaFMP.Office.MovementControl/MovementsSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.Movement]]/[Foxy]System.Collections.Generic.List`1[FNaFMP.Office.Movement]/[1]FNaFMP.Office.Movement/PreventSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.MovePrevent]]/[Freddy]System.Collections.Generic.List`1[FNaFMP.Office.MovePrevent]/[0]FNaFMP.Office.MovePrevent/</NodeID>
             <NodeID>PropertiesDuality.GameObject/GuardTextFNaFMP.Office.GuardText/</NodeID>
             <NodeID>PropertiesDuality.GameObject/MovementControlFNaFMP.Office.MovementControl/MovementsSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.Movement]]/[Chica]System.Collections.Generic.List`1[FNaFMP.Office.Movement]/[7]FNaFMP.Office.Movement/</NodeID>
@@ -280,7 +277,7 @@
             <NodeID>PropertiesDuality.GameObject/CameraRendererFNaFMP.Office.CameraRenderer/CameraListSystem.Collections.Generic.List`1[System.Collections.Generic.List`1[FNaFMP.Office.CameraView]]/[1]System.Collections.Generic.List`1[FNaFMP.Office.CameraView]/[7]FNaFMP.Office.CameraView/RobotListSystem.Collections.Generic.List`1[FNaFMP.Core+Character]/</NodeID>
             <NodeID>PropertiesDuality.GameObject/MovementControlFNaFMP.Office.MovementControl/MovementsSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.Movement]]/[Bonnie]System.Collections.Generic.List`1[FNaFMP.Office.Movement]/[12]FNaFMP.Office.Movement/PreventSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.MovePrevent]]/[Foxy]System.Collections.Generic.List`1[FNaFMP.Office.MovePrevent]/</NodeID>
             <NodeID>PropertiesDuality.GameObject/MovementControlFNaFMP.Office.MovementControl/MovementsSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.Movement]]/[Bonnie]System.Collections.Generic.List`1[FNaFMP.Office.Movement]/[12]FNaFMP.Office.Movement/PreventSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.MovePrevent]]/[Foxy]System.Collections.Generic.List`1[FNaFMP.Office.MovePrevent]/[0]FNaFMP.Office.MovePrevent/</NodeID>
-            <NodeID>PropertiesDuality.GameObject/FoxyListenerFNaFMP.Office.FoxyListener/</NodeID>
+            <NodeID>PropertiesDuality.GameObject/JumpscareManagerFNaFMP.Office.JumpscareManager/jumpscareSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,FNaFMP.Office.CameraView]/[Freddy]FNaFMP.Office.CameraView/</NodeID>
             <NodeID>PropertiesDuality.GameObject/CameraRendererFNaFMP.Office.CameraRenderer/CameraListSystem.Collections.Generic.List`1[System.Collections.Generic.List`1[FNaFMP.Office.CameraView]]/[3]System.Collections.Generic.List`1[FNaFMP.Office.CameraView]/[3]FNaFMP.Office.CameraView/</NodeID>
             <NodeID>PropertiesDuality.GameObject/MovementControlFNaFMP.Office.MovementControl/MovementsSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.Movement]]/[Freddy]System.Collections.Generic.List`1[FNaFMP.Office.Movement]/[0]FNaFMP.Office.Movement/</NodeID>
             <NodeID>PropertiesDuality.GameObject/MovementControlFNaFMP.Office.MovementControl/MovementsSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.Movement]]/[Freddy]System.Collections.Generic.List`1[FNaFMP.Office.Movement]/[0]FNaFMP.Office.Movement/PreventSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.MovePrevent]]/[Bonnie]System.Collections.Generic.List`1[FNaFMP.Office.MovePrevent]/</NodeID>
@@ -298,12 +295,7 @@
             <NodeID>PropertiesDuality.GameObject/MenuTextFNaFMP.Menu.MenuText/</NodeID>
             <NodeID>PropertiesDuality.GameObject/AttackButtonFNaFMP.Office.AttackButton/</NodeID>
             <NodeID>PropertiesDuality.GameObject/SixAMFNaFMP.Office.SixAM/</NodeID>
-            <NodeID>PropertiesDuality.GameObject/MovementControlFNaFMP.Office.MovementControl/</NodeID>
-            <NodeID>PropertiesDuality.GameObject/CameraRendererFNaFMP.Office.CameraRenderer/CameraListSystem.Collections.Generic.List`1[System.Collections.Generic.List`1[FNaFMP.Office.CameraView]]/</NodeID>
-            <NodeID>PropertiesDuality.GameObject/JumpscareManagerFNaFMP.Office.JumpscareManager/jumpscareSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,FNaFMP.Office.CameraView]/</NodeID>
-            <NodeID>PropertiesDuality.GameObject/JumpscareManagerFNaFMP.Office.JumpscareManager/jumpscareSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,FNaFMP.Office.CameraView]/[Freddy]FNaFMP.Office.CameraView/</NodeID>
             <NodeID>PropertiesDuality.Resources.Pixmap/PixmapDuality.Resources.Pixmap/PixmapDuality.Resources.Pixmap/AtlasSystem.Collections.Generic.List`1[Duality.Rect]/</NodeID>
-            <NodeID>PropertiesDuality.GameObject/JumpscareManagerFNaFMP.Office.JumpscareManager/jumpscareSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,FNaFMP.Office.CameraView]/[Foxy]FNaFMP.Office.CameraView/</NodeID>
             <NodeID>PropertiesDuality.GameObject/JumpscareManagerFNaFMP.Office.JumpscareManager/jumpscareSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,FNaFMP.Office.CameraView]/[Chica]FNaFMP.Office.CameraView/</NodeID>
             <NodeID>PropertiesDuality.GameObject/JumpscareManagerFNaFMP.Office.JumpscareManager/jumpscareSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,FNaFMP.Office.CameraView]/[Bonnie]FNaFMP.Office.CameraView/</NodeID>
             <NodeID>PropertiesDuality.GameObject/GameOverBlipFNaFMP.Menu.GameOverBlip/</NodeID>
@@ -313,6 +305,14 @@
             <NodeID>PropertiesDuality.GameObject/MovementControlFNaFMP.Office.MovementControl/MovementsSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.Movement]]/[Foxy]System.Collections.Generic.List`1[FNaFMP.Office.Movement]/[1]FNaFMP.Office.Movement/</NodeID>
             <NodeID>PropertiesDuality.GameObject/MovementControlFNaFMP.Office.MovementControl/MovementsSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.Movement]]/[Foxy]System.Collections.Generic.List`1[FNaFMP.Office.Movement]/[1]FNaFMP.Office.Movement/PreventSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.MovePrevent]]/[Foxy]System.Collections.Generic.List`1[FNaFMP.Office.MovePrevent]/</NodeID>
             <NodeID>PropertiesDuality.GameObject/MovementControlFNaFMP.Office.MovementControl/MovementsSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.Movement]]/[Foxy]System.Collections.Generic.List`1[FNaFMP.Office.Movement]/[1]FNaFMP.Office.Movement/PreventSystem.Collections.Generic.Dictionary`2[FNaFMP.Core+Character,System.Collections.Generic.List`1[FNaFMP.Office.MovePrevent]]/[Foxy]System.Collections.Generic.List`1[FNaFMP.Office.MovePrevent]/[0]FNaFMP.Office.MovePrevent/</NodeID>
+            <NodeID>PropertiesDuality.GameObject/LoadTestFNaFMP.Startup.LoadTest/</NodeID>
+            <NodeID>PropertiesDuality.GameObject/MenuButtonDisplayFNaFMP.Menu.MenuButtonDisplay/</NodeID>
+            <NodeID>PropertiesDuality.GameObject/MenuBackButtonFNaFMP.Menu.MenuBackButton/</NodeID>
+            <NodeID>PropertiesDuality.GameObject/SettingsDisplayFNaFMP.Menu.SettingsDisplay/</NodeID>
+            <NodeID>PropertiesDuality.GameObject/GamejoltMenuFNaFMP.Menu.GamejoltMenu/</NodeID>
+            <NodeID>PropertiesDuality.GameObject/PasswordMenuFNaFMP.Menu.PasswordMenu/</NodeID>
+            <NodeID>PropertiesDuality.GameObject/CreditsDisplayFNaFMP.Menu.CreditsDisplay/</NodeID>
+            <NodeID>PropertiesDuality.GameObject/GameControllerFNaFMP.Office.GameController/</NodeID>
           </ExpandedNodes>
         </ExpandState>
       </ObjectInspector>
@@ -331,7 +331,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--DockPanel configuration file. Author: Weifen Luo, all rights reserved.-->
 <!--!!! AUTOMATICALLY GENERATED FILE. DO NOT MODIFY !!!-->
-<DockPanel FormatVersion="1.0" DockLeftPortion="0.25" DockRightPortion="0.332552083333333" DockTopPortion="0.25" DockBottomPortion="0.25" ActiveDocumentPane="5" ActivePane="0">
+<DockPanel FormatVersion="1.0" DockLeftPortion="0.25" DockRightPortion="0.332552083333333" DockTopPortion="0.25" DockBottomPortion="0.25" ActiveDocumentPane="5" ActivePane="2">
   <Contents Count="6">
     <Content ID="0" PersistString="Duality.Editor.Plugins.CamView.CamView" AutoHidePortion="0.25" IsHidden="False" IsFloat="False" />
     <Content ID="1" PersistString="Duality.Editor.Plugins.ProjectView.ProjectFolderView" AutoHidePortion="0.332552083333333" IsHidden="False" IsFloat="False" />

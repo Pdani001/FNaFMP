@@ -59,6 +59,20 @@
             <param name="value"></param>
             <returns></returns>
         </member>
+        <member name="P:FNaFMP.Menu.GamejoltMenu.Login">
+            <summary>
+            Returns wether a login is in progress at the moment
+            </summary>
+            <returns><b>true</b> if a login is in progress, <b>false</b> otherwise</returns>
+        </member>
+        <member name="M:FNaFMP.Select.CommandManager.RunCommand(System.String,System.String[])">
+            <summary>
+            Run the specified command to run, with the given arguments, then return if the command was found or not
+            </summary>
+            <param name="command">the command to run, case in-sensitive</param>
+            <param name="args">command arguments</param>
+            <returns>true if the command was found, false otherwise</returns>
+        </member>
         <member name="P:FNaFMP.Utility.StringValueAttribute.StringValue">
             <summary>
             Holds the stringvalue for a value in an enum.

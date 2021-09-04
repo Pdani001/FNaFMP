@@ -5,11 +5,12 @@ Door: Left 223x720; Right 248x720
 Panel: 92x247
 Its Me: 1280x720
 Button: 60x40
-Jumpscare (Freddy 2): 1600x720 / 31 frames / 60 speed (0.50)
-Jumpscare (Fazbear): 1600x720 / 31 frames / 50 speed (0.60)
-Jumpscare (Bonnie): 1600x720 / 11 frames / 75 speed (0.35)
-Jumpscare (Chica): 1600x720 / 16 frames / 99 speed (0.11)
-Jumpscare (Foxy): 1600x720 / 25 frames / 50 speed (0.60)
+Jumpscare (Freddy 2): 1600x720 / 31 frames / 60 speed (0.86)
+Jumpscare (Fazbear): 1600x720 / 31 frames / 50 speed (1.03)
+Jumpscare (Bonnie): 1600x720 / 11 frames / 75 speed (0.24)
+Jumpscare (Chica): 1600x720 / 16 frames / 99 speed (0.27)
+Jumpscare (Foxy): 1600x720 / 25 frames / 50 speed (0.83)
+Loading spinner: 64x64 / 15 frames / 50 speed (0.5)
 (Note: this is not all of the images, only the ones I documented /Pdani)
 ============
 640
@@ -36,19 +37,20 @@ Jumpscare (Foxy): 1600x720 / 25 frames / 50 speed (0.60)
 =============
 
 == CHANNELS ==
-"TEMPLATE: *CHANNEL ID* (extra info/type) -> ..message.."
+"TEMPLATE: *CHANNEL ID* (extra info, type) -> ..message.."
 
 -- SELECT --
-Status change:
- - To master: *1* -> .character. .status (0-2).         ## Obselete
- - To player: *2* -> .character. .peer. .status (0-2).  [Also sent to joining players]
+Status change: *2* -> .character. .peer. .status (0-2).  #Also sent to joining players#
 Lobby info (from player to master): *12* -> .length. .version.
 Lobby info (from master to player): *12* -> .success (0/1). [On success: .player count. .password (0/1). .party length. .party.] [On fail: .length. .fail reason.]
+Lobby password (from player to master, text): *13* -> .password.
+Lobby password (from master to player, number): *13* -> .success (0/1).
 Lobby chat: *15* -> .character. .message length. .message.
 Status request (after join, number): *21* -> .random number.
 Game info: *3* (text) -> .game code.
 
 -- IN GAME --
+Game start check *22* (number) -> .character.
 Robot join: *23* (number) -> .character.
 Guard status: *24* -> .light (0 off/1 left/2 right). .left door (0/1). .right door (0/1). .camera status (0/1). .camera position.
 Movement: *25* -> .character. .position. .magic value, can be left out.

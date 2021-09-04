@@ -4,10 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using Alzaitu.Lacewing.Client;
 using DiscordRPC;
 using DiscordRPC.Logging;
 using Duality;
+using Duality.Audio;
+using Duality.Components;
 using Duality.Resources;
 using FNaFMP.Configuration;
 using FNaFMP.Utility;
@@ -22,7 +25,10 @@ namespace FNaFMP
 	public class Core : CorePlugin
 	{
 		private string ConfigPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\FNaFMultiplayer\\config1.yml";
-		public const string VERSION = "0.1.6";
+		public const string VERSION = "0.1.7";
+		public static readonly int[] PreventKeys = new int[] { 0 , 131 , 82, 53, 51, 49, 11, 7, 8 };
+
+		public static bool LoggedIn = false;
 		public static string LeaveReason { get; set; }
 		private static string secret = Guid.NewGuid().ToString();
 		private static Guid party = Guid.NewGuid();
@@ -71,9 +77,9 @@ namespace FNaFMP
 		{
 			Start = DateTime.UtcNow;
 			client.Dispose();
-			client = new LacewingClient(username);
+			client = new LacewingClient();
 			party = Guid.NewGuid();
-			discord.SetPresence(BuildPresence("In Menu", "", party.ToString(), 1, 1));
+			discord.SetPresence(BuildPresence("Restarting game", "", party.ToString(), 1, 1));
 		}
 		public static RichPresence BuildPresence(string Details, string State, string PartyID, int PartyMax, int PartySize)
 		{
@@ -118,7 +124,8 @@ namespace FNaFMP
 		{
 			Settings = new Settings
 			{
-				Server = "server1.dark-wire.com:6121"
+				Server = "server1.dark-wire.com:6121",
+				FullscreenButton = 20
 			}
 		};
 
@@ -196,13 +203,16 @@ namespace FNaFMP
 			web.Dispose();
 		}
 
-
-		private static string username = null;
-
 		bool fullscreen = false;
 
 		public static Point2 MaxWindowSize { get; private set; }
 
+		public static void PreventButtonPress()
+		{
+			lastfullscreen = -1;
+		}
+
+		private static int lastfullscreen = -1;
 		private int restart = -1;
 		protected override void OnAfterUpdate()
 		{
@@ -216,7 +226,7 @@ namespace FNaFMP
 					DualityApp.UserData = data;
 				}
 			}
-			if (DualityApp.Keyboard.KeyHit(Duality.Input.Key.F11))
+			if (lastfullscreen == Config.Settings.FullscreenButton && DualityApp.Keyboard.KeyHit((Duality.Input.Key)Config.Settings.FullscreenButton))
 			{
 				fullscreen = !fullscreen;
 				Logs.Core.Write($"Changing to {(fullscreen ? "fullscreen" : "windowed")}");
@@ -229,6 +239,7 @@ namespace FNaFMP
 					data.WindowMode = ScreenMode.Fullscreen;
 				}
 			}
+			lastfullscreen = Config.Settings.FullscreenButton;
 			if (DualityApp.Keyboard.KeyHit(Duality.Input.Key.F2))
 			{
 				if (restart == -1)
@@ -288,16 +299,22 @@ namespace FNaFMP
 		/// </summary>
 		public static GameDifficulty Difficulty { get; set; }
 
+		public static bool IsEditor { get; private set; }
+
+		public static SoundInstance MenuBGM { get; set; }
+
+		//public static SoundEmitter GlobalEmitter { get; private set; }
+
 		protected override void OnGameStarting()
 		{
+			MenuBGM = null;
+			LoggedIn = false;
 			Difficulty = GameDifficulty.VeryEasy;
 			fullscreen = DualityApp.UserData.WindowMode == ScreenMode.Fullscreen;
 			MaxWindowSize = DualityApp.AppData.ForcedRenderSize;
-			username = null;
 			LoadConfig();
 			string[] args = Environment.GetCommandLineArgs();
 			string t = "";
-			bool editor = false;
 			foreach(string a in args)
 			{
 				if (t.Length == 0)
@@ -306,31 +323,53 @@ namespace FNaFMP
 					t += ", " + $"'{a}'";
 
 				if (a.ToLower().Contains("dualityeditor.exe"))
-					editor = true;
+					IsEditor = true;
 			}
-			if(!editor)
-				LoadHosts();
 			//Console.WriteLine("args = [{0}]",t);
-			Logs.Core.Write("args = [{0}]",t);
+			Logs.Core.Write("CommandLineArgs = [{0}]",t);
 			Logs.Core.Write("CurrentDirectory = [{0}]", System.Reflection.Assembly.GetEntryAssembly().Location);
+			if (IsEditor)
+				Logs.Core.Write("Currently running from the editor");
 			debug = args.Contains("--debug");
-			character = Character.None;
-			
-
-			if(Config != null && Config.Gamejolt != null && !debug)
+			if (debug)
 			{
-				if(Config.Gamejolt.UserName != null && Config.Gamejolt.Token != null)
+				Logs.Core.WriteWarning("DEBUG mode is on!");
+				Logs.Core.WriteWarning("Only use this mode if you were asked to do so!");
+				Logs.Core.WriteWarning("Gamejolt authentication is disabled!");
+			}
+			character = Character.None;
+
+			new Thread(() =>
+			{
+				//if(!Core.IsEditor)
+				if (Config != null && Config.Gamejolt != null && !DEBUG)
 				{
-					GamejoltAuth gamejolt = new GamejoltAuth("637821", "b285cf95496af9351bbab65b39322eaf");
-					AuthResponse auth = gamejolt.Login(Config.Gamejolt.UserName, Base64.Decode(Config.Gamejolt.Token));
-					if (auth.response.success)
+					if (Config.Gamejolt.UserName != null && Config.Gamejolt.Token != null)
 					{
-						Logs.Core.Write("Logged in as {0}",Config.Gamejolt.UserName);
-						username = Config.Gamejolt.UserName;
+						GamejoltAuth gamejolt = SuperSecret.gamejoltAuth;
+						AuthResponse auth = gamejolt.Login(Config.Gamejolt.UserName, Base64.Decode(Config.Gamejolt.Token));
+						FetchResponse fetch = gamejolt.GetData(Config.Gamejolt.UserName);
+						if (auth.response.success)
+						{
+							if (fetch.response.success)
+								Config.Gamejolt.UserName = fetch.response.users[0].username;
+							Logs.Core.Write("Logged in as {0}", Config.Gamejolt.UserName);
+							Client.UserName = Config.Gamejolt.UserName;
+							LoggedIn = true;
+						}
 					}
 				}
+				LoadHosts();
+			}).Start();
+
+			//if(Config.Settings.FullscreenButton)
+			if (PreventKeys.Contains(Config.Settings.FullscreenButton))
+			{
+				Config.Settings.FullscreenButton = 20;
 			}
-			client = new LacewingClient(username);
+			lastfullscreen = Config.Settings.FullscreenButton;
+
+			client = new LacewingClient();
 
 			Start = DateTime.UtcNow;
 			party = Guid.NewGuid();
@@ -350,6 +389,7 @@ namespace FNaFMP
 		}
 		protected override void OnGameEnded()
 		{
+			DualityApp.Sound.StopAll();
 			if(discord != null)
 			{
 				discord.Dispose();

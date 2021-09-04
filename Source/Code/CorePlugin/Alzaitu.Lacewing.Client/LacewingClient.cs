@@ -39,11 +39,12 @@ namespace Alzaitu.Lacewing.Client
 		public ushort ID { get; internal set; }
 		public bool IsConnected { get; internal set; }
 		public bool IsMaster { get; internal set; }
-		public bool LateMessages { get; internal set; }
+		public bool IsDisconnect { get; internal set; }
 
 		public LacewingClient(string username = null)
 		{
-			LateMessages = false;
+			Disposed = false;
+			IsDisconnect = false;
 			_client = new TcpClient();
 			_udp = new UdpClient();
 			UserName = username;
@@ -57,6 +58,7 @@ namespace Alzaitu.Lacewing.Client
 			{
 				return;
 			}
+			IsDisconnect = false;
 			IPAddress IP;
 			try
 			{
@@ -219,7 +221,7 @@ namespace Alzaitu.Lacewing.Client
 
 		private void UDPReceive(IAsyncResult result)
 		{
-			if (Disposed)
+			if (Disposed || IsDisconnect)
 				return;
 			byte[] data = _udp.EndReceive(result, ref UdpEndpoint);
 			String msg = "{";
@@ -265,6 +267,31 @@ namespace Alzaitu.Lacewing.Client
 					Dispose();
 				}
 			}
+		}
+
+		public void Disconnect()
+		{
+			IsConnected = false;
+			IsDisconnect = true;
+			Event.OnDisconnect(new EventDisconnect
+			{
+				Client = this,
+				Reason = "User requested disconnect"
+			});
+			_client.Close();
+			try
+			{
+				_udp.Close();
+			}
+			catch (Exception) { }
+			_client = new TcpClient();
+			_udp = new UdpClient();
+			stream = null;
+			UdpEndpoint = null;
+			ID = new ushort();
+			IsMaster = false;
+			ServerAddress = null;
+			ServerPort = new int();
 		}
 
 		public void Dispose()

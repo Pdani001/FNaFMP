@@ -8,21 +8,38 @@ using Duality.Drawing;
 using FNaFMP.Office;
 using Duality.Components.Renderers;
 using System.Reflection;
+using System.Text.RegularExpressions;
+using Duality.Audio;
 
 namespace FNaFMP.Utility
 {
 	
 	public class Randomizer
 	{
+		private static Random GlobalRandom;
+		private static void Init()
+		{
+			if(GlobalRandom == null)
+			{
+				var seed = Convert.ToInt32(Regex.Match(Guid.NewGuid().ToString(), @"\d+").Value);
+				GlobalRandom = new Random(seed);
+			}
+		}
+		private static Random RandomClass()
+		{
+			Init();
+			var seed2 = Convert.ToInt32(Regex.Match(Guid.NewGuid().ToString(), @"\d+").Value);
+			return new Random((int)(seed2 * GlobalRandom.NextDouble()));
+		}
 		public static int Random(int val)
 		{
-			return new Random().Next(0, val + 1);
+			return RandomClass().Next(0, val + 1);
 		}
 		public static int Random(int min, int max)
 		{
 			if (min > max)
-				throw new ArgumentOutOfRangeException("min value is greater than max value.");
-			return new Random().Next(min, max + 1);
+				throw new ArgumentOutOfRangeException("min","min value is greater than max value.");
+			return RandomClass().Next(min, max + 1);
 		}
 	}
 	public class Utilities
@@ -78,7 +95,9 @@ namespace FNaFMP.Utility
 		private SoundEmitter emitter = null;
 		private Transform transform = null;
 		private List<SoundEmitter.Source> list = null;
-		private readonly List<SoundEmitter.Source> nonloop = new List<SoundEmitter.Source>();
+		private readonly List<SoundEmitter.Source> LocalNonloop = new List<SoundEmitter.Source>();
+		private readonly List<SoundInstance> GlobalNonloop = new List<SoundInstance>();
+		private static readonly List<SoundInstance> GlobalSources = new List<SoundInstance>();
 		public bool IsPlaying(SoundEmitter.Source sound)
 		{
 			if (sound != null)
@@ -91,14 +110,25 @@ namespace FNaFMP.Utility
 			}
 			return false;
 		}
-		public bool IsPlaying(ContentRef<Sound> sound)
+		public bool IsPlaying(ContentRef<Sound> sound, bool global = false)
 		{
 			if (sound != null)
 			{
-				foreach (SoundEmitter.Source src in emitter.Sources)
+				if (!global)
 				{
-					if (src.Sound.Name.Equals(sound.Name))
-						return true;
+					foreach (SoundEmitter.Source src in emitter.Sources)
+					{
+						if (src.Sound.Name.Equals(sound.Name))
+							return true;
+					}
+				}
+				else
+				{
+					foreach (SoundInstance src in GlobalSources)
+					{
+						if (src.Sound.Name.Equals(sound.Name))
+							return true;
+					}
 				}
 			}
 			return false;
@@ -111,6 +141,17 @@ namespace FNaFMP.Utility
 			emitter.Sources.Add(source);
 			return source;
 		}
+
+		public SoundInstance PlayGlobalSound(ContentRef<Sound> sound, bool loop = false)
+		{
+			if (sound == null)
+				return null;
+			var source = DualityApp.Sound.PlaySound(sound);
+			source.Looped = loop;
+			GlobalSources.Add(source);
+			return source;
+		}
+
 		public void StopSound(SoundEmitter.Source sound)
 		{
 			if (sound == null)
@@ -119,34 +160,48 @@ namespace FNaFMP.Utility
 			emitter.Sources.Remove(sound);
 		}
 
-		public void StopAllSounds()
+		public void StopGlobalSound(SoundInstance sound)
+		{
+			sound.Volume = 0;
+			sound.Stop();
+			GlobalSources.Remove(sound);
+		}
+
+		public void StopAllSounds(bool global = false)
 		{
 			if (emitter == null)
 				return;
-			List<SoundEmitter.Source> clone = new List<SoundEmitter.Source>(emitter.Sources);
-			foreach(SoundEmitter.Source source in clone)
+			if (!global)
 			{
-				StopSound(source);
+				List<SoundEmitter.Source> clone = new List<SoundEmitter.Source>(emitter.Sources);
+				foreach (SoundEmitter.Source source in clone)
+				{
+					StopSound(source);
+				}
+			}
+			else
+			{
+				DualityApp.Sound.StopAll();
 			}
 		}
 
-		public bool ToggleSound(String name, bool value)
+		public bool ToggleSound(string name, bool value)
 		{
-			if (list != null)
+
 			foreach (var item in emitter.Sources)
 			{
 				ContentRef<Sound> sound = item.Sound;
 				if (sound.Name.Equals(name))
 				{
-					if (!item.Looped && !nonloop.Contains(item))
+					if (!item.Looped && !LocalNonloop.Contains(item))
 					{
-						nonloop.Add(item);
+						LocalNonloop.Add(item);
 					}
 					item.Paused = !value;
 					return true;
 				}
 			}
-			foreach (var item in nonloop)
+			foreach (var item in LocalNonloop)
 			{
 				ContentRef<Sound> sound = item.Sound;
 				if (sound.Name.Equals(name))
@@ -157,20 +212,61 @@ namespace FNaFMP.Utility
 			}
 			return false;
 		}
-		public bool ChangeVolume(String name, int value)
+		public bool ToggleGlobalSound(string name, bool value)
+		{
+
+			foreach (var item in DualityApp.Sound.Playing)
+			{
+				ContentRef<Sound> sound = item.Sound;
+				if (sound.Name.Equals(name))
+				{
+					if (!item.Looped && !GlobalNonloop.Contains(item))
+					{
+						GlobalNonloop.Add(item);
+					}
+					item.Paused = !value;
+					return true;
+				}
+			}
+			foreach (var item in GlobalNonloop)
+			{
+				ContentRef<Sound> sound = item.Sound;
+				if (sound.Name.Equals(name))
+				{
+					DualityApp.Sound.PlaySound(sound);
+					return true;
+				}
+			}
+			return false;
+		}
+		public bool ChangeVolume(string name, int value, bool global = false)
 		{
 			if (value > 200)
 				value = 200;
 			if (value < 0)
 				value = 0;
-			if (list != null)
-			foreach (var item in emitter.Sources)
+			if (!global)
 			{
-				ContentRef<Sound> sound = item.Sound;
-				if (sound.Name.Equals(name))
+				foreach (var item in emitter.Sources)
 				{
-					item.Volume = value/100f;
-					return true;
+					ContentRef<Sound> sound = item.Sound;
+					if (sound.Name.Equals(name))
+					{
+						item.Volume = value / 100f;
+						return true;
+					}
+				}
+			}
+			else
+			{
+				foreach (var item in DualityApp.Sound.Playing)
+				{
+					ContentRef<Sound> sound = item.Sound;
+					if (sound.Name.Equals(name))
+					{
+						item.Volume = value / 100f;
+						return true;
+					}
 				}
 			}
 			return false;
@@ -188,12 +284,21 @@ namespace FNaFMP.Utility
 		public void OnActivate()
 		{
 			list = null;
-			transform = this.GameObj.GetComponent<Transform>();
-			emitter = this.GameObj.GetComponent<SoundEmitter>();
+			transform = GameObj.Transform;
+			emitter = GameObj.GetComponent<SoundEmitter>();
 			if (emitter != null)
 			{
 				list = emitter.Sources;
 				OnLoad?.Invoke(this, this);
+			}
+			List<SoundInstance> global = new List<SoundInstance>(DualityApp.Sound.Playing);
+			List<SoundInstance> clone = new List<SoundInstance>(GlobalSources);
+			foreach (var source in clone)
+			{
+				if (!global.Contains(source))
+				{
+					GlobalSources.Remove(source);
+				}
 			}
 		}
 
@@ -387,7 +492,7 @@ namespace FNaFMP.Utility
 		}
 	}
 
-	#region Enum helper
+	#region Code helper
 
 	#region StringValue
 	public class StringValueAttribute : Attribute
@@ -504,6 +609,28 @@ namespace FNaFMP.Utility
 		}
 	}
 	#endregion
+
+	public static class StringExtensionMethods
+	{
+		public static string ReplaceFirst(this string text, string search, string replace)
+		{
+			int pos = text.IndexOf(search);
+			if (pos < 0)
+			{
+				return text;
+			}
+			return text.Substring(0, pos) + replace + text.Substring(pos + search.Length);
+		}
+		public static string ReplaceLast(this string text, string search, string replace)
+		{
+			int pos = text.LastIndexOf(search);
+			if (pos < 0)
+			{
+				return text;
+			}
+			return text.Substring(0, pos) + replace + text.Substring(pos + search.Length);
+		}
+	}
 
 	#endregion
 }

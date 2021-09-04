@@ -155,25 +155,29 @@
               <contentPath dataType="String">Data\Menu\Music\ThemeTune.Sound.res</contentPath>
             </themetune>
           </item>
-          <item dataType="Struct" type="FNaFMP.Menu.LobbyStatusText" id="3230015161">
+          <item dataType="Struct" type="FNaFMP.Menu.GamejoltMenu" id="2094745658">
+            <_x003C_ButtonPosition_x003E_k__BackingField dataType="Struct" type="Duality.Point2">
+              <X dataType="Int">128</X>
+              <Y dataType="Int">380</Y>
+            </_x003C_ButtonPosition_x003E_k__BackingField>
             <_x003C_Font_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Font]]">
-              <contentPath dataType="String">Default:Font:GenericMonospace10</contentPath>
+              <contentPath dataType="String">Data\Fonts\Consolas24.Font.res</contentPath>
             </_x003C_Font_x003E_k__BackingField>
-            <_x003C_MaxLength_x003E_k__BackingField dataType="Int">950</_x003C_MaxLength_x003E_k__BackingField>
-            <_x003C_Position_x003E_k__BackingField dataType="Struct" type="Duality.Point2">
-              <X dataType="Int">64</X>
-              <Y dataType="Int">680</Y>
-            </_x003C_Position_x003E_k__BackingField>
+            <_x003C_InfoPosition_x003E_k__BackingField dataType="Struct" type="Duality.Point2">
+              <X dataType="Int">128</X>
+              <Y dataType="Int">430</Y>
+            </_x003C_InfoPosition_x003E_k__BackingField>
             <active dataType="Bool">true</active>
             <gameobj dataType="ObjectRef">2446385983</gameobj>
+            <Status dataType="String"></Status>
           </item>
           <item dataType="Struct" type="FNaFMP.Menu.MenuBackButton" id="1315344264">
             <_x003C_BackScene_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Scene]]">
-              <contentPath dataType="String">Data\Scenes\MainMenu.Scene.res</contentPath>
+              <contentPath dataType="String">Data\Scenes\Settings.Scene.res</contentPath>
             </_x003C_BackScene_x003E_k__BackingField>
             <active dataType="Bool">true</active>
             <font dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Font]]">
-              <contentPath dataType="String">Data\Fonts\Consolas16.Font.res</contentPath>
+              <contentPath dataType="String">Data\Fonts\Consolas16Bold.Font.res</contentPath>
             </font>
             <gameobj dataType="ObjectRef">2446385983</gameobj>
             <location dataType="Struct" type="Duality.Point2">
@@ -199,16 +203,16 @@
             <item dataType="Type" id="1184914958" value="Duality.Components.Renderers.SpriteRenderer" />
             <item dataType="Type" id="3430358858" value="FNaFMP.Menu.Background" />
             <item dataType="Type" id="608493886" value="FNaFMP.Menu.MenuText" />
-            <item dataType="Type" id="1024877018" value="FNaFMP.Menu.LobbyStatusText" />
-            <item dataType="Type" id="3760749294" value="FNaFMP.Menu.MenuBackButton" />
+            <item dataType="Type" id="1024877018" value="FNaFMP.Menu.MenuBackButton" />
+            <item dataType="Type" id="3760749294" value="FNaFMP.Menu.GamejoltMenu" />
           </keys>
           <values dataType="Array" type="System.Object[]" id="2502412224">
             <item dataType="ObjectRef">2503663201</item>
             <item dataType="ObjectRef">3915005263</item>
             <item dataType="ObjectRef">1817012834</item>
             <item dataType="ObjectRef">3735910080</item>
-            <item dataType="ObjectRef">3230015161</item>
             <item dataType="ObjectRef">1315344264</item>
+            <item dataType="ObjectRef">2094745658</item>
           </values>
         </body>
       </compMap>
@@ -475,146 +479,34 @@
       <parent />
       <prefabLink />
     </item>
-    <item dataType="Struct" type="Duality.GameObject" id="979695321">
+    <item dataType="Struct" type="Duality.GameObject" id="991783897">
       <active dataType="Bool">true</active>
-      <children />
-      <compList dataType="Struct" type="System.Collections.Generic.List`1[[Duality.Component]]" id="1499588987">
-        <_items dataType="Array" type="Duality.Component[]" id="1392069462" length="4">
-          <item dataType="Struct" type="Duality.Components.Transform" id="1036972539">
+      <children dataType="Struct" type="System.Collections.Generic.List`1[[Duality.GameObject]]" id="2534058107">
+        <_items dataType="Array" type="Duality.GameObject[]" id="113150294" length="4" />
+        <_size dataType="Int">0</_size>
+      </children>
+      <compList dataType="Struct" type="System.Collections.Generic.List`1[[Duality.Component]]" id="931435176">
+        <_items dataType="Array" type="Duality.Component[]" id="796488081" length="4">
+          <item dataType="Struct" type="Duality.Components.Transform" id="1049061115">
             <active dataType="Bool">true</active>
             <angle dataType="Float">0</angle>
             <angleAbs dataType="Float">0</angleAbs>
-            <gameobj dataType="ObjectRef">979695321</gameobj>
+            <gameobj dataType="ObjectRef">991783897</gameobj>
             <ignoreParent dataType="Bool">false</ignoreParent>
             <pos dataType="Struct" type="Duality.Vector3">
-              <X dataType="Float">64</X>
-              <Y dataType="Float">281</Y>
-              <Z dataType="Float">0</Z>
-            </pos>
-            <posAbs dataType="Struct" type="Duality.Vector3">
-              <X dataType="Float">64</X>
-              <Y dataType="Float">281</Y>
-              <Z dataType="Float">0</Z>
-            </posAbs>
-            <scale dataType="Float">1</scale>
-            <scaleAbs dataType="Float">1</scaleAbs>
-          </item>
-          <item dataType="Struct" type="Duality.Components.Renderers.SpriteRenderer" id="2448314601">
-            <active dataType="Bool">true</active>
-            <colorTint dataType="Struct" type="Duality.Drawing.ColorRgba">
-              <A dataType="Byte">127</A>
-              <B dataType="Byte">255</B>
-              <G dataType="Byte">255</G>
-              <R dataType="Byte">255</R>
-            </colorTint>
-            <customMat />
-            <flipMode dataType="Enum" type="Duality.Components.Renderers.SpriteRenderer+FlipMode" name="None" value="0" />
-            <gameobj dataType="ObjectRef">979695321</gameobj>
-            <offset dataType="Float">160</offset>
-            <pixelGrid dataType="Bool">false</pixelGrid>
-            <rect dataType="Struct" type="Duality.Rect">
-              <H dataType="Float">24</H>
-              <W dataType="Float">64</W>
-              <X dataType="Float">0</X>
-              <Y dataType="Float">0</Y>
-            </rect>
-            <rectMode dataType="Enum" type="Duality.Components.Renderers.SpriteRenderer+UVMode" name="Stretch" value="0" />
-            <sharedMat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
-              <contentPath dataType="String">Data\Menu\Lobby\refresh.Material.res</contentPath>
-            </sharedMat>
-            <spriteIndex dataType="Int">-1</spriteIndex>
-            <visibilityGroup dataType="Enum" type="Duality.Drawing.VisibilityFlag" name="AllGroups" value="2147483647" />
-          </item>
-          <item dataType="Struct" type="FNaFMP.Menu.LobbyListText" id="75050219">
-            <_x003C_PasswordScene_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Scene]]">
-              <contentPath dataType="String">Data\Scenes\Password.Scene.res</contentPath>
-            </_x003C_PasswordScene_x003E_k__BackingField>
-            <_x003C_SelectScene_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Scene]]">
-              <contentPath dataType="String">Data\Scenes\Select.Scene.res</contentPath>
-            </_x003C_SelectScene_x003E_k__BackingField>
-            <active dataType="Bool">true</active>
-            <attempt dataType="Int">0</attempt>
-            <ChannelList />
-            <DenyReason />
-            <error dataType="Bool">false</error>
-            <Event />
-            <font dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Font]]">
-              <contentPath dataType="String">Data\Fonts\Consolas16Bold.Font.res</contentPath>
-            </font>
-            <gameobj dataType="ObjectRef">979695321</gameobj>
-            <host dataType="Int">0</host>
-            <inforetry dataType="Int">-1</inforetry>
-            <join dataType="Bool">false</join>
-            <lastFrame dataType="Int">0</lastFrame>
-            <ListRects />
-            <renderer dataType="ObjectRef">2448314601</renderer>
-            <settings dataType="Struct" type="FNaFMP.Menu.LobbyListSettings" id="1208032475">
-              <columnstep dataType="Int">352</columnstep>
-              <maxcolumns dataType="Int">3</maxcolumns>
-              <maxrows dataType="Int">10</maxrows>
-              <rowstep dataType="Int">32</rowstep>
-              <start dataType="Struct" type="Duality.Point2">
-                <X dataType="Int">32</X>
-                <Y dataType="Int">320</Y>
-              </start>
-            </settings>
-            <transform dataType="ObjectRef">1036972539</transform>
-          </item>
-        </_items>
-        <_size dataType="Int">3</_size>
-      </compList>
-      <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="752883880" surrogate="true">
-        <header />
-        <body>
-          <keys dataType="Array" type="System.Object[]" id="3889554065">
-            <item dataType="ObjectRef">2229467488</item>
-            <item dataType="ObjectRef">1184914958</item>
-            <item dataType="Type" id="3172785646" value="FNaFMP.Menu.LobbyListText" />
-          </keys>
-          <values dataType="Array" type="System.Object[]" id="2848914080">
-            <item dataType="ObjectRef">1036972539</item>
-            <item dataType="ObjectRef">2448314601</item>
-            <item dataType="ObjectRef">75050219</item>
-          </values>
-        </body>
-      </compMap>
-      <compTransform dataType="ObjectRef">1036972539</compTransform>
-      <identifier dataType="Struct" type="System.Guid" surrogate="true">
-        <header>
-          <data dataType="Array" type="System.Byte[]" id="4146731779">myxzkrrYl0SewFAbTenwQQ==</data>
-        </header>
-        <body />
-      </identifier>
-      <initState dataType="Enum" type="Duality.InitState" name="Initialized" value="1" />
-      <name dataType="String">refresh</name>
-      <parent />
-      <prefabLink />
-    </item>
-    <item dataType="Struct" type="Duality.GameObject" id="1725707596">
-      <active dataType="Bool">true</active>
-      <children />
-      <compList dataType="Struct" type="System.Collections.Generic.List`1[[Duality.Component]]" id="3128715970">
-        <_items dataType="Array" type="Duality.Component[]" id="3578964496" length="4">
-          <item dataType="Struct" type="Duality.Components.Transform" id="1782984814">
-            <active dataType="Bool">true</active>
-            <angle dataType="Float">0</angle>
-            <angleAbs dataType="Float">0</angleAbs>
-            <gameobj dataType="ObjectRef">1725707596</gameobj>
-            <ignoreParent dataType="Bool">false</ignoreParent>
-            <pos dataType="Struct" type="Duality.Vector3">
-              <X dataType="Float">64</X>
+              <X dataType="Float">128</X>
               <Y dataType="Float">249</Y>
               <Z dataType="Float">0</Z>
             </pos>
             <posAbs dataType="Struct" type="Duality.Vector3">
-              <X dataType="Float">64</X>
+              <X dataType="Float">128</X>
               <Y dataType="Float">249</Y>
               <Z dataType="Float">0</Z>
             </posAbs>
             <scale dataType="Float">1</scale>
             <scaleAbs dataType="Float">1</scaleAbs>
           </item>
-          <item dataType="Struct" type="Duality.Components.Renderers.SpriteRenderer" id="3194326876">
+          <item dataType="Struct" type="Duality.Components.Renderers.SpriteRenderer" id="2460403177">
             <active dataType="Bool">true</active>
             <colorTint dataType="Struct" type="Duality.Drawing.ColorRgba">
               <A dataType="Byte">255</A>
@@ -624,7 +516,7 @@
             </colorTint>
             <customMat />
             <flipMode dataType="Enum" type="Duality.Components.Renderers.SpriteRenderer+FlipMode" name="None" value="0" />
-            <gameobj dataType="ObjectRef">1725707596</gameobj>
+            <gameobj dataType="ObjectRef">991783897</gameobj>
             <offset dataType="Float">160</offset>
             <pixelGrid dataType="Bool">false</pixelGrid>
             <rect dataType="Struct" type="Duality.Rect">
@@ -640,54 +532,149 @@
             <spriteIndex dataType="Int">-1</spriteIndex>
             <visibilityGroup dataType="Enum" type="Duality.Drawing.VisibilityFlag" name="AllGroups" value="2147483647" />
           </item>
-          <item dataType="Struct" type="FNaFMP.Menu.LobbyNameText" id="2727264161">
+          <item dataType="Struct" type="FNaFMP.Menu.GamejoltNameText" id="2658145355">
             <active dataType="Bool">true</active>
             <backspace dataType="Int">-1</backspace>
             <c dataType="String"></c>
             <extra dataType="String"></extra>
             <font dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Font]]">
-              <contentPath dataType="String">Data\Fonts\Consolas16.Font.res</contentPath>
+              <contentPath dataType="String">Data\Fonts\Consolas16Bold.Font.res</contentPath>
             </font>
-            <gameobj dataType="ObjectRef">1725707596</gameobj>
+            <gameobj dataType="ObjectRef">991783897</gameobj>
             <input dataType="Int">-1</input>
-            <join dataType="Bool">false</join>
             <maxlength dataType="Int">22</maxlength>
             <minlength dataType="Int">3</minlength>
             <Name dataType="String"></Name>
-            <renderer dataType="ObjectRef">3194326876</renderer>
+            <renderer dataType="ObjectRef">2460403177</renderer>
             <repeat dataType="Int">-1</repeat>
-            <scene dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Scene]]">
-              <contentPath dataType="String">Data\Scenes\Select.Scene.res</contentPath>
-            </scene>
-            <transform dataType="ObjectRef">1782984814</transform>
+            <scene dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Scene]]" />
+            <transform dataType="ObjectRef">1049061115</transform>
           </item>
         </_items>
         <_size dataType="Int">3</_size>
       </compList>
-      <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="138566154" surrogate="true">
+      <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="1035283313" surrogate="true">
         <header />
         <body>
-          <keys dataType="Array" type="System.Object[]" id="827121304">
+          <keys dataType="Array" type="System.Object[]" id="528606052">
             <item dataType="ObjectRef">2229467488</item>
             <item dataType="ObjectRef">1184914958</item>
-            <item dataType="Type" id="69727788" value="FNaFMP.Menu.LobbyNameText" />
+            <item dataType="Type" id="1386247108" value="FNaFMP.Menu.GamejoltNameText" />
           </keys>
-          <values dataType="Array" type="System.Object[]" id="1205784862">
-            <item dataType="ObjectRef">1782984814</item>
-            <item dataType="ObjectRef">3194326876</item>
-            <item dataType="ObjectRef">2727264161</item>
+          <values dataType="Array" type="System.Object[]" id="3270330902">
+            <item dataType="ObjectRef">1049061115</item>
+            <item dataType="ObjectRef">2460403177</item>
+            <item dataType="ObjectRef">2658145355</item>
           </values>
         </body>
       </compMap>
-      <compTransform dataType="ObjectRef">1782984814</compTransform>
+      <compTransform dataType="ObjectRef">1049061115</compTransform>
       <identifier dataType="Struct" type="System.Guid" surrogate="true">
         <header>
-          <data dataType="Array" type="System.Byte[]" id="3898440900">LnTBRHbdrkCOxCMmA4vGKQ==</data>
+          <data dataType="Array" type="System.Byte[]" id="3615498336">5EdekNtaJke6ShQqDOGxng==</data>
         </header>
         <body />
       </identifier>
       <initState dataType="Enum" type="Duality.InitState" name="Initialized" value="1" />
       <name dataType="String">namebox</name>
+      <parent />
+      <prefabLink />
+    </item>
+    <item dataType="Struct" type="Duality.GameObject" id="568912162">
+      <active dataType="Bool">true</active>
+      <children />
+      <compList dataType="Struct" type="System.Collections.Generic.List`1[[Duality.Component]]" id="507355372">
+        <_items dataType="Array" type="Duality.Component[]" id="2154766436" length="4">
+          <item dataType="Struct" type="Duality.Components.Transform" id="626189380">
+            <active dataType="Bool">true</active>
+            <angle dataType="Float">0</angle>
+            <angleAbs dataType="Float">0</angleAbs>
+            <gameobj dataType="ObjectRef">568912162</gameobj>
+            <ignoreParent dataType="Bool">false</ignoreParent>
+            <pos dataType="Struct" type="Duality.Vector3">
+              <X dataType="Float">128</X>
+              <Y dataType="Float">313</Y>
+              <Z dataType="Float">0</Z>
+            </pos>
+            <posAbs dataType="Struct" type="Duality.Vector3">
+              <X dataType="Float">128</X>
+              <Y dataType="Float">313</Y>
+              <Z dataType="Float">0</Z>
+            </posAbs>
+            <scale dataType="Float">1</scale>
+            <scaleAbs dataType="Float">1</scaleAbs>
+          </item>
+          <item dataType="Struct" type="Duality.Components.Renderers.SpriteRenderer" id="2037531442">
+            <active dataType="Bool">true</active>
+            <colorTint dataType="Struct" type="Duality.Drawing.ColorRgba">
+              <A dataType="Byte">255</A>
+              <B dataType="Byte">255</B>
+              <G dataType="Byte">255</G>
+              <R dataType="Byte">255</R>
+            </colorTint>
+            <customMat />
+            <flipMode dataType="Enum" type="Duality.Components.Renderers.SpriteRenderer+FlipMode" name="None" value="0" />
+            <gameobj dataType="ObjectRef">568912162</gameobj>
+            <offset dataType="Float">160</offset>
+            <pixelGrid dataType="Bool">false</pixelGrid>
+            <rect dataType="Struct" type="Duality.Rect">
+              <H dataType="Float">32</H>
+              <W dataType="Float">319</W>
+              <X dataType="Float">0</X>
+              <Y dataType="Float">0</Y>
+            </rect>
+            <rectMode dataType="Enum" type="Duality.Components.Renderers.SpriteRenderer+UVMode" name="Stretch" value="0" />
+            <sharedMat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
+              <contentPath dataType="String">Data\Menu\Lobby\namebox.Material.res</contentPath>
+            </sharedMat>
+            <spriteIndex dataType="Int">-1</spriteIndex>
+            <visibilityGroup dataType="Enum" type="Duality.Drawing.VisibilityFlag" name="AllGroups" value="2147483647" />
+          </item>
+          <item dataType="Struct" type="FNaFMP.Menu.GamejoltTokenText" id="2663537240">
+            <active dataType="Bool">true</active>
+            <backspace dataType="Int">-1</backspace>
+            <c dataType="String"></c>
+            <extra dataType="String"></extra>
+            <font dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Font]]">
+              <contentPath dataType="String">Data\Fonts\Consolas16Bold.Font.res</contentPath>
+            </font>
+            <gameobj dataType="ObjectRef">568912162</gameobj>
+            <input dataType="Int">-1</input>
+            <maxlength dataType="Int">22</maxlength>
+            <minlength dataType="Int">3</minlength>
+            <Name dataType="String"></Name>
+            <renderer dataType="ObjectRef">2037531442</renderer>
+            <repeat dataType="Int">-1</repeat>
+            <scene dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Scene]]" />
+            <transform dataType="ObjectRef">626189380</transform>
+          </item>
+        </_items>
+        <_size dataType="Int">3</_size>
+      </compList>
+      <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="3211280694" surrogate="true">
+        <header />
+        <body>
+          <keys dataType="Array" type="System.Object[]" id="594140966">
+            <item dataType="ObjectRef">2229467488</item>
+            <item dataType="ObjectRef">1184914958</item>
+            <item dataType="Type" id="3357705472" value="FNaFMP.Menu.GamejoltTokenText" />
+          </keys>
+          <values dataType="Array" type="System.Object[]" id="1669458618">
+            <item dataType="ObjectRef">626189380</item>
+            <item dataType="ObjectRef">2037531442</item>
+            <item dataType="ObjectRef">2663537240</item>
+          </values>
+        </body>
+      </compMap>
+      <compTransform dataType="ObjectRef">626189380</compTransform>
+      <identifier dataType="Struct" type="System.Guid" surrogate="true">
+        <header>
+          <data dataType="Array" type="System.Byte[]" id="2454703142">ZymLHzWad02mRZif8F3zTw==</data>
+        </header>
+        <body />
+      </identifier>
+      <initState dataType="Enum" type="Duality.InitState" name="Initialized" value="1" />
+      <name dataType="String">tokenbox</name>
       <parent />
       <prefabLink />
     </item>

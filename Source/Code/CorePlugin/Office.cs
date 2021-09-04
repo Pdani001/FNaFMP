@@ -1145,7 +1145,7 @@ namespace FNaFMP.Office
 		}
 	}
 	[RequiredComponent(typeof(SpriteRenderer)), RequiredComponent(typeof(SpriteAnimator)), RequiredComponent(typeof(Transform))]
-	public class CameraRenderer : Component, ICmpUpdatable
+	public class CameraRenderer : Component, ICmpUpdatable, ICmpInitializable
 	{
 		[DontSerialize] private static bool random = false;
 		public static bool IsRandom
@@ -1300,6 +1300,27 @@ namespace FNaFMP.Office
 					}
 				} else
 				{
+				}
+			}
+		}
+
+		public void OnActivate()
+		{
+		}
+
+		public void OnDeactivate()
+		{
+			foreach (var item in list)
+			{
+				if (item != null)
+				{
+					foreach (var sub in item)
+					{
+						if (sub != null && sub.Material != null)
+						{
+							sub.Material.Detach();
+						}
+					}
 				}
 			}
 		}
@@ -2427,7 +2448,8 @@ namespace FNaFMP.Office
 						}
 					}
 					finished = true;
-					Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 28, (int)killer);
+					if(Core.Client != null && Core.Client.IsConnected)
+						Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 28, (int)killer);
 					if (AfterJump != null)
 					{
 						Scene.SwitchTo(AfterJump);
@@ -3195,6 +3217,18 @@ namespace FNaFMP.Office
 					Positions.SetUser((Core.Character)e.Message, e.PeerID);
 				}
 			}
+			if(e.SubChannel == 22)
+			{
+				if(((int)Core.SelfCharacter) == e.Message)
+				{
+					List<byte> msg = new List<byte>
+							{
+								(byte)Core.SelfCharacter,
+								(byte)Positions.GetPosition(Core.SelfCharacter)
+							};
+					Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 25, msg.ToArray());
+				}
+			}
 		}
 
 		[DontSerialize] private int lastmove = -1;
@@ -3256,7 +3290,7 @@ namespace FNaFMP.Office
 				byte charbyte = reader.ReadByte();
 				Core.Character character = (Core.Character)charbyte;
 				byte position = reader.ReadByte();
-				if (Core.SelfCharacter == Core.Character.Guard && CameraViewer.IsViewing && lastmove == -1)
+				if (CameraViewer.IsViewing && lastmove == -1)
 				{
 					if(position == CameraViewer.ViewNumber || (character != Core.Character.Foxy && Positions.GetPosition(character) == CameraViewer.ViewNumber) || (character == Core.Character.Foxy && IsViewingFoxy()))
 					{
@@ -3300,10 +3334,29 @@ namespace FNaFMP.Office
 			}
 		}
 
+		private long GameStartCheck = -1;
+
 		public void OnUpdate()
 		{
 			if (Core.SelfCharacter == Core.Character.Guard)
 			{
+				if (Core.Client != null && Core.Client.IsConnected)
+				{
+					if (GameStartCheck <= Time.MainTimer.TotalMilliseconds && time == 12)
+					{
+						GameStartCheck = (long)(Time.MainTimer.TotalMilliseconds + 21000);
+						foreach (int i in Enum.GetValues(typeof(Core.Character)))
+						{
+							Core.Character character = (Core.Character)i;
+							if (character == Core.Character.None || character == Core.Character.Guard)
+								continue;
+							if (Positions.GetPosition(character) == -1)
+							{
+								Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 22, i);
+							}
+						}
+					}
+				}
 				if (JumpscareManager.Jumpscared)
 					finished = true;
 				if (DualityApp.Keyboard.KeyPressed(Duality.Input.Key.C))

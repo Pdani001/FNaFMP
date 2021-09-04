@@ -120,6 +120,7 @@
     <Compile Include="Menu.cs" />
     <Compile Include="Select.cs" />
     <Compile Include="Splash.cs" />
+    <Compile Include="SuperSecret.cs" />
     <Compile Include="Utility.cs" />
     <Compile Include="CorePlugin.cs" />
     <Compile Include="Office.cs" />

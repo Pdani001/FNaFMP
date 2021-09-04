@@ -13,11 +13,13 @@ using Alzaitu.Lacewing.Client;
 using FNaFMP.Utility;
 using FNaFMP.Alzaitu.Lacewing.Client.Packet;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace FNaFMP.Select
 {
 	public class BGTasks : Component, ICmpInitializable, ICmpUpdatable
 	{
+		public static string Password = "";
 		public static SoundManager SM { get; private set; }
 		private List<int> Players = new List<int>();
 		public ContentRef<Scene> LobbyScene { get; set; }
@@ -62,6 +64,9 @@ namespace FNaFMP.Select
 				DiscordRPC.RichPresence presence = Core.DRPC.CurrentPresence;
 				Core.DRPC.SetPresence(Core.BuildPresence("In Lobby","Selecting",presence.Party.ID,5,presence.Party.Size));
 			}
+			Startup.SplashText.IsLast = false;
+			Core.MenuBGM = null;
+			Password = "";
 			AllowReady = true;
 			countdown = -1;
 			nextcount = -1;
@@ -90,12 +95,33 @@ namespace FNaFMP.Select
 						Players.Add(peer.Id);
 					}
 				}
+				else
+				{
+					Core.Client.Event.TextMessage += Event_TextMessage;
+				}
+			}
+		}
+
+		private void Event_TextMessage(object sender, EventTextMessage e)
+		{
+			if(e.Type == MessageEventType.Peer && e.SubChannel == 13)
+			{
+				ClientPeer peer = ClientPeer.GetPeer(Core.Client, (ushort)e.PeerID);
+				if(e.Message == Password)
+				{
+					peer.SendNumberMessage(Core.Client, 13, Core.Client.joinedChannels[0], 1);
+				}
+				else
+				{
+					peer.SendNumberMessage(Core.Client, 13, Core.Client.joinedChannels[0], 0);
+				}
 			}
 		}
 
 		private void SoundManager_OnLoad(object sender, SoundManager e)
 		{
 			SM = e;
+			SM.StopAllSounds(true);
 			SoundManager.OnLoad -= SoundManager_OnLoad;
 		}
 
@@ -233,7 +259,7 @@ namespace FNaFMP.Select
 						Players.Add(e.PeerID);
 						msg.Add(1);	// SUCCESS
 						msg.Add((byte)Players.Count);
-						msg.Add(0);
+						msg.Add((byte)(Password == "" ? 0 : 1));
 						msg.AddRange(BinaryData.GetData(Core.PartyID.ToString()));
 						peer.SendBinaryMessage(Core.Client, 12, channel, msg.ToArray());
 					}
@@ -322,6 +348,10 @@ namespace FNaFMP.Select
 				Core.Client.Event.BinaryMessage -= Event_BinaryMessage;
 				Core.Client.Event.NumberMessage -= Event_NumberMessage;
 				Core.Client.Event.Disconnect -= Event_Disconnect;
+				if (Core.Client.IsMaster)
+				{
+					Core.Client.Event.TextMessage -= Event_TextMessage;
+				}
 			}
 		}
 		public static bool AllowReady { get; private set; }
@@ -907,9 +937,9 @@ namespace FNaFMP.Select
 				{
 					if (Text.Replace(" ","").Length <= 0)
 						return;
-					if (nextchat > Time.MainTimer.TotalSeconds)
+					if (nextchat > Time.MainTimer.TotalMilliseconds)
 						return;
-					nextchat = (int)(Time.MainTimer.TotalSeconds + 2);
+					nextchat = (int)(Time.MainTimer.TotalMilliseconds + 2000);
 					SendMessage();
 				}
 			}
@@ -948,12 +978,37 @@ namespace FNaFMP.Select
 
 		private void SendMessage()
 		{
+			if (Text.StartsWith("/"))
+			{
+				var cmd = Text.ReplaceFirst("/", "");
+				string[] args = new string[0];
+				if (cmd.Contains(" "))
+					args = cmd.Split(' ');
+				if (args.Length > 0)
+				{
+					cmd = args[0];
+					string[] temp = args;
+					args = new string[temp.Length - 1];
+					for (int i = 1; i < temp.Length; i++)
+					{
+						args[i - 1] = temp[i];
+					}
+				}
+				nextchat = (int)Time.MainTimer.TotalMilliseconds + 20;
+				var result = CommandManager.RunCommand(cmd,args);
+				if (!result)
+				{
+					AddChat("Unknown command.", ColorRgba.DarkGrey);
+				}
+				Text = "";
+				return;
+			}
 			List<byte> msg = new List<byte>();
 			msg.Add((byte)Core.SelfCharacter);
 			msg.AddRange(BinaryData.GetData(Text));
 			Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 15, msg.ToArray());
 			string display = string.Format(ChatFormat, "", Core.Client.UserName, Core.SelfCharacter == Core.Character.None ? "" : " (" + Core.SelfCharacter.GetStringValue() + ")", Text);
-			if(Core.Client.UserName != "Pdani")
+			if(Core.Client.UserName != "Pdani" && Core.Client.UserName != "Brawlbox")
 				AddChat(display);
 			else
 				AddChat(display,new ColorRgba(235, 52, 198));
@@ -1008,7 +1063,7 @@ namespace FNaFMP.Select
 				int length = reader.ReadInt();
 				string text = reader.ReadText(length);
 				string display = string.Format(ChatFormat, "", peer.Name, c == Core.Character.None ? "" : " ("+c.GetStringValue()+")", text);
-				if (peer.Name != "Pdani")
+				if (peer.Name != "Pdani" && peer.Name != "Brawlbox")
 					AddChat(display);
 				else
 					AddChat(display, new ColorRgba(235, 52, 198));
@@ -1038,10 +1093,84 @@ namespace FNaFMP.Select
 			}
 		}
 	}
-
 	internal class ChatLine
 	{
 		public string Text { get; set; }
 		public ColorRgba Color { get; set; }
+	}
+
+	public class CommandManager
+	{
+		/// <summary>
+		/// Run the specified command to run, with the given arguments, then return if the command was found or not
+		/// </summary>
+		/// <param name="command">the command to run, case in-sensitive</param>
+		/// <param name="args">command arguments</param>
+		/// <returns>true if the command was found, false otherwise</returns>
+		public static bool RunCommand(string command, string[] args)
+		{
+			if (command == null)
+				return false;
+			if (args == null)
+				args = new string[0];
+			ColorRgba color = new ColorRgba(52, 235, 155);
+			ColorRgba masterColor = new ColorRgba(99, 190, 50);
+			switch (command.ToLower())
+			{
+				case "help":
+					ChatBox.AddChat("/help - Displays this list",color);
+					ChatBox.AddChat("/list - List all players in the lobby",color);
+					ChatBox.AddChat("/difficulty - Print the current difficulty",color);
+					if (Core.Client.IsMaster)
+					{
+						ChatBox.AddChat("/difficulty [0-4] - Change the difficulty", color);
+						ChatBox.AddChat("/password [text] - Change/remove the current password",color);
+						ChatBox.AddChat("To remove the password, just type in the command without parameters.", masterColor);
+					}
+					return true;
+				case "list":
+					ChatBox.AddChat("List of players: ",color);
+					ChatBox.AddChat("- "+Core.Client.UserName+" (You)",color);
+					foreach(ClientPeer peer in Core.Client.joinedChannels[0])
+					{
+						ChatBox.AddChat("- " + peer.Name + (peer.ChannelMaster ? " (Master) " : " ") + "#" + peer.Id, color);
+					}
+					return true;
+				case "difficulty":
+					if (!Core.Client.IsMaster || args.Length == 0)
+					{
+						ChatBox.AddChat("Current difficulty: "+Core.Difficulty.GetStringValue(),color);
+					}
+					if(Core.Client.IsMaster && args.Length > 0)
+					{
+						ChatBox.AddChat("Changing difficulty doesn't work yet.", masterColor);
+					}
+					return true;
+				case "password":
+					if (Core.Client.IsMaster)
+					{
+						if(args.Length == 0)
+						{
+							if(BGTasks.Password != "")
+							{
+								BGTasks.Password = "";
+								ChatBox.AddChat("Password removed.", masterColor);
+							}
+							else
+							{
+								ChatBox.AddChat("Usage: /password [text]", masterColor);
+							}
+						}
+						else
+						{
+							ChatBox.AddChat("Password " + (BGTasks.Password == "" ? "set" : "changed"), masterColor);
+							BGTasks.Password = string.Join(" ", args);
+						}
+						return true;
+					}
+					break;
+			}
+			return false;
+		}
 	}
 }

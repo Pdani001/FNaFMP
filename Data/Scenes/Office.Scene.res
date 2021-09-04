@@ -17,13 +17,13 @@
             <gameobj dataType="ObjectRef">1256118317</gameobj>
             <ignoreParent dataType="Bool">false</ignoreParent>
             <pos dataType="Struct" type="Duality.Vector3">
-              <X dataType="Float">640</X>
-              <Y dataType="Float">360</Y>
+              <X dataType="Float">0</X>
+              <Y dataType="Float">0</Y>
               <Z dataType="Float">-500</Z>
             </pos>
             <posAbs dataType="Struct" type="Duality.Vector3">
-              <X dataType="Float">640</X>
-              <Y dataType="Float">360</Y>
+              <X dataType="Float">0</X>
+              <Y dataType="Float">0</Y>
               <Z dataType="Float">-500</Z>
             </posAbs>
             <scale dataType="Float">1</scale>
@@ -849,7 +849,7 @@
                 </keys>
                 <values dataType="Array" type="System.Object[]" id="3870096602">
                   <item dataType="Struct" type="FNaFMP.Office.CameraView" id="667310692">
-                    <duration dataType="Float">0.6</duration>
+                    <duration dataType="Float">1.03</duration>
                     <extra dataType="Int">160</extra>
                     <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
                       <contentPath dataType="String">Data\Jumpscare\jump-freddy.Material.res</contentPath>
@@ -859,7 +859,7 @@
                     <robots />
                   </item>
                   <item dataType="Struct" type="FNaFMP.Office.CameraView" id="4136060950">
-                    <duration dataType="Float">0.35</duration>
+                    <duration dataType="Float">0.24</duration>
                     <extra dataType="Int">160</extra>
                     <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
                       <contentPath dataType="String">Data\Jumpscare\jump-bonnie.Material.res</contentPath>
@@ -869,7 +869,7 @@
                     <robots />
                   </item>
                   <item dataType="Struct" type="FNaFMP.Office.CameraView" id="1682173792">
-                    <duration dataType="Float">0.25</duration>
+                    <duration dataType="Float">0.27</duration>
                     <extra dataType="Int">160</extra>
                     <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
                       <contentPath dataType="String">Data\Jumpscare\jump-chica.Material.res</contentPath>
@@ -879,8 +879,8 @@
                     <robots />
                   </item>
                   <item dataType="Struct" type="FNaFMP.Office.CameraView" id="3972292450">
-                    <duration dataType="Float">0.6</duration>
-                    <extra dataType="Int">-1</extra>
+                    <duration dataType="Float">0.83</duration>
+                    <extra dataType="Int">0</extra>
                     <mat dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Material]]">
                       <contentPath dataType="String">Data\Jumpscare\jump-foxy.Material.res</contentPath>
                     </mat>
