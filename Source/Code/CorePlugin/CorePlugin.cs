@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using Alzaitu.Lacewing.Client;
@@ -25,7 +26,7 @@ namespace FNaFMP
 	public class Core : CorePlugin
 	{
 		private string ConfigPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\FNaFMultiplayer\\config1.yml";
-		public const string VERSION = "0.1.7";
+		public const string VERSION = "0.1.8";
 		public static readonly int[] PreventKeys = new int[] { 0 , 131 , 82, 53, 51, 49, 11, 7, 8 };
 
 		public static bool LoggedIn = false;
@@ -216,6 +217,8 @@ namespace FNaFMP
 		private int restart = -1;
 		protected override void OnAfterUpdate()
 		{
+			if (IsEditor)
+				return;
 			DualityUserData data = DualityApp.UserData;
 			if(DualityApp.WindowSize.X != MaxWindowSize.X || DualityApp.WindowSize.Y != MaxWindowSize.Y)
 			{
@@ -268,27 +271,27 @@ namespace FNaFMP
 			/// <summary>
 			/// Default move times, extra slow power drain
 			/// </summary>
-			[StringValue("Very Easy")]
+			[StringValue("Very Easy/Night 1")]
 			VeryEasy = 0,
 			/// <summary>
 			/// Couple seconds faster move times, slow power drain
 			/// </summary>
-			[StringValue("Easy")]
+			[StringValue("Easy/Night 2")]
 			Easy = 1,
 			/// <summary>
 			/// Significantly faster move times, noticably faster power drain
 			/// </summary>
-			[StringValue("Medium")]
+			[StringValue("Medium/Night 3")]
 			Medium = 2,
 			/// <summary>
 			/// Faster move times, faster power drain
 			/// </summary>
-			[StringValue("Hard")]
+			[StringValue("Hard/Night 4")]
 			Hard = 3,
 			/// <summary>
 			/// Extra fast move times, extra fast power drain
 			/// </summary>
-			[StringValue("Very Hard")]
+			[StringValue("Very Hard/Night 5+")]
 			VeryHard = 4
 		}
 
@@ -338,29 +341,6 @@ namespace FNaFMP
 				Logs.Core.WriteWarning("Gamejolt authentication is disabled!");
 			}
 			character = Character.None;
-
-			new Thread(() =>
-			{
-				//if(!Core.IsEditor)
-				if (Config != null && Config.Gamejolt != null && !DEBUG)
-				{
-					if (Config.Gamejolt.UserName != null && Config.Gamejolt.Token != null)
-					{
-						GamejoltAuth gamejolt = SuperSecret.gamejoltAuth;
-						AuthResponse auth = gamejolt.Login(Config.Gamejolt.UserName, Base64.Decode(Config.Gamejolt.Token));
-						FetchResponse fetch = gamejolt.GetData(Config.Gamejolt.UserName);
-						if (auth.response.success)
-						{
-							if (fetch.response.success)
-								Config.Gamejolt.UserName = fetch.response.users[0].username;
-							Logs.Core.Write("Logged in as {0}", Config.Gamejolt.UserName);
-							Client.UserName = Config.Gamejolt.UserName;
-							LoggedIn = true;
-						}
-					}
-				}
-				LoadHosts();
-			}).Start();
 
 			//if(Config.Settings.FullscreenButton)
 			if (PreventKeys.Contains(Config.Settings.FullscreenButton))

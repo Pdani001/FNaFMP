@@ -12,6 +12,7 @@ Jumpscare (Chica): 1600x720 / 16 frames / 99 speed (0.27)
 Jumpscare (Foxy): 1600x720 / 25 frames / 50 speed (0.83)
 Loading spinner: 64x64 / 15 frames / 50 speed (0.5)
 (Note: this is not all of the images, only the ones I documented /Pdani)
+(Speed calculator: https://pdani.hu/speed.php)
 ============
 640
 == CHARACTERS ==
@@ -45,18 +46,20 @@ Lobby info (from player to master): *12* -> .length. .version.
 Lobby info (from master to player): *12* -> .success (0/1). [On success: .player count. .password (0/1). .party length. .party.] [On fail: .length. .fail reason.]
 Lobby password (from player to master, text): *13* -> .password.
 Lobby password (from master to player, number): *13* -> .success (0/1).
+User kick (from master to target, number): *14* -> .user id/random number.
 Lobby chat: *15* -> .character. .message length. .message.
+Extra lobby info: *18* -> .difficulty.
 Status request (after join, number): *21* -> .random number.
 Game info: *3* (text) -> .game code.
 
 -- IN GAME --
-Game start check *22* (number) -> .character.
+Game start check: *22* (number) -> .character.
 Robot join: *23* (number) -> .character.
-Guard status: *24* -> .light (0 off/1 left/2 right). .left door (0/1). .right door (0/1). .camera status (0/1). .camera position.
+Guard status: *24* -> .ready (0/1). .light (0 off/1 left/2 right). .left door (0/1). .right door (0/1). .camera status (0/1). .camera position.
 Movement: *25* -> .character. .position. .magic value, can be left out.
-Power & Time *26* -> .type (0=power,1=time). .value.
-Animatronic requests jumpscare *27* (number) -> .character.
-Guard jumpscared *28* (number) -> .robot.
-Foxy office enter response *29* (number) -> .new state (0-2/21).
-Freddy InOffice Musicbox *30* (number) -> .state.
+Power & Time: *26* -> .type (0=power,1=time). .value.
+Animatronic requests jumpscare: *27* (number) -> .character.
+Guard jumpscared: *28* (number) -> .robot.
+Foxy office enter response: *29* (number) -> .new state (0-2/21).
+Freddy InOffice Musicbox: *30* (number) -> .state.
 ==============

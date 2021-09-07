@@ -31,22 +31,35 @@ namespace Alzaitu.Lacewing.Client
 		private readonly string Name;
 		private StringBuilder sb = new StringBuilder();
 		private Timer Timer;
+		private readonly string file;
 		private Logger(string name)
 		{
-			if (File.Exists(Environment.CurrentDirectory + "\\" + Name + ".log"))
-			{
-				File.Delete(Environment.CurrentDirectory + "\\" + Name + ".log");
-			}
 			Name = name;
+			file = Environment.CurrentDirectory + $"\\{Name}.log";
+			if (File.Exists(file))
+			{
+				File.WriteAllText(file,"");
+				File.SetAttributes(file, FileAttributes.Normal);
+			}
 			Timer = new Timer(5000); // X/1000=Y seconds
 			Timer.Elapsed += OnTimedEvent;
 			Timer.AutoReset = true;
 			Timer.Enabled = true;
 		}
-
+		public void Close()
+		{
+			/*if (File.Exists(file))
+			{
+				File.SetAttributes(file, FileAttributes.Normal);
+				File.Delete(file);
+			}*/
+		}
 		private void OnTimedEvent(object sender, ElapsedEventArgs e)
 		{
-			File.AppendAllText(Environment.CurrentDirectory + "\\" + Name + ".log", sb.ToString());
+			if (sb.ToString() == "")
+				return;
+			File.AppendAllText(file, sb.ToString());
+			File.SetAttributes(file, FileAttributes.Normal);
 			sb.Clear();
 		}
 		public void Write(string text, params object[] obj)
@@ -55,9 +68,12 @@ namespace Alzaitu.Lacewing.Client
 		}
 		public void Write(Level level, string text, params object[] obj)
 		{
-			string time = DateTime.Now.ToString("HH:mm:ss");
+			string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 			text = $"[{time}] [{Name}/{level.GetStringValue()}]" + text;
-			Console.WriteLine(text,obj);
+			if (level == Level.ERROR)
+				Console.Error.WriteLine(text, obj);
+			else
+				Console.WriteLine(text, obj);
 			sb.AppendLine(string.Format(text, obj));
 		}
 	}

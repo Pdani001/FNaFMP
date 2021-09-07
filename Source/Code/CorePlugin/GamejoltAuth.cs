@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,36 +7,22 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace FNaFMP
 {
-	public class FetchResponse
-	{
-		public FetchData response { get; set; }
-	}
-	public class FetchData
-	{
-		public bool success { get; set; }
-		public string message { get; set; }
-		public FetchUser[] users { get; set; }
-	}
-	public class FetchUser
-	{
-		public string username { get; set; }
-	}
-	public class AuthResponse
-	{
-		public AuthData response { get; set; }
-	}
 	public class AuthData
 	{
 		public bool success { get; set; }
 		public string message { get; set; }
+		public string username { get; set; }
 	}
 	public class GamejoltAuth
 	{
-		private const string LOGIN_URL = "https://api.gamejolt.com/api/game/v1_2/users/auth/?game_id={0}&username={1}&user_token={2}";
-		private const string DATA_URL = "https://api.gamejolt.com/api/game/v1_2/users/?game_id={0}&username={1}";
+		private const string API_URL = "https://api.gamejolt.com/api/game/v1_2";
+		private const string LOGIN_EP = "/users/auth/?game_id={0}&username={1}&user_token={2}";
+		private const string DATA_EP = "/users/?game_id={0}&username={1}";
+		private const string BATCH_EP = "/batch/?game_id={0}";
 		private string GameID = "";
 		private string GameKey = "";
 		public GamejoltAuth(string gameid, string gamekey)
@@ -47,57 +34,57 @@ namespace FNaFMP
 			GameID = gameid;
 			GameKey = gamekey;
 		}
-		public AuthResponse Login(string user, string token)
+		public AuthData Login(string user, string token)
 		{
 			WebClient web = new WebClient();
-			string login_link = string.Format(LOGIN_URL, GameID, user, token);
-			string login_sign = Hash(login_link + GameKey);
-			string loginapi;
+			string login_link = string.Format(LOGIN_EP, GameID, user, token);
+			login_link += "&signature=" + Hash(login_link + GameKey);
+			login_link = HttpUtility.UrlEncode(login_link);
+			string data_link = string.Format(DATA_EP, GameID, user);
+			data_link += "&signature=" + Hash(data_link + GameKey);
+			data_link = HttpUtility.UrlEncode(data_link);
+			string batch_link = string.Format(BATCH_EP,GameID);
+			string full_link = API_URL + batch_link + "&requests[]=" + login_link + "&requests[]=" + data_link;
+			string full_sign = Hash(full_link + GameKey);
+			string api;
 			try
 			{
-				loginapi = web.DownloadString(login_link + "&signature=" + login_sign);
+				api = web.DownloadString(full_link + "&signature=" + full_sign);
 			}
 			catch (Exception e)
 			{
-				return new AuthResponse
+				return new AuthData
 				{
-					response = new AuthData
-					{
-						message = e.Message,
-						success = false
-					}
+					message = e.Message,
+					success = false
 				};
 			}
-			AuthResponse authResponse = JsonConvert.DeserializeObject<AuthResponse>(loginapi);
-			web.Dispose();
-			return authResponse;
-		}
-
-		public FetchResponse GetData(string user)
-		{
-			WebClient web = new WebClient();
-			string data_link = string.Format(DATA_URL, GameID, user);
-			string data_sign = Hash(data_link + GameKey);
-			string dataapi;
-			try
-			{
-				dataapi = web.DownloadString(data_link + "&signature=" + data_sign);
-			}
-			catch (Exception e)
-			{
-				return new FetchResponse
+			dynamic response = JsonConvert.DeserializeObject(api, typeof(object));
+			bool success = (bool)response.response.success;
+			if(!success)
+				return new AuthData
 				{
-					response = new FetchData
-					{
-						message = e.Message,
-						success = false
-					}
+					message = (string)response.response.message,
+					success = false
 				};
-			}
-			Duality.Logs.Core.Write(dataapi);
-			FetchResponse response = JsonConvert.DeserializeObject<FetchResponse>(dataapi);
+			var auth = response.response.responses[0];
+			var data = response.response.responses[1];
+			success = (bool)auth.success && (bool)data.success;
+			string message = !success ? (!(bool)auth.success ? (string)auth.message : (string)data.message) : "";
+			string username = success ? (string)data.users[0].username : user;
 			web.Dispose();
-			return response;
+			if (!success)
+				return new AuthData
+				{
+					success = false,
+					message = message
+				};
+			else
+				return new AuthData
+				{
+					success = true,
+					username = username
+				};
 		}
 
 		private string Hash(string input)

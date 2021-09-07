@@ -20,18 +20,36 @@ namespace FNaFMP.Startup
 	{
 		[EditorHintFlags(MemberFlags.Visible)]
 		private ContentRef<Scene> Continue { get; set; }
-		[DontSerialize] private bool finished = false;
+		private bool Finished
+		{
+			get { return time > -1 && time + 1000 < Time.MainTimer.TotalMilliseconds; }
+		}
 		[DontSerialize] private bool printed = false;
-		[DontSerialize] private int count = 0;
-		[DontSerialize] private int load = 0;
-		[DontSerialize] private string[] files = null;
+		[DontSerialize] private long time = -1;
 		public void OnActivate()
 		{
-			finished = false;
+			time = -1;
 			printed = false;
-			count = 0;
-			load = 0;
-			files = Directory.GetFiles(Environment.CurrentDirectory + "\\Data", "*.res", SearchOption.AllDirectories);
+			new Thread(() =>
+			{
+				if (Core.Config != null && Core.Config.Gamejolt != null && !Core.DEBUG)
+				{
+					if (Core.Config.Gamejolt.UserName != null && Core.Config.Gamejolt.Token != null)
+					{
+						GamejoltAuth gamejolt = SuperSecret.gamejoltAuth;
+						AuthData auth = gamejolt.Login(Core.Config.Gamejolt.UserName, Base64.Decode(Core.Config.Gamejolt.Token));
+						if (auth.success)
+						{
+							Core.Config.Gamejolt.UserName = auth.username;
+							Logs.Core.Write("Logged in as {0}", Core.Config.Gamejolt.UserName);
+							Core.Client.UserName = Core.Config.Gamejolt.UserName;
+							Core.LoggedIn = true;
+						}
+					}
+				}
+				Core.LoadHosts();
+				time = (long)Time.MainTimer.TotalMilliseconds;
+			}).Start();
 		}
 
 		public void OnDeactivate()
@@ -41,24 +59,10 @@ namespace FNaFMP.Startup
 
 		public void OnUpdate()
 		{
-			if (files.Length > count)
-			{
-				var file = files[count++];
-				var content = ContentProvider.RequestContent(file);
-				if (content != null)
-				{
-					content.EnsureLoaded();
-					load++;
-				}
-			}
-			else
-			{
-				finished = true;
-			}
-			if (finished && !printed)
+			if (Finished && !printed)
 			{
 				printed = true;
-				Logs.Core.Write("Loading {0} resources finished!",load);
+				Logs.Core.Write("Loading finished!");
 				Scene.SwitchTo(Continue);
 			}
 		}

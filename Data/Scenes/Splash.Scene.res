@@ -77,32 +77,12 @@
               <_size dataType="Int">2</_size>
             </renderers>
             <scene dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Scene]]">
-              <contentPath dataType="String">Data\Scenes\MainMenu.Scene.res</contentPath>
+              <contentPath dataType="String">Data\Scenes\LoadTest.Scene.res</contentPath>
             </scene>
             <time dataType="Int">0</time>
           </item>
-          <item dataType="Struct" type="FNaFMP.Startup.SplashText" id="3430438410">
-            <active dataType="Bool">true</active>
-            <display dataType="String">Musicbox not included</display>
-            <font dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Font]]">
-              <contentPath dataType="String">Data\Fonts\Consolas16.Font.res</contentPath>
-            </font>
-            <gameobj dataType="ObjectRef">45223425</gameobj>
-            <texts dataType="Struct" type="System.Collections.Generic.List`1[[System.String]]" id="1696487326">
-              <_items dataType="Array" type="System.String[]" id="2578630544" length="8">
-                <item dataType="String">When the power goes out, all is not lost. If Freddy is kind to you, he will take longer to do his song!</item>
-                <item dataType="String">You can use discord to invite people to lobbies. Just click the + icon when you have the game open and you can send the invite in chat!</item>
-                <item dataType="String">Bonnie is a speedy bunny! On average, he has the fastest movetime of all the animatronics!</item>
-                <item dataType="String">Did you know that Foxy has the longest average movetime out of all of the animatronics?</item>
-                <item dataType="String">As the guard, you don't always have to shut the door instantly. Remember, the animatronics have to wait before being able to attack!</item>
-                <item dataType="String">Remember to check the lights to see if Bonnie or Chica are behind the doors!</item>
-                <item dataType="String">Freddy in space... AGAIN?!</item>
-              </_items>
-              <_size dataType="Int">7</_size>
-            </texts>
-          </item>
         </_items>
-        <_size dataType="Int">5</_size>
+        <_size dataType="Int">4</_size>
       </compList>
       <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="632670136" surrogate="true">
         <header />
@@ -112,14 +92,12 @@
             <item dataType="Type" id="3340566858" value="Duality.Components.Renderers.SpriteRenderer" />
             <item dataType="Type" id="514452030" value="Duality.Components.Renderers.SpriteAnimator" />
             <item dataType="Type" id="3519836122" value="FNaFMP.Startup.Splash" />
-            <item dataType="Type" id="1439328238" value="FNaFMP.Startup.SplashText" />
           </keys>
           <values dataType="Array" type="System.Object[]" id="2180795072">
             <item dataType="ObjectRef">102500643</item>
             <item dataType="ObjectRef">1513842705</item>
             <item dataType="ObjectRef">4080387261</item>
             <item dataType="ObjectRef">2751908383</item>
-            <item dataType="ObjectRef">3430438410</item>
           </values>
         </body>
       </compMap>

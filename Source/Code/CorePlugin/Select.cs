@@ -64,6 +64,7 @@ namespace FNaFMP.Select
 				DiscordRPC.RichPresence presence = Core.DRPC.CurrentPresence;
 				Core.DRPC.SetPresence(Core.BuildPresence("In Lobby","Selecting",presence.Party.ID,5,presence.Party.Size));
 			}
+			kicked = false;
 			Startup.SplashText.IsLast = false;
 			Core.MenuBGM = null;
 			Password = "";
@@ -155,8 +156,8 @@ namespace FNaFMP.Select
 							continue;
 						}
 						peer.SendBinaryMessage(Core.Client, 2, Core.Client.joinedChannels[0], message.ToArray());
-						//Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 2, message.ToArray());
 					}
+					SendExtraLobbyInfo(peer);
 					Core.DRPC.UpdatePartySize(Players.Count);
 				}
 				else
@@ -165,6 +166,28 @@ namespace FNaFMP.Select
 					Core.DRPC.UpdatePartySize(Players.Count);
 				}
 			}
+			if(e.SubChannel == 14)
+			{
+				if(e.PeerID == Core.Client.joinedChannels[0].ChannelMaster.Id)
+				{
+					kicked = true;
+					Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
+				}
+			}
+		}
+
+		public static void SendExtraLobbyInfo(ClientPeer peer = null)
+		{
+			if (!Core.Client.IsMaster)
+				return;
+			List<byte> message = new List<byte>();
+
+			message.Add((byte)Core.Difficulty);
+
+			if (peer != null)
+				peer.SendBinaryMessage(Core.Client, 18, Core.Client.joinedChannels[0], message.ToArray());
+			else
+				Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 18, message.ToArray());
 		}
 
 		private void Event_BinaryMessage(object sender, EventBinaryMessage e)
@@ -264,6 +287,20 @@ namespace FNaFMP.Select
 						peer.SendBinaryMessage(Core.Client, 12, channel, msg.ToArray());
 					}
 					break;
+				case 18:
+					if(e.PeerID == Core.Client.joinedChannels[0].ChannelMaster.Id)
+					{
+						byte difficulty = reader.ReadByte();
+						if(difficulty != (byte)Core.Difficulty)
+						{
+							Core.Difficulty = (Core.GameDifficulty)difficulty;
+							if(e.Type == MessageEventType.Channel)
+								ChatBox.AddChat($"[Game] Difficulty changed to '{Core.Difficulty.GetStringValue()}'", new ColorRgba(255, 208, 0));
+							if(e.Type == MessageEventType.Peer)
+								ChatBox.AddChat($"[Game] Difficulty is '{Core.Difficulty.GetStringValue()}'", new ColorRgba(255, 208, 0));
+						}
+					}
+					break;
 				default:
 					break;
 			}
@@ -292,38 +329,27 @@ namespace FNaFMP.Select
 						}
 					}
 					break;
-				/*case EventPeer.PeerAction.Join:
-					if (Core.Client.IsMaster)
-					{
-						foreach (Core.Character c in Checkmarks.Keys)
-						{
-							Checkmark check = Checkmarks[c];
-							if(check.Peer > -1)
-							{
-								List<byte> message = new List<byte>();
-								message.Add((byte)c);
-								message.AddRange(BitConverter.GetBytes((ushort)check.Peer));
-								message.Add((byte)(check.Ready ? 2 : 1));
-								Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 2, message.ToArray());
-							}
-						}
-					}
-					break;*/
 				default:
 					break;
 			}
 		}
 
+		private bool kicked = false;
 		private void Event_LeaveChannel(object sender, EventResponseLeaveChannel e)
 		{
-			if (BackButton.leave)
+			if (!kicked)
 			{
-				Core.LeaveReason = "You left the lobby.";
+				if (BackButton.leave)
+				{
+					Core.LeaveReason = "You left the lobby.";
+				}
+				else
+				{
+					Core.LeaveReason = "The lobby owner left.";
+				}
 			}
 			else
-			{
-				Core.LeaveReason = "The lobby owner left.";
-			}
+				Core.LeaveReason = "You were kicked from the lobby.";
 			Core.SelfCharacter = Core.Character.None;
 			if(LobbyScene != null)
 			{
@@ -497,7 +523,7 @@ namespace FNaFMP.Select
 					bool onbox = (mouse.X > pos.X && mouse.X < pos.X + Size.X && mouse.Y > pos.Y && mouse.Y < pos.Y + Size.Y);
 					if (onbox)
 					{
-						/*if(Character == Core.Character.Foxy)	// TEMPORARY, UNTIL FOXY IS IMPLEMENTED PROPERLY
+						/*if(Character == Core.Character.Foxy)
 						{
 							ChatBox.AddChat("Foxy is not yet playable.", new ColorRgba(143, 9, 9));
 							return;
@@ -1126,24 +1152,44 @@ namespace FNaFMP.Select
 						ChatBox.AddChat("/difficulty [0-4] - Change the difficulty", color);
 						ChatBox.AddChat("/password [text] - Change/remove the current password",color);
 						ChatBox.AddChat("To remove the password, just type in the command without parameters.", masterColor);
+						ChatBox.AddChat("/kick <user id> - Kicks the specified user from the lobby",color);
 					}
 					return true;
 				case "list":
 					ChatBox.AddChat("List of players: ",color);
-					ChatBox.AddChat("- "+Core.Client.UserName+" (You)",color);
+					ChatBox.AddChat($"- {Core.Client.UserName} (You)",color);
 					foreach(ClientPeer peer in Core.Client.joinedChannels[0])
 					{
-						ChatBox.AddChat("- " + peer.Name + (peer.ChannelMaster ? " (Master) " : " ") + "#" + peer.Id, color);
+						ChatBox.AddChat($"- {peer.Name} {(peer.ChannelMaster ? " (Master)" : "")}{(Core.Client.IsMaster ? $" #{peer.Id}" : "")}", color);
 					}
 					return true;
 				case "difficulty":
 					if (!Core.Client.IsMaster || args.Length == 0)
 					{
-						ChatBox.AddChat("Current difficulty: "+Core.Difficulty.GetStringValue(),color);
+						ChatBox.AddChat($"Current difficulty: '{Core.Difficulty.GetStringValue()}'",color);
 					}
 					if(Core.Client.IsMaster && args.Length > 0)
 					{
-						ChatBox.AddChat("Changing difficulty doesn't work yet.", masterColor);
+						try
+						{
+							int i = int.Parse(args[0]);
+							Core.GameDifficulty c = (Core.GameDifficulty)i;
+							if (Enum.IsDefined(typeof(Core.GameDifficulty), c))
+							{
+								Core.Difficulty = c;
+								ChatBox.AddChat($"Difficulty changed to '{c.GetStringValue()}'", masterColor);
+								BGTasks.SendExtraLobbyInfo();
+							}
+							else
+							{
+								ChatBox.AddChat("Invalid difficulty index! Valid values: 0-4", masterColor);
+							}
+						}
+						catch (Exception)
+						{
+							ChatBox.AddChat("Invalid number given!", masterColor);
+						}
+						
 					}
 					return true;
 				case "password":
@@ -1165,6 +1211,54 @@ namespace FNaFMP.Select
 						{
 							ChatBox.AddChat("Password " + (BGTasks.Password == "" ? "set" : "changed"), masterColor);
 							BGTasks.Password = string.Join(" ", args);
+						}
+						return true;
+					}
+					break;
+				case "kick":
+					if (Core.Client.IsMaster)
+					{
+						if(args.Length == 0)
+						{
+							ChatBox.AddChat("Usage: /kick <user id>", masterColor);
+							ChatBox.AddChat("User IDs are the numbers displayed in the '/list' command next to usernames", masterColor);
+						}
+						else
+						{
+							ClientPeer target = null;
+							string rawid = args[0];
+							int id = -1;
+							try
+							{
+								if (rawid.StartsWith("#"))
+									id = int.Parse(rawid.ReplaceFirst("#", ""));
+								else
+									id = int.Parse(rawid);
+								if (id != Core.Client.ID)
+								{
+									foreach (ClientPeer peer in Core.Client.joinedChannels[0])
+									{
+										if (peer.Id == id)
+										{
+											target = peer;
+											peer.SendNumberMessage(Core.Client, 14, Core.Client.joinedChannels[0], id);
+											break;
+										}
+									}
+									if (target != null)
+										ChatBox.AddChat("Kicking user from lobby...", masterColor);
+									else
+										ChatBox.AddChat("User not found.", masterColor);
+								}
+								else
+								{
+									ChatBox.AddChat("You can't kick yourself!", masterColor);
+								}
+							}
+							catch (Exception)
+							{
+								ChatBox.AddChat("Invalid number given!", masterColor);
+							}
 						}
 						return true;
 					}

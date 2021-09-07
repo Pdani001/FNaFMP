@@ -793,7 +793,9 @@ namespace FNaFMP.Office
 	}
 	public class MoveTime
 	{
+		[EditorHintRange(5,int.MaxValue)]
 		public int Min { get; set; }
+		[EditorHintRange(5, int.MaxValue)]
 		public int Max { get; set; }
 	}
 	public class MovementControl : Component, ICmpInitializable, ICmpUpdatable
@@ -898,16 +900,20 @@ namespace FNaFMP.Office
 			if (character == Core.Character.Guard || times == null || !times.ContainsKey(character))
 				return 0;
 			MoveTime time = times[character];
+			if (time.Min < 5)
+				time.Min = 5;
+			if (time.Max < 5)
+				time.Max = 5;
 			if (time.Min > time.Max)
-				return 1;
-			return random.Next(time.Min, time.Max);
+				return 5 - (int)Core.Difficulty;
+			return random.Next(time.Min - (int)Core.Difficulty, time.Max - (int)Core.Difficulty);
 		}
 		public void OnActivate()
 		{
 			random = new Random();
 			random = new Random((int)(random.NextDouble() * Time.StartupTime.Ticks));
 			check = movements;
-			times = mt;
+			times = new Dictionary<Core.Character, MoveTime>(mt);
 			SelfTime = GetRandomMoveTime(Core.SelfCharacter);
 			Buttons.Clear();
 			if (Core.SelfCharacter == Core.Character.Guard && Buttons.Count == 0)
@@ -2467,8 +2473,10 @@ namespace FNaFMP.Office
 		[EditorHintFlags(MemberFlags.Visible)]
 		private ContentRef<Sound> FoxyDoorBang { get; set; }
 
+		[DontSerialize] private int runs = 0;
 		public void OnActivate()
 		{
+			runs = 0;
 			if (Core.Client != null)
 			{
 				Core.Client.Event.NumberMessage += Event_NumberMessage;
@@ -2489,6 +2497,7 @@ namespace FNaFMP.Office
 				{
 					if (FoxyDoorBang != null)
 						GameController.SM.PlaySound(FoxyDoorBang).Volume = (40 + Randomizer.Random(50)) / 100f;
+					runs++;
 				}
 				if(Core.SelfCharacter == Core.Character.Foxy)
 				{
@@ -2536,8 +2545,13 @@ namespace FNaFMP.Office
 							attack = -1;
 							Positions.SetPosition(Core.Character.Foxy, DoorController.LeftDoor.IsOpen() ? 21 : Randomizer.Random(2));
 							Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 29, Positions.GetPosition(Core.Character.Foxy));
-							if(!DoorController.LeftDoor.IsOpen() && FoxyDoorBang != null)
-								GameController.SM.PlaySound(FoxyDoorBang).Volume = (40 + Randomizer.Random(50)) / 100f;
+							if (!DoorController.LeftDoor.IsOpen())
+							{
+								if(FoxyDoorBang != null)
+									GameController.SM.PlaySound(FoxyDoorBang).Volume = (40 + Randomizer.Random(50)) / 100f;
+								GameController.Power -= 10 + (runs * 50);
+								runs++;
+							}
 						}
 						break;
 					case 4:
@@ -2546,8 +2560,13 @@ namespace FNaFMP.Office
 							attack = -1;
 							Positions.SetPosition(Core.Character.Foxy, DoorController.LeftDoor.IsOpen() ? 21 : Randomizer.Random(2));
 							Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 29, Positions.GetPosition(Core.Character.Foxy));
-							if (!DoorController.LeftDoor.IsOpen() && FoxyDoorBang != null)
-								GameController.SM.PlaySound(FoxyDoorBang).Volume = (40 + Randomizer.Random(50)) / 100f;
+							if (!DoorController.LeftDoor.IsOpen())
+							{
+								if (FoxyDoorBang != null)
+									GameController.SM.PlaySound(FoxyDoorBang).Volume = (40 + Randomizer.Random(50)) / 100f;
+								GameController.Power -= 10 + (runs * 50);
+								runs++;
+							}
 						}
 						break;
 				}
@@ -2942,6 +2961,7 @@ namespace FNaFMP.Office
 		[DontSerialize] private static int usage = 1;
 		[DontSerialize] private static int power = 999;
 		[DontSerialize] private Timer GuardTimer;
+		[DontSerialize] private Timer ExtraPowerTimer;
 		[DontSerialize] private Timer PowerTimer;
 		[DontSerialize] private Timer RobotTimer;
 
@@ -2964,6 +2984,7 @@ namespace FNaFMP.Office
 		public static int Power
 		{
 			get { return power; }
+			set { power = value; }
 		}
 		public static GuardStatus Guard { get; private set; }
 
@@ -2976,6 +2997,7 @@ namespace FNaFMP.Office
 		public static void SendStatus()
 		{
 			List<byte> msg = new List<byte>();
+			msg.Add((byte)(begin ? 1 : 0));
 			if (!CameraViewer.IsViewing)
 				msg.Add((byte)DoorController.LightDirection);
 			else
@@ -3043,8 +3065,10 @@ namespace FNaFMP.Office
 			Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 24, msg.ToArray());
 		}
 
+		private long frames = -1;
 		public void OnActivate()
 		{
+			frames = Time.FrameCount;
 			SoundManager.OnLoad += SoundLoad;
 			lastmove = -1;
 			finished = false;
@@ -3053,6 +3077,7 @@ namespace FNaFMP.Office
 			time = 12;
 			Guard = new GuardStatus();
 			Players.Clear();
+			begin = false;
 			if (Core.Client != null)
 			{
 				Core.Client.Event.BinaryMessage += Event_BinaryMessage;
@@ -3064,11 +3089,34 @@ namespace FNaFMP.Office
 					GuardTimer = new Timer(85*1000);
 					GuardTimer.Elapsed += Guard_Timer;
 					GuardTimer.AutoReset = true;
-					GuardTimer.Enabled = true;
+					GuardTimer.Enabled = false;
 					PowerTimer = new Timer(1000);
 					PowerTimer.Elapsed += Power_Timer;
 					PowerTimer.AutoReset = true;
-					PowerTimer.Enabled = true;
+					PowerTimer.Enabled = false;
+					if (Core.Difficulty != Core.GameDifficulty.VeryEasy)
+					{
+						double time = 9999.00;
+						switch (Core.Difficulty)
+						{
+							case Core.GameDifficulty.Easy:
+								time = 6.00;
+								break;
+							case Core.GameDifficulty.Medium:
+								time = 5.00;
+								break;
+							case Core.GameDifficulty.Hard:
+								time = 4.00;
+								break;
+							case Core.GameDifficulty.VeryHard:
+								time = 3.00;
+								break;
+						}
+						ExtraPowerTimer = new Timer(time*1000);
+						ExtraPowerTimer.Elapsed += ExtraPower_Timer;
+						ExtraPowerTimer.AutoReset = true;
+						ExtraPowerTimer.Enabled = false;
+					}
 					List<byte> msg = new List<byte>(new byte[]{
 						0,
 						0,
@@ -3177,6 +3225,17 @@ namespace FNaFMP.Office
 			Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 26, msg.ToArray(),true);
 		}
 
+		private void ExtraPower_Timer(object sender, ElapsedEventArgs e)
+		{
+			if (finished)
+			{
+				ExtraPowerTimer.Enabled = false;
+				return;
+			}
+			if (power > 0)
+				power -= 1;
+		}
+
 		private void Guard_Timer(object sender, ElapsedEventArgs e)
 		{
 			switch (time)
@@ -3203,7 +3262,8 @@ namespace FNaFMP.Office
 		{
 			if(e.SubChannel == 23)
 			{
-				Players.Add(e.PeerID);
+				if(!Players.Contains(e.PeerID))
+					Players.Add(e.PeerID);
 				if(Core.SelfCharacter == Core.Character.Guard)
 					SendStatus();
 				else
@@ -3246,21 +3306,25 @@ namespace FNaFMP.Office
 			{
 				Positions.SetUser(Core.Character.Guard, e.PeerID);
 				BinaryReader reader = new BinaryReader(e.Message);
-				Guard.Light = reader.ReadByte();
-				Guard.LeftDoorClosed = reader.ReadByte() == 1;
-				Guard.RightDoorClosed = reader.ReadByte() == 1;
-				Guard.IsViewing = reader.ReadByte() == 1;
-				Guard.Position = reader.ReadByte();
-				if (!Guard.Active)
+				bool active = reader.ReadByte() == 1;
+				if (active)
 				{
-					List<byte> msg = new List<byte>
+					Guard.Light = reader.ReadByte();
+					Guard.LeftDoorClosed = reader.ReadByte() == 1;
+					Guard.RightDoorClosed = reader.ReadByte() == 1;
+					Guard.IsViewing = reader.ReadByte() == 1;
+					Guard.Position = reader.ReadByte();
+					if (!Guard.Active)
+					{
+						List<byte> msg = new List<byte>
 							{
 								(byte)Core.SelfCharacter,
 								(byte)Positions.GetPosition(Core.SelfCharacter)
 							};
-					Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 25, msg.ToArray());
+						Core.Client.SendBinaryChannelMessage(Core.Client.joinedChannels[0].Name, 25, msg.ToArray());
+					}
 				}
-				Guard.Active = true;
+				Guard.Active = active;
 			}
 			if(e.SubChannel == 26 && Core.SelfCharacter != Core.Character.Guard)
 			{
@@ -3317,6 +3381,9 @@ namespace FNaFMP.Office
 			if (PowerTimer != null)
 				PowerTimer.Close();
 
+			if (ExtraPowerTimer != null)
+				ExtraPowerTimer.Close();
+
 			if (RobotTimer != null)
 				RobotTimer.Close();
 
@@ -3334,12 +3401,20 @@ namespace FNaFMP.Office
 			}
 		}
 
+		[DontSerialize] private static bool begin = false;
 		private long GameStartCheck = -1;
 
 		public void OnUpdate()
 		{
 			if (Core.SelfCharacter == Core.Character.Guard)
 			{
+				if(frames+Time.FramesPerSecond < Time.FrameCount && !begin)
+				{
+					begin = true;
+					ExtraPowerTimer.Enabled = true;
+					PowerTimer.Enabled = true;
+					GuardTimer.Enabled = true;
+				}
 				if (Core.Client != null && Core.Client.IsConnected)
 				{
 					if (GameStartCheck <= Time.MainTimer.TotalMilliseconds && time == 12)

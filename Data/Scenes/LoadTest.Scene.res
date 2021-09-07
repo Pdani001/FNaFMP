@@ -19,19 +19,23 @@
           </item>
           <item dataType="Struct" type="FNaFMP.Startup.SplashText" id="3126641738">
             <active dataType="Bool">true</active>
-            <display dataType="String">Freddy hates being alone</display>
+            <display />
             <font dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Font]]">
               <contentPath dataType="String">Data\Fonts\Consolas16.Font.res</contentPath>
             </font>
             <gameobj dataType="ObjectRef">4036394049</gameobj>
+            <lines />
             <texts dataType="Struct" type="System.Collections.Generic.List`1[[System.String]]" id="4003777758">
               <_items dataType="Array" type="System.String[]" id="3970398992" length="8">
-                <item dataType="String">Hippity hoppity, your power is my property</item>
-                <item dataType="String">Freddy hates being alone</item>
-                <item dataType="String">Musicbox not included</item>
+                <item dataType="String">When the power goes out, all is not lost. If Freddy is kind to you, he will take longer to do his song!</item>
+                <item dataType="String">You can use discord to invite people to lobbies. Just click the + icon when you have the game open and you can send the invite in chat!</item>
+                <item dataType="String">Bonnie is a speedy bunny! On average, he has the fastest movetime of all the animatronics!</item>
+                <item dataType="String">Did you know that Foxy has the longest average movetime out of all of the animatronics?</item>
+                <item dataType="String">As the guard, you don't always have to shut the door instantly. Remember, the animatronics have to wait before being able to attack!</item>
+                <item dataType="String">Remember to check the lights to see if Bonnie or Chica are behind the doors!</item>
                 <item dataType="String">Freddy in space... AGAIN?!</item>
               </_items>
-              <_size dataType="Int">4</_size>
+              <_size dataType="Int">7</_size>
             </texts>
           </item>
         </_items>

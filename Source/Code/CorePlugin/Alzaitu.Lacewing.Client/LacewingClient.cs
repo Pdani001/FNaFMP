@@ -304,6 +304,7 @@ namespace Alzaitu.Lacewing.Client
 				_udp.Close();
 			}
 			catch (Exception) { }
+			logger.Close();
 		}
 	}
 }

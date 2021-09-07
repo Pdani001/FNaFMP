@@ -428,9 +428,14 @@ namespace FNaFMP.Menu
 
 			canvas.DrawText("Five Nights at Freddy's created by and Copyright", Position.X, Position.Y);
 			canvas.DrawText("    Scott Cawthon", Position.X, Position.Y + step.Y);
+
 			canvas.DrawText("This multiplayer game was created by", Position.X, Position.Y + (step.Y * 3));
 			canvas.DrawText("    Dániel 'Pdani' Pécsi", Position.X, Position.Y + (step.Y * 4));
 			canvas.DrawText("    Brawlbox", Position.X, Position.Y + (step.Y * 5));
+
+			canvas.DrawText("Helped test the game", Position.X, Position.Y + (step.Y * 7));
+			canvas.DrawText("    Balint817", Position.X, Position.Y + (step.Y * 8));
+			canvas.DrawText("    RockandRoll64", Position.X, Position.Y + (step.Y * 9));
 
 			canvas.End();
 		}
@@ -658,12 +663,10 @@ namespace FNaFMP.Menu
 				Status = "";
 				thread = new Thread(() => {
 					GamejoltAuth auth = SuperSecret.gamejoltAuth;
-					AuthResponse response = auth.Login(Username, Token);
-					FetchResponse fetch = auth.GetData(Username);
-					if (response.response.success)
+					AuthData data = auth.Login(Username, Token);
+					if (data.success)
 					{
-						if(fetch.response.success)
-							Username = fetch.response.users[0].username;
+						Username = data.username;
 						Core.Config.Gamejolt = new Configuration.Gamejolt
 						{
 							UserName = Username,
@@ -680,9 +683,10 @@ namespace FNaFMP.Menu
 					}
 					else
 					{
-						Status = "Login failed: " + response.response.message;
+						Status = "Login failed: " + data.message;
 					}
 					Login = false;
+					thread = null;
 				});
 				thread.Start();
 			}
@@ -2394,10 +2398,17 @@ namespace FNaFMP.Menu
 			DualityApp.Keyboard.KeyUp += KeyUp;
 			if (Core.Client != null)
 			{
+				Core.Client.Event.ResponseLeaveChannel += Event_LeaveChannel;
 				Core.Client.Event.NumberMessage += Event_NumberMessage;
 				if (!Core.Client.IsConnected && LobbyScene != null)
 					Scene.SwitchTo(LobbyScene);
 			}
+		}
+
+		private void Event_LeaveChannel(object sender, EventResponseLeaveChannel e)
+		{
+			if (LobbyScene != null)
+				Scene.SwitchTo(LobbyScene);
 		}
 
 		private void Event_NumberMessage(object sender, EventNumberMessage e)
@@ -2410,8 +2421,6 @@ namespace FNaFMP.Menu
 					{
 						Core.LeaveReason = "Invalid password.";
 						Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
-						if (LobbyScene != null)
-							Scene.SwitchTo(LobbyScene);
 					}
 					else
 					{
@@ -2427,7 +2436,10 @@ namespace FNaFMP.Menu
 			DualityApp.Keyboard.KeyDown -= KeyDown;
 			DualityApp.Keyboard.KeyUp -= KeyUp;
 			if (Core.Client != null)
+			{
+				Core.Client.Event.ResponseLeaveChannel -= Event_LeaveChannel;
 				Core.Client.Event.NumberMessage -= Event_NumberMessage;
+			}
 		}
 	}
 	#endregion
