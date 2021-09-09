@@ -56,13 +56,24 @@ namespace FNaFMP.Select
 			return Ready.Contains(c);
 		}
 
+		private bool WasMaster = false;
 		public void OnActivate()
 		{
+			Core.DiscordJoinLobby = null;
+			WasMaster = false;
 			SoundManager.OnLoad += SoundManager_OnLoad;
 			if (Core.DRPC != null)
 			{
 				DiscordRPC.RichPresence presence = Core.DRPC.CurrentPresence;
-				Core.DRPC.SetPresence(Core.BuildPresence("In Lobby","Selecting",presence.Party.ID,5,presence.Party.Size));
+				Core.DRPC.UpdateState("Selecting");
+				Core.DRPC.UpdateDetails("In Lobby");
+				Core.DRPC.UpdateParty(new DiscordRPC.Party
+				{
+					ID = presence.Party.ID,
+					Max = 5,
+					Size = presence.Party.Size,
+					Privacy = DiscordRPC.Party.PrivacySetting.Public
+				});
 			}
 			kicked = false;
 			Startup.SplashText.IsLast = false;
@@ -98,9 +109,28 @@ namespace FNaFMP.Select
 				}
 				else
 				{
+					JoinRequestUser = null;
+					WasMaster = true;
 					Core.Client.Event.TextMessage += Event_TextMessage;
+					Core.DRPC.OnJoinRequested += DRPC_OnJoinRequested;
 				}
 			}
+		}
+
+		private static DiscordRPC.Message.JoinRequestMessage JoinRequestUser { get; set; }
+		private static long JoinRequestTimeout = -1;
+		private void DRPC_OnJoinRequested(object sender, DiscordRPC.Message.JoinRequestMessage msg)
+		{
+			ChatBox.AddChat($"[Discord] {msg.User.Username} requested to join the game. Type in '/accept' to accept the request. The request times out in 30 seconds",new ColorRgba(114, 137, 218));
+			JoinRequestUser = msg;
+			JoinRequestTimeout = (long)(Time.MainTimer.TotalMilliseconds + 30000);
+		}
+		public static bool AcceptJoinRequest()
+		{
+			if (JoinRequestUser == null || JoinRequestTimeout <= Time.MainTimer.TotalMilliseconds)
+				return false;
+			Core.DRPC.Respond(JoinRequestUser, true);
+			return true;
 		}
 
 		private void Event_TextMessage(object sender, EventTextMessage e)
@@ -374,8 +404,9 @@ namespace FNaFMP.Select
 				Core.Client.Event.BinaryMessage -= Event_BinaryMessage;
 				Core.Client.Event.NumberMessage -= Event_NumberMessage;
 				Core.Client.Event.Disconnect -= Event_Disconnect;
-				if (Core.Client.IsMaster)
+				if (WasMaster)
 				{
+					Core.DRPC.OnJoinRequested -= DRPC_OnJoinRequested;
 					Core.Client.Event.TextMessage -= Event_TextMessage;
 				}
 			}
@@ -386,6 +417,15 @@ namespace FNaFMP.Select
 		[DontSerialize] private bool leaving = false;
 		public void OnUpdate()
 		{
+			if(JoinRequestTimeout > -1)
+			{
+				if(JoinRequestTimeout <= Time.MainTimer.TotalMilliseconds)
+				{
+					JoinRequestTimeout = -1;
+					ChatBox.AddChat($"[Discord] The join request from {JoinRequestUser.User.Username} timed out.", new ColorRgba(114, 137, 218));
+					JoinRequestUser = null;
+				}
+			}
 			if(Core.Client != null)
 			{
 				if (!Core.Client.IsConnected)
@@ -1050,15 +1090,26 @@ namespace FNaFMP.Select
 		{
 			if (display.Length > staticcut)
 			{
+				int start = 0;
 				int cut = (int)Math.Floor(display.Length / (float)staticcut);
 				for (int i = 0; i <= cut; i++)
 				{
 					int max = staticcut;
-					int min = i * staticcut;
+					int min = i * staticcut - start;
+					start = 0;
+					if (min >= display.Length)
+						break;
 					if (min + max > display.Length)
 						max = display.Length - min;
 					if (Chat.Count > int.MaxValue)
 						Chat.RemoveAt(0);
+					while(!display.Substring(min, max).EndsWith(" ") && start < 5)
+					{
+						max--;
+						if (start == 0)
+							cut++;
+						start++;
+					}
 					Chat.Add(new ChatLine {
 						Text = display.Substring(min, max),
 						Color = color
@@ -1259,6 +1310,21 @@ namespace FNaFMP.Select
 							{
 								ChatBox.AddChat("Invalid number given!", masterColor);
 							}
+						}
+						return true;
+					}
+					break;
+				case "accept":
+					if (Core.Client.IsMaster)
+					{
+						bool result = BGTasks.AcceptJoinRequest();
+						if (!result)
+						{
+							ChatBox.AddChat("[Discord] No join request, or last request timed out", new ColorRgba(218, 114, 114));
+						}
+						else
+						{
+							ChatBox.AddChat("[Discord] Join request accepted", new ColorRgba(138, 218, 114));
 						}
 						return true;
 					}

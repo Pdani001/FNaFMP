@@ -116,7 +116,6 @@
     <Compile Include="Base64.cs" />
     <Compile Include="Configuration\Gamejolt.cs" />
     <Compile Include="Configuration\RootConfig.cs" />
-    <Compile Include="Configuration\ServerHostList.cs" />
     <Compile Include="Configuration\Settings.cs" />
     <Compile Include="GamejoltAuth.cs" />
     <Compile Include="Menu.cs" />

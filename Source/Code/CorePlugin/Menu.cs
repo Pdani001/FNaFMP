@@ -93,11 +93,6 @@ namespace FNaFMP.Menu
 		private bool nosound = false;
 		public void OnUpdate()
 		{
-			if (render == null)
-			{
-				render = GameObj.GetComponent<SpriteRenderer>();
-				return;
-			}
 			if (SM == null)
 				return;
 			if(def == null)
@@ -192,16 +187,26 @@ namespace FNaFMP.Menu
 
 		public void OnActivate()
 		{
+			if (render == null)
+			{
+				render = GameObj.GetComponent<SpriteRenderer>();
+			}
 			if (Core.MenuBGM != null)
 			{
 				source = Core.MenuBGM;
 				music = SplashText.IsLast ? 1 : source.Sound.Name == Ambience.Name ? 2 : 5;
+			}
+			if(music == 1)
+			{
+				if (fnaf57bg != null)
+					render.SharedMaterial = fnaf57bg;
 			}
 			SoundManager.OnLoad += SoundManager_OnLoad;
 			if (Core.DRPC != null)
 			{
 				Core.DRPC.SetPresence(Core.BuildPresence(!SplashText.IsLast ? "In Menu" : "In Space", "", Core.PartyID.ToString(), 1, 1));
 			}
+			MenuBackButton.Disallow = false;
 		}
 
 		private void SoundManager_OnLoad(object sender, SoundManager e)
@@ -274,6 +279,8 @@ namespace FNaFMP.Menu
 			set { location = value; }
 		}
 
+		public static bool Disallow { get; set; }
+
 		void ICmpRenderer.GetCullingInfo(out CullingInfo info)
 		{
 			info.Position = Vector3.Zero;
@@ -295,7 +302,7 @@ namespace FNaFMP.Menu
 			canvas.End();
 
 			Vector2 mouse = DualityApp.Mouse.Pos;
-			if (DualityApp.Mouse.ButtonHit(MouseButton.Left))
+			if (DualityApp.Mouse.ButtonHit(MouseButton.Left) && !Disallow)
 			{
 				if (mouse.X > location.X - (size.X / 2) && mouse.X < location.X + size.X + (size.X / 2) && mouse.Y > location.Y - (size.Y / 2) && mouse.Y < location.X + size.Y + (size.Y / 2))
 				{
@@ -306,6 +313,38 @@ namespace FNaFMP.Menu
 				}
 			}
 
+		}
+	}
+
+	public class DiscordJoinListener : Component, ICmpUpdatable
+	{
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Scene> LobbyScene { get; set; }
+
+		private bool join = false;
+
+		public void OnUpdate()
+		{
+			if(LobbyScene != null)
+			{
+				if(Core.DiscordJoinLobby != null)
+				{
+					if(Scene.Current.FullName != LobbyScene.FullName)
+						Scene.SwitchTo(LobbyScene);
+					else
+					{
+						if(Core.Client != null && Core.Client.IsConnected && !join)
+						{
+							join = true;
+							Core.Client.JoinChannel(Core.DiscordJoinLobby.Split('@')[0]);
+						}
+					}
+				}
+				else
+				{
+					join = false;
+				}
+			}
 		}
 	}
 	#endregion
@@ -501,6 +540,14 @@ namespace FNaFMP.Menu
 					change = null;
 					Selecting = -1;
 				};
+			});
+			AddText(i, out i, $"Default server: Server {Core.ServerID+1}", () =>{
+				Core.ServerID++;
+				if(Core.ServerID == Core.Hosts.Length)
+				{
+					Core.ServerID = 0;
+				}
+				Core.Config.Settings.Server = Core.ServerID;
 			});
 
 			canvas.End();
@@ -1212,13 +1259,13 @@ namespace FNaFMP.Menu
 
 		public void OnActivate()
 		{
-			Status = null;
-			if (Core.Client != null) {
+			Status = "";
+			/*if (Core.Client != null) {
 				if(!Core.Client.IsConnected)
 					Status = "...";
 				else
 					Status = "";
-			}
+			}*/
 			if(Core.LeaveReason != null)
 			{
 				Status = Core.LeaveReason;
@@ -1319,6 +1366,7 @@ namespace FNaFMP.Menu
 		private Dictionary<string,ClientChannel> ChannelList = null;
 		private Dictionary<Rect,string> ListRects = null;
 		private int lastFrame = 0;
+		private string lastKeyClick = null;
 		private int inforetry = -1;
 		private int attempt = 0;
 
@@ -1374,7 +1422,17 @@ namespace FNaFMP.Menu
 				}
 			}
 
-			if(ListRects != null && !join)
+			if (Core.DiscordJoinLobby != null)
+			{
+				join = true;
+				MenuBackButton.Disallow = true;
+			}
+			else
+			{
+				MenuBackButton.Disallow = false;
+			}
+
+			if (ListRects != null && !join)
 			{
 				Vector2 mPos = DualityApp.Mouse.Pos;
 				foreach(Rect rect in ListRects.Keys)
@@ -1387,14 +1445,18 @@ namespace FNaFMP.Menu
 						string key = ListRects[rect];
 						if (DualityApp.Mouse.ButtonHit(MouseButton.Left))
 						{
+							if (lastKeyClick != null && lastKeyClick != key)
+								return;
 							if (lastFrame == 0)
 							{
 								lastFrame = (int)Time.MainTimer.TotalMilliseconds;
+								lastKeyClick = key;
 							}
 							else
 							{	// DOUBLE CLICKED
 								Utilities.Logger.Write($"Lobby '{key}' selected, joining...");
 								lastFrame = 0;
+								lastKeyClick = null;
 								join = true;
 								Core.Client.JoinChannel(key, false, true);
 							}
@@ -1403,7 +1465,10 @@ namespace FNaFMP.Menu
 							if (lastFrame != 0)
 							{
 								if (lastFrame + 500 < (int)Time.MainTimer.TotalMilliseconds)
+								{
 									lastFrame = 0;
+									lastKeyClick = null;
+								}
 							}
 						}
 					}
@@ -1471,10 +1536,9 @@ namespace FNaFMP.Menu
 
 		private void ClientConnect(object sender, EventResponseConnect args)
 		{
-			if(error)
-				Core.Config.Settings.Server = Core.Hosts[host-1];
-			LobbyStatusText.Status = "Connected, setting name...";
-			Utilities.Logger.Write("Connected, setting name...");
+			Core.ServerID = ServerID;
+			LobbyStatusText.Status = "Connection established, setting name...";
+			Utilities.Logger.Write("Connection established, setting name...");
 			if(Core.Client.UserName == null)
 				Core.Client.SetName("FMPlayer"+new Random().Next(999999));
 		}
@@ -1491,7 +1555,7 @@ namespace FNaFMP.Menu
 			}
 			else
 			{
-				LobbyStatusText.Status = "Connected to server";
+				LobbyStatusText.Status = $"Connected to server {ServerID + 1}";
 				Utilities.Logger.Write("Name set, requesting channel list...");
 				Core.Client.RequestChannelList();
 			}
@@ -1512,6 +1576,7 @@ namespace FNaFMP.Menu
 			{
 				LobbyStatusText.Status = "Lobby no longer exists";
 				Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
+				Core.DiscordJoinLobby = null;
 				return;
 			}
 			LobbyStatusText.Status = "Authenticating with lobby master...";
@@ -1556,10 +1621,11 @@ namespace FNaFMP.Menu
 					if (!success)
 					{
 						DenyReason = reader.ReadText(reader.ReadInt());
-						Event = "LobbyJoin";
+						Event = "Lobby Join";
 						LobbyStatusText.Status = "Join denied: "+DenyReason;
 						Utilities.Logger.Write(DualityLogger.LogLevel.WARN,"'{0}': {1}", Event, DenyReason);
 						Core.Client.LeaveChannel(Core.Client.joinedChannels[0]);
+						Core.DiscordJoinLobby = null;
 						join = false;
 					} else
 					{
@@ -1592,6 +1658,7 @@ namespace FNaFMP.Menu
 		}
 		public void OnActivate()
 		{
+			ServerID = Core.ServerID;
 			Core.Difficulty = Core.GameDifficulty.VeryEasy;
 			join = false;
 			ChannelList = null;
@@ -1607,32 +1674,54 @@ namespace FNaFMP.Menu
 				Core.Client.Event.ResponseLeaveChannel += OnChannelLeave;
 				Core.Client.Event.BinaryMessage += BinaryMessage;
 				Core.Client.Event.Error += Event_Error;
+				Core.Client.Event.Disconnect += Event_Disconnect;
 				if (!Core.Client.IsConnected)
 				{
-					string srv = null;
-					if(Core.Config != null && Core.Config.Settings != null)
+					if(Core.DiscordJoinLobby != null)
 					{
-						srv = Core.Config.Settings.Server;
+						ServerID = int.Parse(Core.DiscordJoinLobby.Split('@')[1]);
 					}
-					if (srv == null)
-						connect("lekkit.hopto.org");
-					else
+					if (Core.Hosts != null && Core.Hosts.Length > 0)
 					{
-						connect(srv);
+						Task.Delay(2).ContinueWith((t) =>
+						{
+							LobbyStatusText.Status = $"Connecting to server {ServerID + 1}...";
+							Utilities.Logger.Write($"Connecting to server {ServerID + 1}...");
+						});
+						connect(Core.Hosts[ServerID]);
+						host = ServerID + 1;
 					}
-					LobbyStatusText.Status = "Connecting to server...";
-					Utilities.Logger.Write("Connecting to server...");
 				}
 				else
 				{
-					if(Core.Client.joinedChannels.Count > 0)
+					if (Core.DiscordJoinLobby != null)
 					{
-						foreach(ClientChannel channel in Core.Client.joinedChannels)
-						{
-							Core.Client.LeaveChannel(channel);
-						}
+						Core.Client.Disconnect();
 					}
-					Core.Client.RequestChannelList();
+					else
+					{
+						if (Core.Client.joinedChannels.Count > 0)
+						{
+							foreach (ClientChannel channel in Core.Client.joinedChannels)
+							{
+								Core.Client.LeaveChannel(channel);
+							}
+						}
+						Core.Client.RequestChannelList();
+					}
+				}
+			}
+		}
+
+		private void Event_Disconnect(object sender, EventDisconnect e)
+		{
+			if (Core.DiscordJoinLobby != null)
+			{
+				ServerID = int.Parse(Core.DiscordJoinLobby.Split('@')[1]);
+				if (Core.Hosts != null && Core.Hosts.Length > 0)
+				{
+					connect(Core.Hosts[ServerID]);
+					host = ServerID + 1;
 				}
 			}
 		}
@@ -1645,21 +1734,27 @@ namespace FNaFMP.Menu
 				Core.Client.Connect(srv, 6121);
 		}
 
-		private bool error = false;
 		private int host = 0;
+		public static int ServerID = 0;
 		private void Event_Error(object sender, EventError e)
 		{
 			if(e.Error.ToLower().StartsWith("failed to connect"))
 			{
-				Logs.Game.WriteWarning("Failed to connect to server: {0}", e.Error);
-				Logs.Game.WriteWarning("Current host: {0}", Core.Config.Settings.Server);
-				LobbyStatusText.Status = "Failed to connect to server";
+				Utilities.Logger.Write(DualityLogger.LogLevel.WARN, e.Error);
+				LobbyStatusText.Status = $"Failed to connect to server {ServerID+1}";
 				if (Core.Hosts == null)
 					return;
-				error = true;
+				if(Core.Hosts.Length == host)
+				{
+					host = 0;
+					ServerID = -1;
+				}
+					
 				if(Core.Hosts.Length > 0 && Core.Hosts.Length > host)
 				{
-					LobbyStatusText.Status += "; Retrying...";
+					ServerID++;
+					LobbyStatusText.Status += $"; Trying server {ServerID+1}...";
+					Utilities.Logger.Write($"Connecting to server {ServerID + 1}...");
 					connect(Core.Hosts[host++]);
 				}
 			}
@@ -1667,6 +1762,7 @@ namespace FNaFMP.Menu
 
 		private void OnChannelLeave(object sender, EventResponseLeaveChannel e)
 		{
+			Core.DiscordJoinLobby = null;
 			join = false;
 			Core.Client.RequestChannelList();
 			ChannelList = null;
@@ -1686,6 +1782,7 @@ namespace FNaFMP.Menu
 				Core.Client.Event.ResponseJoinChannel -= OnChannelJoin;
 				Core.Client.Event.BinaryMessage -= BinaryMessage;
 				Core.Client.Event.Error -= Event_Error;
+				Core.Client.Event.Disconnect -= Event_Disconnect;
 			}
 		}
 	}
@@ -1797,7 +1894,7 @@ namespace FNaFMP.Menu
 				Point2 size = text.Size;
 				Vector3 pos = transform.Pos;
 				Vector2 mouse = DualityApp.Mouse.Pos;
-				if (DualityApp.Mouse.ButtonHit(MouseButton.Left))
+				if (DualityApp.Mouse.ButtonHit(MouseButton.Left) && Core.DiscordJoinLobby == null)
 				{
 					bool onbox = (mouse.X > pos.X && mouse.X < pos.X + size.X && mouse.Y > pos.Y && mouse.Y < pos.Y + size.Y);
 					input = onbox ? (int)Time.MainTimer.TotalMilliseconds + 500 : -1;
@@ -1867,7 +1964,7 @@ namespace FNaFMP.Menu
 				if (Name.Length >= maxlength)
 					return;
 				c = DualityApp.Keyboard.CharInput;
-				if (!c.Equals(""))
+				if (!c.Equals("") && !c.Equals("@"))
 				{
 					Name += c;
 					repeat = (int)Time.MainTimer.TotalMilliseconds + 500;
@@ -1900,6 +1997,10 @@ namespace FNaFMP.Menu
 			}
 			LobbyStatusText.Status = "Lobby created!";
 			Utilities.Logger.Write("Joined channel '{0}'",args.Channel);
+			Core.DRPC.UpdateSecrets(new DiscordRPC.Secrets
+			{
+				JoinSecret = args.Channel + "@" + LobbyListText.ServerID
+			});
 			if(scene != null)
 				Scene.SwitchTo(scene);
 		}

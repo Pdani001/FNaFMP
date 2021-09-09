@@ -26,7 +26,7 @@ namespace FNaFMP
 	public class Core : CorePlugin
 	{
 		private string ConfigPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\FNaFMultiplayer\\config1.yml";
-		public const string VERSION = "0.1.8";
+		public const string VERSION = "0.1.9";
 		public static readonly int[] PreventKeys = new int[] { 0 , 131 , 82, 53, 51, 49, 11, 7, 8 };
 
 		public static bool LoggedIn = false;
@@ -125,7 +125,7 @@ namespace FNaFMP
 		{
 			Settings = new Settings
 			{
-				Server = "server1.dark-wire.com:6121",
+				Server = 0,
 				FullscreenButton = 20
 			}
 		};
@@ -191,18 +191,6 @@ namespace FNaFMP
 		}
 
 		public static string[] Hosts { get; private set; }
-
-		internal static void LoadHosts()
-		{
-			Hosts = new string[0];
-			Logs.Core.Write("Loading server list");
-			WebClient web = new WebClient();
-			string hosts = web.DownloadString("https://pdani.hu/lacewing.php");
-			var result = JsonConvert.DeserializeObject<ServerHostList>(hosts);
-			Hosts = result.hosts;
-			Logs.Core.Write("Loaded {0} servers",Hosts.Length);
-			web.Dispose();
-		}
 
 		bool fullscreen = false;
 
@@ -302,20 +290,29 @@ namespace FNaFMP
 		/// </summary>
 		public static GameDifficulty Difficulty { get; set; }
 
+		public static int ServerID { get; set; }
+
 		public static bool IsEditor { get; private set; }
 
 		public static SoundInstance MenuBGM { get; set; }
 
 		//public static SoundEmitter GlobalEmitter { get; private set; }
+		public static string DiscordJoinLobby = null;
 
 		protected override void OnGameStarting()
 		{
+			Hosts = new string[3] {
+				"server1.dark-wire.com:6121",
+				"lekkit.hopto.org:6121",
+				"shadsoft.fr:6121"
+			};
 			MenuBGM = null;
 			LoggedIn = false;
 			Difficulty = GameDifficulty.VeryEasy;
 			fullscreen = DualityApp.UserData.WindowMode == ScreenMode.Fullscreen;
 			MaxWindowSize = DualityApp.AppData.ForcedRenderSize;
 			LoadConfig();
+			ServerID = Config.Settings.Server;
 			string[] args = Environment.GetCommandLineArgs();
 			string t = "";
 			foreach(string a in args)
@@ -330,9 +327,11 @@ namespace FNaFMP
 			}
 			//Console.WriteLine("args = [{0}]",t);
 			Logs.Core.Write("CommandLineArgs = [{0}]",t);
-			Logs.Core.Write("CurrentDirectory = [{0}]", System.Reflection.Assembly.GetEntryAssembly().Location);
+			Logs.Core.Write("CurrentDirectory = [{0}]", Assembly.GetEntryAssembly().Location);
 			if (IsEditor)
+			{
 				Logs.Core.Write("Currently running from the editor");
+			}
 			debug = args.Contains("--debug");
 			if (debug)
 			{
@@ -345,7 +344,7 @@ namespace FNaFMP
 			//if(Config.Settings.FullscreenButton)
 			if (PreventKeys.Contains(Config.Settings.FullscreenButton))
 			{
-				Config.Settings.FullscreenButton = 20;
+				Config.Settings.FullscreenButton = DefaultConfig.Settings.FullscreenButton;
 			}
 			lastfullscreen = Config.Settings.FullscreenButton;
 
@@ -363,6 +362,11 @@ namespace FNaFMP
 			{
 				Console.WriteLine("Received Update! {0}", e.Presence);
 			};*/
+			discord.OnJoin += (sender, e) =>
+			{
+				if (e.Secret.Contains("@"))
+					DiscordJoinLobby = e.Secret;
+			};
 			discord.Initialize();
 			discord.RegisterUriScheme();
 			discord.SetPresence(BuildPresence("In Menu", "", party.ToString(), 1, 1));

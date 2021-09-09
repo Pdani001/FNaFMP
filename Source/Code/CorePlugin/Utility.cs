@@ -10,10 +10,10 @@ using Duality.Components.Renderers;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Duality.Audio;
+using System.Threading.Tasks;
 
 namespace FNaFMP.Utility
 {
-	
 	public class Randomizer
 	{
 		private static Random GlobalRandom;
@@ -48,6 +48,60 @@ namespace FNaFMP.Utility
 		public static DualityLogger Logger
 		{
 			get { return logger; }
+		}
+
+		[DontSerialize] private static readonly Dictionary<int, System.Timers.Timer> Repeat = new Dictionary<int, System.Timers.Timer>();
+
+		public static void RunTaskLater(int delay, Action<Task> a)
+		{
+			Task.Delay(delay).ContinueWith(a);
+		}
+		public static void RunTaskAsync(Action a)
+		{
+			new System.Threading.Thread(()=> {
+				a?.Invoke();
+			}).Start();
+		}
+		public static int ScheduleRepeatingTask(int delay, int period, Action a)
+		{
+			System.Timers.Timer timer = new System.Timers.Timer(period);
+			timer.Elapsed += (_, arg) =>
+			{
+				a?.Invoke();
+			};
+			timer.AutoReset = true;
+			Task.Delay(delay).ContinueWith((t) =>
+			{
+				timer.Start();
+			});
+			int id = 0;
+			if(Repeat.Count > 0)
+			{
+				while (Repeat.ContainsKey(id))
+				{
+					id++;
+				}
+			}
+			Repeat.Add(id, timer);
+			return id;
+		}
+		public static void CancelTask(int id)
+		{
+			if (Repeat.ContainsKey(id))
+			{
+				Repeat[id].Stop();
+				Repeat[id].Close();
+				Repeat.Remove(id);
+			}
+		}
+		public static void CancelTasks()
+		{
+			foreach(KeyValuePair<int,System.Timers.Timer> pair in Repeat)
+			{
+				pair.Value.Stop();
+				pair.Value.Close();
+			}
+			Repeat.Clear();
 		}
 	}
 	public class DualityLogger
@@ -110,6 +164,18 @@ namespace FNaFMP.Utility
 			}
 			return false;
 		}
+		public SoundEmitter.Source GetSource(ContentRef<Sound> sound)
+		{
+			if (sound != null)
+			{
+				foreach (SoundEmitter.Source src in emitter.Sources)
+				{
+					if (src.Sound.Name.Equals(sound.Name))
+						return src;
+				}
+			}
+			return null;
+		}
 		public bool IsPlaying(ContentRef<Sound> sound, bool global = false)
 		{
 			if (sound != null)
@@ -124,10 +190,21 @@ namespace FNaFMP.Utility
 				}
 				else
 				{
-					foreach (SoundInstance src in GlobalSources)
+					List<SoundInstance> clone = new List<SoundInstance>(GlobalSources);
+					foreach (SoundInstance src in clone)
 					{
 						if (src.Sound.Name.Equals(sound.Name))
-							return true;
+						{
+							if(new List<SoundInstance>(DualityApp.Sound.Playing).Contains(src))
+							{
+								return true;
+							}
+							else
+							{
+								GlobalSources.Remove(src);
+								return false;
+							}
+						}
 					}
 				}
 			}

@@ -1548,7 +1548,8 @@ namespace FNaFMP.Office
 			}
 			if (SixAM.Started)
 				return;
-			GameController.SM.ChangeVolume("fan_sound", IsViewing ? 20 : 80);
+			//GameController.SM.ChangeVolume("fan_sound", IsViewing ? 20 : 80);
+			DisplayController.FanSource.Volume = IsViewing ? 0.2f : 0.8f;
 			TimeSpan span = Time.MainTimer;
 			int seconds = (int)span.TotalSeconds;
 			if (seconds - 3 >= lastTime)
@@ -1573,6 +1574,7 @@ namespace FNaFMP.Office
 	{
 		[EditorHintFlags(MemberFlags.Visible)]
 		private ContentRef<Sound> FanSound { get; set; }
+		public static SoundEmitter.Source FanSource { get; private set; }
 		[DontSerialize] private bool started = false;
 		[DontSerialize] private static float direction = 0;
 		public static float OfficeDirection
@@ -1587,8 +1589,14 @@ namespace FNaFMP.Office
 		[DontSerialize] public static bool movement = true;
 		private void SoundLoad(object sender, SoundManager e)
 		{
-			if(!e.IsPlaying(FanSound))
-				e.PlaySound(FanSound, true);
+			if (!e.IsPlaying(FanSound))
+			{
+				FanSource = e.PlaySound(FanSound, true);
+			}
+			else
+			{
+				FanSource = e.GetSource(FanSound);
+			}
 			SoundManager.OnLoad -= SoundLoad;
 		}
 		[DontSerialize] private static Camera camera = null;
@@ -1683,7 +1691,7 @@ namespace FNaFMP.Office
 			}
 		}
 
-		public void OnActivate()	//																							<- OFFICE STARTUP
+		public void OnActivate()	//																							<- OLD OFFICE STARTUP // Please use the GameController instead
 		{
 			bool test = false;
 			if(Core.SelfCharacter == Core.Character.None)
@@ -1698,6 +1706,7 @@ namespace FNaFMP.Office
 					Core.SelfCharacter = Core.Character.Guard;
 				}
 			}
+			FanSource = null;
 			SoundManager.OnLoad += SoundLoad;
 			direction = 0;
 			defaultX = Core.MaxWindowSize.X / 2;
@@ -1723,7 +1732,7 @@ namespace FNaFMP.Office
 			if (test)
 			{
 				//Positions.SetPosition(Core.Character.Bonnie, 22);
-				Positions.SetPosition(Core.Character.Chica, 22);
+				Positions.SetPosition(Core.Character.Chica, 21);
 			}
 
 			if (Core.SelfCharacter == Core.Character.Foxy)
@@ -1756,7 +1765,7 @@ namespace FNaFMP.Office
 			}
 			FlipButton.Disabled = Core.SelfCharacter != Core.Character.Guard;
 			started = true;
-		}	//																														END OF OFFICE STARTUP
+		}	//																														END OF OLD OFFICE STARTUP
 
 		public void OnDeactivate()
 		{
@@ -2015,6 +2024,46 @@ namespace FNaFMP.Office
 					limit = (int)Time.MainTimer.TotalMilliseconds + 200;
 				}
 			}
+		}
+	}
+
+	public class FreddyVoice : Component, ICmpInitializable
+	{
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Sound> KillSound { get; set; }
+		private static ContentRef<Sound> StaticKillSound = null;
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private List<ContentRef<Sound>> Sounds { get; set; }
+		private static List<ContentRef<Sound>> StaticList = null;
+		public static void PlayLaugh(int volume = 100)
+		{
+			if (volume < 0)
+				volume = 0;
+			if (volume > 200)
+				volume = 200;
+			if(StaticList != null && StaticList.Count > 0)
+			{
+				GameController.SM.PlaySound(StaticList[Randomizer.Random(StaticList.Count-1)]).Volume = volume / 100.00f;
+			}
+		}
+
+		public static void PlayKillSound()
+		{
+			if (StaticKillSound != null)
+				GameController.SM.PlaySound(StaticKillSound);
+		}
+
+		public void OnActivate()
+		{
+			StaticList = Sounds;
+			StaticKillSound = KillSound;
+		}
+
+		public void OnDeactivate()
+		{
+			StaticList = null;
+			StaticKillSound = null;
 		}
 	}
 
@@ -2355,12 +2404,17 @@ namespace FNaFMP.Office
 					jumped = (int)Time.MainTimer.TotalMilliseconds;
 					Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 27, (int)Core.SelfCharacter);
 				}
-				if (Positions.GetPosition(Core.Character.Freddy) == 21 && !GameController.Guard.IsViewing)
+				if (time <= 0 && CameraViewer.ViewNumber == 21 && !Jumpscared && GameController.Guard.IsViewing && Core.SelfCharacter == Core.Character.Freddy)
 				{
-					killer = Core.Character.Freddy;
 					jumped = (int)Time.MainTimer.TotalMilliseconds;
+					Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 27, (int)Core.SelfCharacter);
 				}
-				if (Positions.GetPosition(Core.Character.Foxy) == 21)
+				if (time <= 5 && CameraViewer.ViewNumber == 21 && !Jumpscared && !GameController.Guard.IsViewing && Core.SelfCharacter == Core.Character.Freddy)
+				{
+					jumped = (int)Time.MainTimer.TotalMilliseconds;
+					Core.Client.SendNumberChannelMessage(Core.Client.joinedChannels[0].Name, 27, (int)Core.SelfCharacter);
+				}
+				if (Positions.GetPosition(Core.Character.Foxy) == 21 && !Jumpscared)
 				{
 					killer = Core.Character.Foxy;
 					jumped = (int)Time.MainTimer.TotalMilliseconds;
@@ -2372,13 +2426,13 @@ namespace FNaFMP.Office
 					return;
 				if (!Jumpscared)
 				{
-					if (Positions.GetPosition(Core.Character.Freddy) == 21 && !CameraViewer.IsViewing)
+					/*if (Positions.GetPosition(Core.Character.Freddy) == 21 && !CameraViewer.IsViewing)
 					{
 						killer = Core.Character.Freddy;
 						jumped = (int)Time.MainTimer.TotalMilliseconds;
 						CameraAnimator.DisableCamera = true;
 						BeginJumpscare(killer);
-					}
+					}*/
 					if (Positions.GetPosition(Core.Character.Foxy) == 21)
 					{
 						if (CameraViewer.IsViewing)
@@ -2958,6 +3012,13 @@ namespace FNaFMP.Office
 		[EditorHintFlags(MemberFlags.Visible)]
 		private List<ContentRef<Sound>> MoveSounds { get; set; }
 
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Sound> BGAmbience { get; set; }
+
+		[EditorHintFlags(MemberFlags.Visible)]
+		private ContentRef<Sound> RobotAmbience { get; set; }
+		public static SoundEmitter.Source RobotAmbienceSource { get; private set; }
+
 		[DontSerialize] private static int usage = 1;
 		[DontSerialize] private static int power = 999;
 		[DontSerialize] private Timer GuardTimer;
@@ -2991,6 +3052,14 @@ namespace FNaFMP.Office
 		private void SoundLoad(object sender, SoundManager e)
 		{
 			SM = e;
+			if (!SM.IsPlaying(BGAmbience))
+				SM.PlaySound(BGAmbience, true).Volume = 0.5f;
+			if(!SM.IsPlaying(RobotAmbience))
+			{
+				RobotAmbienceSource = SM.PlaySound(RobotAmbience,true);
+				if(RobotAmbienceSource != null)
+					RobotAmbienceSource.Volume = 0f;
+			}
 			SoundManager.OnLoad -= SoundLoad;
 		}
 
@@ -3068,6 +3137,7 @@ namespace FNaFMP.Office
 		private long frames = -1;
 		public void OnActivate()
 		{
+			RobotAmbienceSource = null;
 			frames = Time.FrameCount;
 			SoundManager.OnLoad += SoundLoad;
 			lastmove = -1;
@@ -3368,6 +3438,56 @@ namespace FNaFMP.Office
 				}
 				Positions.SetPosition(character, position);
 				Positions.SetUser(character, e.PeerID);
+				if (character == Core.Character.Freddy)
+				{
+					int vol = 10;
+					if(Core.SelfCharacter == Core.Character.Guard)
+					{
+						switch (position)
+						{
+							case 1:
+								vol = 15;
+								break;
+							case 10:
+								vol = 20;
+								break;
+							case 9:
+								vol = 30;
+								break;
+							case 6:
+								vol = 40;
+								break;
+							case 7:
+								vol = 60;
+								break;
+							case 21:
+								vol = 80;
+								FreddyVoice.PlayKillSound();
+								break;
+						}
+					}
+					FreddyVoice.PlayLaugh(vol);
+				}
+				if(position >= 21 && RobotAmbienceSource != null)
+					RobotAmbienceSource.Volume = 1f;
+				else
+				{
+					if(RobotAmbienceSource.Volume < 1f)
+					{
+						float vol = 0f;
+						if (Positions.GetPosition(Core.Character.Bonnie) >= 3)
+							vol = 0.3f;
+						if(Positions.GetPosition(Core.Character.Chica) >= 6 && Positions.GetPosition(Core.Character.Chica) <= 7)
+						{
+							vol = vol > 0f ? 0.5f : 0.3f;
+						}
+						if(Positions.GetPosition(Core.Character.Foxy) > 2)
+						{
+							vol = vol > 0f ? vol > 0.3f ? 0.75f : 0.5f : 0.3f;
+						}
+						RobotAmbienceSource.Volume = vol;
+					}
+				}
 				if (!Players.Contains(e.PeerID))
 					Players.Add(e.PeerID);
 			}
@@ -3408,10 +3528,11 @@ namespace FNaFMP.Office
 		{
 			if (Core.SelfCharacter == Core.Character.Guard)
 			{
-				if(frames+Time.FramesPerSecond < Time.FrameCount && !begin)
+				if(frames+10 < Time.FrameCount && !begin)
 				{
 					begin = true;
-					ExtraPowerTimer.Enabled = true;
+					if(ExtraPowerTimer != null)
+						ExtraPowerTimer.Enabled = true;
 					PowerTimer.Enabled = true;
 					GuardTimer.Enabled = true;
 				}

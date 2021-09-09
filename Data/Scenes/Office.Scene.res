@@ -813,7 +813,31 @@
               <contentPath dataType="String">Data\Office\FreddyNose.Sound.res</contentPath>
             </sound>
           </item>
+          <item dataType="Struct" type="FNaFMP.Office.FreddyVoice" id="4023774288">
+            <_x003C_KillSound_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+              <contentPath dataType="String">Data\Camera\freddy\whispering2.Sound.res</contentPath>
+            </_x003C_KillSound_x003E_k__BackingField>
+            <_x003C_Sounds_x003E_k__BackingField dataType="Struct" type="System.Collections.Generic.List`1[[Duality.ContentRef`1[[Duality.Resources.Sound]]]]" id="1186429336">
+              <_items dataType="Array" type="Duality.ContentRef`1[[Duality.Resources.Sound]][]" id="1222245420" length="4">
+                <item dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+                  <contentPath dataType="String">Data\Camera\freddy\laugh1.Sound.res</contentPath>
+                </item>
+                <item dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+                  <contentPath dataType="String">Data\Camera\freddy\laugh2.Sound.res</contentPath>
+                </item>
+                <item dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+                  <contentPath dataType="String">Data\Camera\freddy\laugh3.Sound.res</contentPath>
+                </item>
+              </_items>
+              <_size dataType="Int">3</_size>
+            </_x003C_Sounds_x003E_k__BackingField>
+            <active dataType="Bool">true</active>
+            <gameobj dataType="ObjectRef">194760272</gameobj>
+          </item>
           <item dataType="Struct" type="FNaFMP.Office.GameController" id="1677696842">
+            <_x003C_BGAmbience_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+              <contentPath dataType="String">Data\Office\ColdPresc B.Sound.res</contentPath>
+            </_x003C_BGAmbience_x003E_k__BackingField>
             <_x003C_Menu_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Scene]]">
               <contentPath dataType="String">Data\Scenes\Lobbies.Scene.res</contentPath>
             </_x003C_Menu_x003E_k__BackingField>
@@ -831,8 +855,13 @@
               </_items>
               <_size dataType="Int">3</_size>
             </_x003C_MoveSounds_x003E_k__BackingField>
+            <_x003C_RobotAmbience_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+              <contentPath dataType="String">Data\Office\EerieAmbience.Sound.res</contentPath>
+            </_x003C_RobotAmbience_x003E_k__BackingField>
             <active dataType="Bool">true</active>
+            <frames dataType="Long">184910</frames>
             <gameobj dataType="ObjectRef">194760272</gameobj>
+            <GameStartCheck dataType="Long">-1</GameStartCheck>
           </item>
           <item dataType="Struct" type="FNaFMP.Office.JumpscareManager" id="3043278311">
             <_x003C_AfterJump_x003E_k__BackingField dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Scene]]">
@@ -900,10 +929,12 @@
                 <keys dataType="Array" type="System.Object[]" id="3901545841">
                   <item dataType="Enum" type="FNaFMP.Core+Character" name="Bonnie" value="2" />
                   <item dataType="Enum" type="FNaFMP.Core+Character" name="Chica" value="3" />
+                  <item dataType="Enum" type="FNaFMP.Core+Character" name="Foxy" value="4" />
                 </keys>
                 <values dataType="Array" type="System.Object[]" id="753197280">
                   <item dataType="Int">1</item>
                   <item dataType="Int">1</item>
+                  <item dataType="Int">2</item>
                 </values>
               </body>
             </_x003C_jumpscaretime_x003E_k__BackingField>
@@ -1987,7 +2018,7 @@
             </right>
           </item>
         </_items>
-        <_size dataType="Int">11</_size>
+        <_size dataType="Int">12</_size>
       </compList>
       <compMap dataType="Struct" type="System.Collections.Generic.Dictionary`2[[System.Type],[Duality.Component]]" id="1548074518" surrogate="true">
         <header />
@@ -2004,6 +2035,7 @@
             <item dataType="Type" id="1600618506" value="FNaFMP.Office.JumpscareManager" />
             <item dataType="Type" id="3246530316" value="FNaFMP.Office.FoxyListener" />
             <item dataType="Type" id="131219686" value="FNaFMP.Office.FreddyMusicbox" />
+            <item dataType="Type" id="2267380856" value="FNaFMP.Office.FreddyVoice" />
           </keys>
           <values dataType="Array" type="System.Object[]" id="2117106766">
             <item dataType="ObjectRef">252037490</item>
@@ -2017,6 +2049,7 @@
             <item dataType="ObjectRef">3043278311</item>
             <item dataType="ObjectRef">3963297672</item>
             <item dataType="ObjectRef">2891994140</item>
+            <item dataType="ObjectRef">4023774288</item>
           </values>
         </body>
       </compMap>
@@ -2145,6 +2178,10 @@
             <scale dataType="Float">1</scale>
             <scaleAbs dataType="Float">1</scaleAbs>
           </item>
+          <item dataType="Struct" type="Duality.Components.VelocityTracker" id="4213648085">
+            <active dataType="Bool">true</active>
+            <gameobj dataType="ObjectRef">2142513618</gameobj>
+          </item>
           <item dataType="Struct" type="Duality.Components.Renderers.SpriteRenderer" id="3611132898">
             <active dataType="Bool">true</active>
             <colorTint dataType="Struct" type="Duality.Drawing.ColorRgba">
@@ -2170,10 +2207,6 @@
             </sharedMat>
             <spriteIndex dataType="Int">0</spriteIndex>
             <visibilityGroup dataType="Enum" type="Duality.Drawing.VisibilityFlag" name="Group0" value="1" />
-          </item>
-          <item dataType="Struct" type="Duality.Components.VelocityTracker" id="4213648085">
-            <active dataType="Bool">true</active>
-            <gameobj dataType="ObjectRef">2142513618</gameobj>
           </item>
           <item dataType="Struct" type="Duality.Components.Renderers.SpriteAnimator" id="1882710158">
             <active dataType="Bool">true</active>
@@ -2413,7 +2446,7 @@
             <active dataType="Bool">true</active>
             <gameobj dataType="ObjectRef">436961546</gameobj>
             <sources dataType="Struct" type="System.Collections.Generic.List`1[[Duality.Components.SoundEmitter+Source]]" id="1474143449">
-              <_items dataType="Array" type="Duality.Components.SoundEmitter+Source[]" id="4039163342" length="4">
+              <_items dataType="Array" type="Duality.Components.SoundEmitter+Source[]" id="4039163342" length="8">
                 <item dataType="Struct" type="Duality.Components.SoundEmitter+Source" id="2735004112">
                   <looped dataType="Bool">true</looped>
                   <lowpass dataType="Float">1</lowpass>
@@ -2425,19 +2458,45 @@
                   </sound>
                   <volume dataType="Float">1</volume>
                 </item>
+                <item dataType="Struct" type="Duality.Components.SoundEmitter+Source" id="4039503470">
+                  <looped dataType="Bool">true</looped>
+                  <lowpass dataType="Float">1</lowpass>
+                  <offset dataType="Struct" type="Duality.Vector3" />
+                  <paused dataType="Bool">false</paused>
+                  <pitch dataType="Float">1</pitch>
+                  <sound dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+                    <contentPath dataType="String">Data\Office\ColdPresc B.Sound.res</contentPath>
+                  </sound>
+                  <volume dataType="Float">0.5</volume>
+                </item>
+                <item dataType="Struct" type="Duality.Components.SoundEmitter+Source" id="3551515052">
+                  <looped dataType="Bool">true</looped>
+                  <lowpass dataType="Float">1</lowpass>
+                  <offset dataType="Struct" type="Duality.Vector3" />
+                  <paused dataType="Bool">false</paused>
+                  <pitch dataType="Float">1</pitch>
+                  <sound dataType="Struct" type="Duality.ContentRef`1[[Duality.Resources.Sound]]">
+                    <contentPath dataType="String">Data\Office\EerieAmbience.Sound.res</contentPath>
+                  </sound>
+                  <volume dataType="Float">0</volume>
+                </item>
               </_items>
-              <_size dataType="Int">1</_size>
+              <_size dataType="Int">3</_size>
             </sources>
           </item>
           <item dataType="Struct" type="FNaFMP.Utility.SoundManager" id="1934141442">
             <active dataType="Bool">true</active>
             <emitter dataType="ObjectRef">2657773429</emitter>
             <gameobj dataType="ObjectRef">436961546</gameobj>
-            <list dataType="ObjectRef">1474143449</list>
-            <nonloop dataType="Struct" type="System.Collections.Generic.List`1[[Duality.Components.SoundEmitter+Source]]" id="778736562">
-              <_items dataType="Array" type="Duality.Components.SoundEmitter+Source[]" id="3170629328" length="0" />
+            <GlobalNonloop dataType="Struct" type="System.Collections.Generic.List`1[[Duality.Audio.SoundInstance]]" id="778736562">
+              <_items dataType="Array" type="Duality.Audio.SoundInstance[]" id="3170629328" length="0" />
               <_size dataType="Int">0</_size>
-            </nonloop>
+            </GlobalNonloop>
+            <list dataType="ObjectRef">1474143449</list>
+            <LocalNonloop dataType="Struct" type="System.Collections.Generic.List`1[[Duality.Components.SoundEmitter+Source]]" id="3613835850">
+              <_items dataType="Array" type="Duality.Components.SoundEmitter+Source[]" id="3720577704" length="0" />
+              <_size dataType="Int">0</_size>
+            </LocalNonloop>
             <transform dataType="ObjectRef">494238764</transform>
           </item>
         </_items>

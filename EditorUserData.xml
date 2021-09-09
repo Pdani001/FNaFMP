@@ -312,7 +312,14 @@
             <NodeID>PropertiesDuality.GameObject/GamejoltMenuFNaFMP.Menu.GamejoltMenu/</NodeID>
             <NodeID>PropertiesDuality.GameObject/PasswordMenuFNaFMP.Menu.PasswordMenu/</NodeID>
             <NodeID>PropertiesDuality.GameObject/CreditsDisplayFNaFMP.Menu.CreditsDisplay/</NodeID>
+            <NodeID>PropertiesDuality.GameObject/JumpscareManagerFNaFMP.Office.JumpscareManager/</NodeID>
+            <NodeID>PropertiesDuality.GameObject/SoundEmitterDuality.Components.SoundEmitter/Sources[0]Duality.Components.SoundEmitter+Source/</NodeID>
+            <NodeID>PropertiesDuality.GameObject/ChatBoxFNaFMP.Select.ChatBox/</NodeID>
+            <NodeID>PropertiesDuality.GameObject/SoundEmitterDuality.Components.SoundEmitter/</NodeID>
             <NodeID>PropertiesDuality.GameObject/GameControllerFNaFMP.Office.GameController/</NodeID>
+            <NodeID>PropertiesDuality.GameObject/FreddyVoiceFNaFMP.Office.FreddyVoice/</NodeID>
+            <NodeID>PropertiesDuality.GameObject/SoundEmitterDuality.Components.SoundEmitter/Sources[1]Duality.Components.SoundEmitter+Source/</NodeID>
+            <NodeID>PropertiesDuality.GameObject/SoundEmitterDuality.Components.SoundEmitter/Sources[2]Duality.Components.SoundEmitter+Source/</NodeID>
           </ExpandedNodes>
         </ExpandState>
       </ObjectInspector>
@@ -331,7 +338,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--DockPanel configuration file. Author: Weifen Luo, all rights reserved.-->
 <!--!!! AUTOMATICALLY GENERATED FILE. DO NOT MODIFY !!!-->
-<DockPanel FormatVersion="1.0" DockLeftPortion="0.25" DockRightPortion="0.332552083333333" DockTopPortion="0.25" DockBottomPortion="0.25" ActiveDocumentPane="5" ActivePane="5">
+<DockPanel FormatVersion="1.0" DockLeftPortion="0.25" DockRightPortion="0.332552083333333" DockTopPortion="0.25" DockBottomPortion="0.25" ActiveDocumentPane="5" ActivePane="0">
   <Contents Count="6">
     <Content ID="0" PersistString="Duality.Editor.Plugins.CamView.CamView" AutoHidePortion="0.25" IsHidden="False" IsFloat="False" />
     <Content ID="1" PersistString="Duality.Editor.Plugins.ProjectView.ProjectFolderView" AutoHidePortion="0.332552083333333" IsHidden="False" IsFloat="False" />

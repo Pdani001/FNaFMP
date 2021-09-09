@@ -47,7 +47,6 @@ namespace FNaFMP.Startup
 						}
 					}
 				}
-				Core.LoadHosts();
 				time = (long)Time.MainTimer.TotalMilliseconds;
 			}).Start();
 		}
