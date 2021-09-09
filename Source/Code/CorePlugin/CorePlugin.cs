@@ -90,7 +90,8 @@ namespace FNaFMP
 				State = State,
 				Assets = new Assets()
 				{
-					LargeImageKey = "icon"
+					LargeImageKey = "icon",
+					LargeImageText = VERSION
 				},
 				Timestamps = new Timestamps()
 				{
@@ -158,9 +159,17 @@ namespace FNaFMP
 			}
 			else
 			{
-				StreamReader input = new StreamReader(ConfigPath);
-				config = (RootConfig)ser.Deserialize(input, typeof(RootConfig));
-				if (config == null)
+				try
+				{
+					StreamReader input = new StreamReader(ConfigPath);
+					config = (RootConfig)ser.Deserialize(input, typeof(RootConfig));
+					if (config == null)
+					{
+						File.Delete(ConfigPath);
+						LoadConfig();
+					}
+				}
+				catch (Exception)
 				{
 					File.Delete(ConfigPath);
 					LoadConfig();
