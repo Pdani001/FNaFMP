@@ -188,12 +188,12 @@ namespace FNaFMP.Select
 						peer.SendBinaryMessage(Core.Client, 2, Core.Client.joinedChannels[0], message.ToArray());
 					}
 					SendExtraLobbyInfo(peer);
-					Core.DRPC.UpdatePartySize(Players.Count);
+					Core.DRPC.UpdatePartySize(Players.Count,5);
 				}
 				else
 				{
 					Players.Add(e.PeerID);
-					Core.DRPC.UpdatePartySize(Players.Count);
+					Core.DRPC.UpdatePartySize(Players.Count,5);
 				}
 			}
 			if(e.SubChannel == 14)
